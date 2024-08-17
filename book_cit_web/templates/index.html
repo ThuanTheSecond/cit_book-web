@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+
+{%block navbar%}
+						<li><font color="red";>Welcome,{{request.session.loginuser}}</font></li>
+						<li><a href="{% url 'index'%}">logout</a></li>              
+{%endblock%}
+
+{% block content %}
+
+    {% comment %} {% include 'navbar.html' %}
+    <h1>Home</h1>    
+    {% for book in books  %}
+    <ul>
+        <li>Title: {{ book.book_title }}</li>
+        <li><img src="{{ book.bookImage.url}}" alt="img here"></li>
+    </ul>  
+    {% endfor %}  {% endcomment %}
+
+    <script></script>
+    <!-- /TOP HEADER -->
+    </header>
+    <!-- MAIN HEADER -->
+		<div id="header">
+				<!-- container -->
+				<div class="container">
+					  <!-- row -->
+					  <div class="row">
+						    <!-- LOGO -->
+						    <div class="col-md-3">
+							      <div class="header-logo">
+								        <a href="#" class="logo">
+									      <img  style="border-radius: 50%; margin-top: 15%"  src="/static/img/logob.png" alt="error"></a>
+
+							      </div>
+							      <br/>
+							      <span><h3 style="color: #FFFFFF">YourReads</h3></span>
+						    </div>
+{% endblock %}
