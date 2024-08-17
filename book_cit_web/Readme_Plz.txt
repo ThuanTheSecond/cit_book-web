@@ -3,3 +3,4 @@
 
 B1: Mở cả thư mục bằng vscode, bật terminal của nó lên
 B2: chạy code pip install -r requirements.txt
+test push
