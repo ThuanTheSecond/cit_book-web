@@ -3,6 +3,7 @@ from .models import Book, Rating, Book_Topic
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from .forms import searchForm
+from .utils import normalize_vietnamese
 
 
 # Logic xử lí
@@ -25,7 +26,8 @@ def rateBook(userid, bookid, point):
 # Ajax Response
 def searchPost(request):
     skey = request.POST.get('skey')
-
+    # Loại bỏ dấu câu của skey
+    skey = normalize_vietnamese(skey)
     if len(skey)>=3:
         # sử dùng hàm __unaccent để có thể truy xuất băng tiếng việt không dấu
         books = Book.objects.filter(book_title__unaccent__icontains=skey)[:5]
@@ -35,6 +37,9 @@ def searchPost(request):
             for book in books:
                 context+= f'<li><a href="/book/detail/id={book.book_id}">{ book.book_title }</a></li>'
             return HttpResponse(context)
+        
+    # có khả năng lỗi ở đây, lưu ý chọn giá trị return phù hợp
+    return 
 
 def searchTest(request):
     form = searchForm()
