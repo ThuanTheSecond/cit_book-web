@@ -19,13 +19,6 @@ def rateBook(userid, bookid, point):
     rate.rating = point
     rate.save()
 
-# def search(request):
-#     if request.POST == 'POST':
-#         sdata = {}
-#         if 'sbutton' in request.POST:
-#             print('hello')
-#             match request.POST.get('stype'):
-#                 case 0: #case title
                     
         
 # Create your views here.

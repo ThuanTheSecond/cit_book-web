@@ -1,151 +1,59 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>CIT - Book recommender system</title>
-    
-    <!-- Google font -->
-		<link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet">
+  <title>CIT - Book recommender system</title>
 
-    <!--Bootstrap-->
-		<link type="text/css" rel="stylesheet" href="{% static 'Css/bootstrap.min.css' %}"/>
+  <!-- Google font -->
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet">
 
-    <!-- Slick -->
-		<link type="text/css" rel="stylesheet" href="{% static 'Css/slick.css' %}"/>
-		<link type="text/css" rel="stylesheet" href="{% static 'Css/slick-theme.css' %}"/>
+  <!--Bootstrap-->
+  <link type="text/css" rel="stylesheet" href="{% static 'Css/bootstrap.min.css' %}" />
 
-		<!-- nouislider -->
-		<link type="text/css" rel="stylesheet" href="{% static 'Css/nouislider.min.css' %}"/>
+  <!-- Slick -->
+  <link type="text/css" rel="stylesheet" href="{% static 'Css/slick.css' %}" />
+  <link type="text/css" rel="stylesheet" href="{% static 'Css/slick-theme.css' %}" />
 
-		<!-- Font Awesome Icon -->
-		<link rel="stylesheet" href="{% static 'Css/font-awesome.min.css' %}">
+  <!-- nouislider -->
+  <link type="text/css" rel="stylesheet" href="{% static 'Css/nouislider.min.css' %}" />
 
-		<!-- Custom stlylesheet -->
-        <link type="text/css" rel="stylesheet" href="{% static 'Css/style.css' %}"/>
-        <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.css"/> 
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css"/>
-        {% block pack %}
-        {% endblock %}
+  <!-- Font Awesome Icon -->
+  <link rel="stylesheet" href="{% static 'Css/font-awesome.min.css' %}">
+
+  <!-- Custom stlylesheet -->
+  <link type="text/css" rel="stylesheet" href="{% static 'Css/style.css' %}" />
+  <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" />
+  <!-- Add bonus component for head -->
+  {% block pack %}
+  {% endblock %}
 </head>
 
 <body>
-
   <!-- HEADER -->
-  <header>
-      <!-- TOP HEADER -->
-      <div id="top-header">
-          <div class="container">
-              <ul class="header-links pull-left">
-                  <li><a href="/">CIT LIBRARY</li>
-                  <li><a href="#"><i class="fa fa-phone"></i> +91 911111113664</a></li>
-                  <li><a href="#"><i class="fa fa-envelope-o"></i> Khang1@gmail.com</a></li>
-                  <li><a href="#"><i class="fa fa-map-marker"></i> Ninh Kieu, Can Tho</a></li>
-              </ul>
-              <ul class="header-links pull-right">
-                  <li class="active"><a href="{% url 'index' %}">Home</a></li>
-                  <!--<li><a href="#"><i class="fa fa-dollar"></i> USD</a></li>-->
-                  {% block navbar %}
-                  {% endblock %}
+  {% include 'header.html' %}
 
-                    
-              </ul>
-          </div>
-      </div>
 
-    {% block content %}
-    {% endblock %}
+  {% block content %}
+  {% endblock %}
 
-    <footer id="footer">
-      <!-- top footer -->
-      <div class="section">
-          <!-- container -->
-          <div class="container">
-              <!-- row -->
-              <div class="row">
-                  
-                      <div class="footer">
-                          <h3 class="footer-title">About Us</h3>
-                          <p>This site is for book Recommendation. On the basis of user's history it recommends the book. Users can also search and rate the book. We made this site as our college term project. It will be upgraded in future. </p>
-                          <ul class="footer-links">
-                              <li><a href="#"><i class="fa fa-map-marker"></i>Collage Road, Nadiad, Gujarat, India.</a></li>
-                              <li><a href="#"><i class="fa fa-phone"></i>+91 9106473664</a></li>
-                              <li><a href="#"><i class="fa fa-envelope-o"></i>truptidl0101@gmail.com</a></li>
-                          </ul>
-                      </div>
-              </div>
-          <!-- /row -->
-          </div>
-      <!-- /container -->
-      </div>
-      <!-- /top footer -->
+  
+  <!-- FOOTER -->
+  {% include 'footer.html' %}
 
-      <!-- bottom footer -->
-      <div id="bottom-footer" class="section">
-          <div class="container">
-              <!-- row -->
-              <div class="row">
-                  <div class="col-md-12 text-center">
-                            
-                      <span class="copyright">
-                          <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                          Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This website template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">TDRCE Team</a> and website back-end is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by Trupti Langalia.
-                          <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                      </span>
-                  </div>
-              </div>
-          </div>
-      </div>
-    </footer>
-
-        <!-- jQuery Plugins -->
-        <script src="{% static 'Js/jquery.min.js' %}"></script>
-        <script src="{% static 'Js/bootstrap.min.js'%}"></script>
-        <script src="{% static 'Js/slick.min.js'%}"></script>
-        <script src="{% static 'Js/nouislider.min.js'%}"></script>
-        <script src="{% static 'Js/jquery.zoom.min.js'%}%"></script>
-        <script src="{% static 'Js/main.js'%}"></script>
-
-    </body>
-</html>
-  <!--
-     <header class="site-header">
-         <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
-           <div class="container">
-             <a </a>
-             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
-               <span class="navbar-toggler-icon"></span>
-             </button>
-             <div class="collapse navbar-collapse" id="navbarToggle">
-                 {% if current_user.is_authenticated %}
-                   <div class="navbar-nav mr-auto">
-                   <a class="nav-item nav-link" href="">Home</a>
-                   <a class="nav-item nav-link" href="#">Upload Book</a>
-                   <a class="nav-item nav-link" href="#">Delete Book</a>
-                   <a class="nav-item nav-link" href="#">Contact Us</a>
-                   </div>
-                Navbar Right Side 
-                   <div class="navbar-nav">
-                   <a class="nav-item nav-link" href="#">Account</a>
-                   <a class="nav-item nav-link" href="#">Logout</a>
-                   </div>
-               {% else %}
-                   <div class="navbar-nav mr-auto">
-                   <a class="nav-item nav-link" href="">Home</a>
-                   </div>
-                   <div class="navbar-nav">      
-                     <a class="nav-item nav-link" href="/login">Login</a>
-                     <a class="nav-item nav-link" href="/register">Register</a>
-                   </div>
-               {% endif %}
-               </div>
-             </div>
-           </div>
-         </nav>
-       </header>-->
+  <!-- jQuery Plugins -->
+  <script src="{% static 'Js/jquery.min.js' %}"></script>
+  <script src="{% static 'Js/bootstrap.min.js'%}"></script>
+  <script src="{% static 'Js/slick.min.js'%}"></script>
+  <script src="{% static 'Js/nouislider.min.js'%}"></script>
+  <script src="{% static 'Js/jquery.zoom.min.js'%}%"></script>
+  <script src="{% static 'Js/main.js'%}"></script>
 </body>
+
 </html>
