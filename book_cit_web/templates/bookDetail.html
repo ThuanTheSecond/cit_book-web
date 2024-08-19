@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>detail</title>
+</head>
+<body>
+    <h2>Book Detail</h2>
+    <ul>
+        <li>Title: {{detail.book_title}}</li>
+        <li>Author: {{detail.book_author}}</li>
+        <li>Position: {{ detail.book_position }}</li>
+        <li>Publish: {{ detail.book_publish }}</li>
+        <li><img src= "{{ detail.bookImage.url }}" alt="image of manga {{myManga.title}}"></li>
+    </ul>
+    <div>
+        <h3>The loai</h3>
+        
+        {% for topic in topicList %}
+            <a href="">{{ topic.topic_id.topic_name }}</a>
+            <br>
+        {% endfor %}
+            
+    </div>
+   
+</body>
+</html>

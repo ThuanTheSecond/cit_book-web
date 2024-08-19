@@ -1,5 +1,6 @@
 from django.db import models
 # from account.models import user
+from django.db.models import Transform, CharField
 from django.contrib.auth.models import User
 import datetime
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -59,3 +60,10 @@ class FavList(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(default= datetime.datetime.now())
     is_active = models.BooleanField(default=True)
+
+# Dùng để thêm extension Unaccent của postgresql
+class Unaccent(Transform):
+    lookup_name = 'unaccent'
+    function = 'unaccent'
+
+CharField.register_lookup(Unaccent)

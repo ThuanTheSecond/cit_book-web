@@ -102,15 +102,20 @@
       </div>
     </footer>
 
-        <!-- jQuery Plugins -->
-        <script src="{% static 'Js/jquery.min.js' %}"></script>
-        <script src="{% static 'Js/bootstrap.min.js'%}"></script>
-        <script src="{% static 'Js/slick.min.js'%}"></script>
-        <script src="{% static 'Js/nouislider.min.js'%}"></script>
-        <script src="{% static 'Js/jquery.zoom.min.js'%}%"></script>
-        <script src="{% static 'Js/main.js'%}"></script>
-
-    </body>
+    
+  </body>
+  
+  {% block scripts %}
+    <!-- jQuery Plugins -->
+    <script src="{% static 'Js/jquery.min.js' %}"></script>
+    <script src="{% static 'Js/bootstrap.min.js'%}"></script>
+    <script src="{% static 'Js/slick.min.js'%}"></script>
+    <script src="{% static 'Js/nouislider.min.js'%}"></script>
+    <script src="{% static 'Js/jquery.zoom.min.js'%}%"></script>
+    <script src="{% static 'Js/main.js'%}"></script>
+  
+  {% endblock scripts %}
+      
 </html>
   <!--
      <header class="site-header">

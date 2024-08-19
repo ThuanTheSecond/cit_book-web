@@ -7,15 +7,8 @@
 {%endblock%}
 
 {% block content %}
-
-    {% comment %} {% include 'navbar.html' %}
-    <h1>Home</h1>    
-    {% for book in books  %}
-    <ul>
-        <li>Title: {{ book.book_title }}</li>
-        <li><img src="{{ book.bookImage.url}}" alt="img here"></li>
-    </ul>  
-    {% endfor %}  {% endcomment %}
+    {% comment %} {% include 'navbar.html' %} {% endcomment %}  
+    
 
     <script></script>
     <!-- /TOP HEADER -->
@@ -36,4 +29,14 @@
 							      <br/>
 							      <span><h3 style="color: #FFFFFF">YourReads</h3></span>
 						    </div>
+						<div class="row">
+							{% for book in bookList.popular  %}
+							<ul>
+								<li>Title: {{ book.book_title }}</li>
+								<li><img src="{{ book.bookImage.url}}" alt="img here"></li>
+							</ul>  
+							{% endfor %} 
+						</div>
+
+							 
 {% endblock %}
