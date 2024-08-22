@@ -3,8 +3,7 @@ from .models import Book, Rating, Book_Topic
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from .forms import searchForm
-from .utils import normalize_vietnamese
-from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from .utils import normalize_vietnamese, pagePaginator
 from django.shortcuts import redirect
 
 # Logic xử lí
@@ -84,18 +83,7 @@ def search(request, skey):
     skey = normalize_vietnamese(skey)
     books = Book.objects.filter(book_title__unaccent__icontains=skey)
     # pagnition
-    paginator = Paginator(books, 7)
-    
-    page_number = request.GET.get('page')
-    try:
-        page_obj = paginator.get_page(page_number)
-    except PageNotAnInteger:
-        # nếu số trang không phải số nguyên, load trang đầu tiên
-        page_obj = paginator.page(1)
-    except EmptyPage:
-        # Nếu vượt qua trang cuối cùng, load trang cuối cùng
-        page_obj = paginator.page(paginator.num_pages)
-          
+    page_obj = pagePaginator(request, books)
     context = {
         'form': form,
         'page_obj' : page_obj,

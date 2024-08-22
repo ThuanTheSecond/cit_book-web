@@ -5,7 +5,7 @@
 {%block navbar%}
 	<li><font color="red";>Welcome,{{request.session.loginuser}}</font></li>
 	<li><a href="{% url 'index'%}">logout</a></li> 
-	  {% comment %} Thanh tim kiem  {% endcomment %}
+	{% comment %} Đây là form của thanh tìm kiếm {% endcomment %}
 	<form action="{% url 'search_slug' %}", method='GET'>
 		{% csrf_token %}
 		{{ forms.searchbar.skey.label }}
@@ -45,5 +45,6 @@
 {% endblock %}
 
 {% block scripts %}
+	{% comment %} Them vao thu vien HTMX Để chạy ajax {% endcomment %}
   <script src="https://unpkg.com/htmx.org@2.0.2/dist/htmx.js" integrity="sha384-yZq+5izaUBKcRgFbxgkRYwpHhHHCpp5nseXp0MEQ1A4MTWVMnqkmcuFez8x5qfxr" crossorigin="anonymous"></script>
 {% endblock %}
