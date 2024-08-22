@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'home',
     'account',
+    'widget_tweaks',
     # 'django_extensions',
 ]
 

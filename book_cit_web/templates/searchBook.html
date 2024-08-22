@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block navbar %}
+{% comment %} Đây là form của thanh tìm kiếm {% endcomment %}
+<form action="{% url 'search_slug' %}", method="get">
+    {% csrf_token %}
+    {{ form.skey.label }}
+    {% render_field form.skey class='search-bar' hx-post="/search_post/" hx-trigger="keyup changed delay:500ms" hx-target='#ssuggest' placeholder="Enter title"%} 
+    <input type="submit" value="Search">
+</form>
+{% comment %} Đây là phần sẽ hiển thị suggest sách dựa vào kết quả tìm kiếm - ajax {% endcomment %}
+<div>
+    <ul id="ssuggest">
+
+    </ul>
+</div>
+{% endblock navbar %}
+
+{% block content %}
+
+{% if page_obj %}
+    <div>
+        <ul>
+            {% for book in page_obj %}
+                {% comment %} chỉnh sửa câu lệnh dưới để hiển thị từng cuốn sách {% endcomment %}
+                <li><a href="/book/detail/id={{book.book_id}}">{{ book.book_title }}</a></li>
+            {% endfor %}
+        </ul>
+    </div> 
+    
+    {% comment %} Đây là thanh phân trang {% endcomment %}
+    <nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page=1" aria-label="First">
+            <span aria-hidden="true">&laquo;&laquo;</span>
+            </a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">&laquo;&laquo;</span>
+        </li>
+        <li class="page-item disabled">
+            <span class="page-link">&laquo;</span>
+        </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+        {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
+            <span aria-hidden="true">&raquo;&raquo;</span>
+            </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">&raquo;</span>
+        </li>
+        <li class="page-item disabled">
+            <span class="page-link">&raquo;&raquo;</span>
+        </li>
+
+    
+        {% endif %}
+    </ul>
+    </nav>
+    
+    {% comment %} Đây là thanh phân trang {% endcomment %}
+    {% elif not page_obj%}
+    {% comment %} Chỉnh sửa thông báo khi không tìm thấy sách {% endcomment %}
+            <div style="color:red">
+                Can not found book with your search key
+            </div>
+    {% endif %}
+        
+{% endblock content %}
+    
+
+
+{% block scripts %}
+<script src="https://unpkg.com/htmx.org@2.0.2/dist/htmx.js" integrity="sha384-yZq+5izaUBKcRgFbxgkRYwpHhHHCpp5nseXp0MEQ1A4MTWVMnqkmcuFez8x5qfxr"crossorigin="anonymous"></script>
+{% endblock scripts %}

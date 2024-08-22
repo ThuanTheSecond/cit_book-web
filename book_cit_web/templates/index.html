@@ -1,23 +1,28 @@
 {% extends "base.html" %}
 {% load static %}
+{% load widget_tweaks %}
 
 {%block navbar%}
-						<li><font color="red";>Welcome,{{request.session.loginuser}}</font></li>
-						<li><a href="{% url 'index'%}">logout</a></li>              
+	<li><font color="red";>Welcome,{{request.session.loginuser}}</font></li>
+	<li><a href="{% url 'index'%}">logout</a></li> 
+	{% comment %} Đây là form của thanh tìm kiếm {% endcomment %}
+	<form action="{% url 'search_slug' %}", method='GET'>
+		{% csrf_token %}
+		{{ forms.searchbar.skey.label }}
+		{% render_field forms.searchbar.skey class='search-bar' hx-post="/search_post/" hx-trigger="keyup changed delay:500ms" hx-target='#ssuggest' placeholder="Enter title"%} 
+		<input type="submit" value="Search">
+	</form>
+	{% comment %} danh sach goi y dua theo tu khoa {% endcomment %}
+	<div>
+		<ul id="ssuggest">
+
+		</ul>
+	</div>
+						           
 {%endblock%}
 
 {% block content %}
 
-    {% comment %} {% include 'navbar.html' %}
-    <h1>Home</h1>    
-    {% for book in books  %}
-    <ul>
-        <li>Title: {{ book.book_title }}</li>
-        <li><img src="{{ book.bookImage.url}}" alt="img here"></li>
-    </ul>  
-    {% endfor %}  {% endcomment %}
-
-    <script></script>
     <!-- /TOP HEADER -->
     </header>
     <!-- MAIN HEADER -->
@@ -36,4 +41,10 @@
 							      <br/>
 							      <span><h3 style="color: #FFFFFF">YourReads</h3></span>
 						    </div>
+	
+{% endblock %}
+
+{% block scripts %}
+	{% comment %} Them vao thu vien HTMX Để chạy ajax {% endcomment %}
+  <script src="https://unpkg.com/htmx.org@2.0.2/dist/htmx.js" integrity="sha384-yZq+5izaUBKcRgFbxgkRYwpHhHHCpp5nseXp0MEQ1A4MTWVMnqkmcuFez8x5qfxr" crossorigin="anonymous"></script>
 {% endblock %}
