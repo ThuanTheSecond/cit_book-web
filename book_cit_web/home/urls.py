@@ -3,13 +3,14 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('test/', views.searchTest, name='search_test'),
+    path('searchSlug', views.searchSlug, name='search_slug'),
     path('book/detail/id=<int:id>', views.bookDetail, name='book_detail'), 
-    path('category/<str:name>', views.category, name='category'),
-    path('search/<str:name>', views.search, name='search'),  
+    path('category/filter/id=<int:id>', views.categoryFilter, name='category'),
+    path('search/<str:skey>', views.search, name='search'),  
 ]
 
 htmxpatterns = [
     path('search_post/', views.searchPost, name='search_post'),
+    path('category_post/', views.categoryPost, name='category_post')
 ]
 urlpatterns+= htmxpatterns

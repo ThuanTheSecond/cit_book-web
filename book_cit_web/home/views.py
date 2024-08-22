@@ -4,7 +4,8 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from .forms import searchForm
 from .utils import normalize_vietnamese
-
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.shortcuts import redirect
 
 # Logic xử lí
 def checkRate(userid = None, bookid = None):
@@ -35,29 +36,34 @@ def searchPost(request):
             context = ""
             # Chỉnh sửa phần context để hiển thị ra đúng
             for book in books:
+                # chỉnh sủa để hiển thị suggest dựa theo từ khóa
                 context+= f'<li><a href="/book/detail/id={book.book_id}">{ book.book_title }</a></li>'
             return HttpResponse(context)
-        
-    # có khả năng lỗi ở đây, lưu ý chọn giá trị return phù hợp
-    return 
+    return HttpResponse('')
 
-def searchTest(request):
-    form = searchForm()
-    context = {
-        'form': form
-    }
-    return render(request, 'search.html', context)
+def categoryPost(request):
+    pass
 
+# middle logic
+def searchSlug(request):
+    skey = request.GET.get('skey')
+    skey.replace(" ", "+")
+    return redirect('search', skey = skey)
                    
         
 # Các view để trả về trang HTML theo url.
 def index(request):
+    forms = {}
+    # thanh tim kiem
+    forms['searchbar'] = searchForm()
+    
     bookList = {}
     bookList['popular'] = Book.objects.order_by('book_view')[0:10]  
     bookList['topVn'] = Book.objects.filter(book_lang = 'Vietnamese').order_by('book_view')[0:10]
     bookList['topFL'] = Book.objects.filter(book_lang = 'Foreign').order_by('book_view')[0:10]
     context = {
-        'bookList' : bookList
+        'bookList' : bookList,
+        'forms' : forms,
     }
     return render(request, 'index.html', context)
     
@@ -71,8 +77,42 @@ def bookDetail(request, id):
     return render(request, 'bookDetail.html', context)
 
 # pagepanigtion, su dung lai cau lenh truy xuat book o tren, 
-def search(request):
-    pass
+def search(request, skey):
+    form = searchForm()
+    # Take skey and execute query
+    skey.replace('+',' ')
+    skey = normalize_vietnamese(skey)
+    books = Book.objects.filter(book_title__unaccent__icontains=skey)
+    # pagnition
+    paginator = Paginator(books, 7)
+    
+    page_number = request.GET.get('page')
+    try:
+        page_obj = paginator.get_page(page_number)
+    except PageNotAnInteger:
+        # nếu số trang không phải số nguyên, load trang đầu tiên
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        # Nếu vượt qua trang cuối cùng, load trang cuối cùng
+        page_obj = paginator.page(paginator.num_pages)
+          
+    context = {
+        'form': form,
+        'page_obj' : page_obj,
+    }
+    return render(request, 'searchBook.html', context)
 
-def category(request):
-    pass
+def categoryFilter(request,id):
+    Book_TopicList = Book_Topic.objects.prefetch_related('topic_id').filter(topic_id = id)
+    bookList = None
+    topicTitle =False
+    for book in Book_TopicList:
+        if not topicTitle:
+            topicTitle = book.topic_id.topic_name
+        # Chinh sua hien thi cho cac quyen sach
+        bookList+= f'<li><a href="/book/detail/id={book.book_id}">{ book.book_title }</a></li>'
+    context = {
+        'topicTitle': topicTitle,
+        'bookList': bookList
+    }
+    return render(request, 'bookDetail.html', context)
