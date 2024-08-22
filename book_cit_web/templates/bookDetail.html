@@ -1,11 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>detail</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+
+{% block content %}
     <h2>Book Detail</h2>
     <ul>
         <li>Title: {{detail.book_title}}</li>
@@ -21,8 +17,6 @@
             <a href="">{{ topic.topic_id.topic_name }}</a>
             <br>
         {% endfor %}
-            
     </div>
-   
-</body>
-</html>
+{% endblock content %}
+    

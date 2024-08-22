@@ -38,12 +38,19 @@
 <body>
   <!-- HEADER -->
   {% include 'header.html' %}
-
+  
+  {% block navTop %}
+  {% endblock navTop %}
+    
 
   {% block content %}
   {% endblock %}
 
   
+  
+  {% block navBot %}
+  {% endblock navBot %}
+    
   <!-- FOOTER -->
   {% include 'footer.html' %}
 
@@ -54,6 +61,10 @@
   <script src="{% static 'Js/nouislider.min.js'%}"></script>
   <script src="{% static 'Js/jquery.zoom.min.js'%}%"></script>
   <script src="{% static 'Js/main.js'%}"></script>
+  
+  {% block scripts %}
+  {% endblock scripts %}
+    
 </body>
 
 </html>

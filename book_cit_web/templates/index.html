@@ -2,7 +2,8 @@
 {% load static %}
 {% load widget_tweaks %}
 
-{%block navbar%}
+
+{% block navTop %}
 	<li><font color="red";>Welcome,{{request.session.loginuser}}</font></li>
 	<li><a href="{% url 'index'%}">logout</a></li> 
 	{% comment %} Đây là form của thanh tìm kiếm {% endcomment %}
@@ -18,8 +19,8 @@
 
 		</ul>
 	</div>
-						           
-{%endblock%}
+{% endblock navTop %}
+	
 
 {% block content %}
 

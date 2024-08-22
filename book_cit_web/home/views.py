@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Book, Rating, Book_Topic
+from .models import Book, Rating, Book_Topic, Topic
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from .forms import searchForm
@@ -36,12 +36,16 @@ def searchPost(request):
             # Chỉnh sửa phần context để hiển thị ra đúng
             for book in books:
                 # chỉnh sủa để hiển thị suggest dựa theo từ khóa
-                context+= f'<li><a href="/book/detail/id={book.book_id}">{ book.book_title }</a></li>'
+                context+= f'<li><a href="/book/detail/id={book.book_id -3000}">{ book.book_title }</a></li>'
             return HttpResponse(context)
     return HttpResponse('')
 
 def categoryPost(request):
-    pass
+    topics = Topic.objects.all()
+    context = None
+    for topic in topics:
+        context+= f'<li><a href="/category/filter/id={topic.topic_id - 3000}">{ topic.topic_name }</a></li>'
+    return HttpResponse(context)
 
 # middle logic
 def searchSlug(request):
@@ -67,6 +71,7 @@ def index(request):
     return render(request, 'index.html', context)
     
 def bookDetail(request, id):
+    id += 3000
     detail = Book.objects.filter(book_id = id).first()
     topicList = Book_Topic.objects.prefetch_related('topic_id').filter(book_id = detail.book_id)
     context = {
@@ -91,6 +96,7 @@ def search(request, skey):
     return render(request, 'searchBook.html', context)
 
 def categoryFilter(request,id):
+    id += 3000
     Book_TopicList = Book_Topic.objects.prefetch_related('topic_id').filter(topic_id = id)
     bookList = None
     topicTitle =False
@@ -103,4 +109,5 @@ def categoryFilter(request,id):
         'topicTitle': topicTitle,
         'bookList': bookList
     }
+    # Cần thêm một html để hiển thị filter theo thể loại
     return render(request, 'bookDetail.html', context)

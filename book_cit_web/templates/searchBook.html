@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
 
-{% block navbar %}
+{% block navTop %}
 {% comment %} Đây là form của thanh tìm kiếm {% endcomment %}
 <form action="{% url 'search_slug' %}", method="get">
     {% csrf_token %}
@@ -15,11 +15,14 @@
 
     </ul>
 </div>
-{% endblock navbar %}
+{% endblock %}
+
+
+
+
 
 {% block content %}
-
-{% if page_obj %}
+    {% if page_obj %}
     <div>
         <ul>
             {% for book in page_obj %}
@@ -28,7 +31,17 @@
             {% endfor %}
         </ul>
     </div> 
+    {% comment %} Đây là thanh phân trang {% endcomment %}
+    {% elif not page_obj%}
+    {% comment %} Chỉnh sửa thông báo khi không tìm thấy sách {% endcomment %}
+            <div style="color:red">
+                Can not found book with your search key
+            </div>
+    {% endif %}
+{% endblock content %}
     
+
+{% block navBot %}
     {% comment %} Đây là thanh phân trang {% endcomment %}
     <nav aria-label="Page navigation example">
     <ul class="pagination justify-content-center">
@@ -78,23 +91,11 @@
         <li class="page-item disabled">
             <span class="page-link">&raquo;&raquo;</span>
         </li>
-
-    
         {% endif %}
     </ul>
     </nav>
     
-    {% comment %} Đây là thanh phân trang {% endcomment %}
-    {% elif not page_obj%}
-    {% comment %} Chỉnh sửa thông báo khi không tìm thấy sách {% endcomment %}
-            <div style="color:red">
-                Can not found book with your search key
-            </div>
-    {% endif %}
-        
-{% endblock content %}
-    
-
+{% endblock navBot %}
 
 {% block scripts %}
 <script src="https://unpkg.com/htmx.org@2.0.2/dist/htmx.js" integrity="sha384-yZq+5izaUBKcRgFbxgkRYwpHhHHCpp5nseXp0MEQ1A4MTWVMnqkmcuFez8x5qfxr"crossorigin="anonymous"></script>
