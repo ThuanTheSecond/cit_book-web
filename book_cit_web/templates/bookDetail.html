@@ -1,6 +1,42 @@
 {% extends 'base.html' %}
 
 
+{% block pack %}
+<style>
+    .star-rating {
+        white-space: nowrap;
+    }
+    .star-rating [type="radio"] {
+        appearance: none;
+    }
+    .star-rating i {
+        font-size: 1.2em;
+        transition: 0.3s;
+    }
+    
+    .star-rating label:is(:hover, :has(~ :hover)) i {
+        transform: scale(1.35);
+        color: #fffdba;
+        animation: jump 0.5s calc(0.3s + (var(--i) - 1) * 0.15s) alternate infinite;
+    }
+    .star-rating label:has(~ :checked) i {
+        color: #faec1b;
+        text-shadow: 0 0 2px #ffffff, 0 0 10px #ffee58;
+    }
+    
+    @keyframes jump {
+        0%,
+        50% {
+            transform: translatey(0) scale(1.35);
+        }
+        100% {
+            transform: translatey(-15%) scale(1.35);
+        }
+    }
+</style>
+{% endblock pack %}
+    
+
 {% block content %}
     <h2>Book Detail</h2>
     <ul>
@@ -18,5 +54,30 @@
             <br>
         {% endfor %}
     </div>
+    <h3>Your rating</h3>
+    <div>
+        <form action="">
+            {% csrf_token %}
+            <div class="rating">
+                <p>Rating: <span class="star-rating">
+                    {% for i in "12345" %} 
+                        <label for="rate-{{i}}" style="--i: {{i}}"><i class="fa fa-star" title="{{i}} star"></i></label>
+                        <input type="radio" name="rating" id="rate-{{i}}" hx-vals='{"rating": {{i}}, "book_id": {{detail.book_id}}}' hx-post ="/rating_post/" hx-trigger="click delay:0.25s" hx-target="#clear" hx-swap="outerHTML">
+                    {% endfor %}    
+                </span></p>
+            </div>
+        </form>
+        <form action="">
+            {% csrf_token %}
+            <div class="clear_rating">
+                <input type="hidden" name="clear" id="clear">
+            </div>
+        </form>
+    </div>
 {% endblock content %}
+
+
+{% block scripts %}
+<script src="https://unpkg.com/htmx.org@2.0.2/dist/htmx.js" integrity="sha384-yZq+5izaUBKcRgFbxgkRYwpHhHHCpp5nseXp0MEQ1A4MTWVMnqkmcuFez8x5qfxr"crossorigin="anonymous"></script> 
+{% endblock scripts %}
     
