@@ -1,11 +1,11 @@
 from django.shortcuts import render
 from .models import Book, Rating, Book_Topic, Topic
-from django.contrib.auth.models import User
 from django.http import HttpResponse
 from .forms import searchForm
 from .utils import normalize_vietnamese, pagePaginator
 from django.shortcuts import redirect
-
+import json
+from django.contrib.auth.decorators import login_required
 # Logic xử lí
 def checkRate(userid = None, bookid = None):
     rate = Rating.objects.filter(user_id = userid, book_id = bookid).first()
@@ -47,6 +47,38 @@ def categoryPost(request):
         context+= f'<li><a href="/category/filter/id={topic.topic_id - 3000}">{ topic.topic_name }</a></li>'
     return HttpResponse(context)
 
+# @login_required
+def ratingPost(request):
+    # insert rating vao database va hien thi nut clear rating
+    rate = request.POST.get('rate')
+    book_id = request.POST.get('book_id')
+    # ----------- Thêm hoặc cập nhật rating----------
+    # rating, created = Rating.objects.update_or_create(
+    #     user_id = request.user.id,
+    #     book_id = book_id,
+    #     defaults={'rating' : rate}
+    # )
+    hx_vals_data = json.dumps({"rate": int(rate),
+                               "book_id": int(book_id),
+                               })
+    val = "rate-" + rate
+    return HttpResponse(f'''
+                        <input type="button" onclick="hidebutton(this)" name="clear" id="clear" hx-post ='/clear_rating_post/' hx-trigger="click delay:0.25s" hx-target='#{val}' hx-swap = "outerHTML" value="Clear Rating" hx-vals ='{hx_vals_data}'>
+                        ''')
+
+def clearRatingPost(request):
+    rate = request.POST.get('rate')
+    book_id = request.POST.get('book_id')
+    
+    # delete record rating
+    # Rating.objects.filter(user_id = request.user.id, book_id = book_id).delete()
+    val = "rate-" + rate
+    hx_vals_data = json.dumps({"rate": int(rate), "book_id": int(book_id)})
+    return HttpResponse(f'''
+                        <input type="radio" name="rating" id="{val}" hx-vals='{hx_vals_data}' hx-post ="/rating_post/" hx-trigger="click delay:0.25s" hx-target="#clear" hx-swap="outerHTML">
+                        ''')
+
+
 # middle logic
 def searchSlug(request):
     skey = request.GET.get('skey')
@@ -74,6 +106,11 @@ def bookDetail(request, id):
     id += 3000
     detail = Book.objects.filter(book_id = id).first()
     topicList = Book_Topic.objects.prefetch_related('topic_id').filter(book_id = detail.book_id)
+    
+    # xử lý rating
+    # truy xuất rating của cuốn sách, thêm checked vào radio của sao đã được rating, thêm nút clear rating
+    
+    
     context = {
         'detail':detail,
         'topicList':topicList,
@@ -104,7 +141,7 @@ def categoryFilter(request,id):
         if not topicTitle:
             topicTitle = book.topic_id.topic_name
         # Chinh sua hien thi cho cac quyen sach
-        bookList+= f'<li><a href="/book/detail/id={book.book_id}">{ book.book_title }</a></li>'
+        bookList+= f'<li><a href="/book/detail/id={book.book_id -3000}">{ book.book_id.book_title }</a></li>'
     context = {
         'topicTitle': topicTitle,
         'bookList': bookList
