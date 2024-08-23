@@ -61,8 +61,13 @@
             <div class="rating">
                 <p>Rating: <span class="star-rating">
                     {% for i in "12345" %} 
-                        <label for="rate-{{i}}" style="--i: {{i}}"><i class="fa fa-star" title="{{i}} star"></i></label>
-                        <input type="radio" name="rating" id="rate-{{i}}" hx-vals='{"rate": {{i}}, "book_id": {{detail.book_id}}}' hx-post ="/rating_post/" hx-trigger="click delay:0.25s" hx-target="#clear" hx-swap="outerHTML">
+                        {% if i == rating %}
+                            <label for="rate-{{i}}" style="--i: {{i}}"><i class="fa fa-star" title="{{i}} star"></i></label>
+                            <input type="radio" name="rating" id="rate-{{i}}" hx-vals='{"rate": {{i}}, "book_id": {{detail.book_id}}}' hx-post ="/rating_post/" hx-trigger="load click delay:0.25s" hx-target="#clear" hx-swap="outerHTML" checked>
+                        {% else %}
+                            <label for="rate-{{i}}" style="--i: {{i}}"><i class="fa fa-star" title="{{i}} star"></i></label>
+                            <input type="radio" name="rating" id="rate-{{i}}" hx-vals='{"rate": {{i}}, "book_id": {{detail.book_id}}}' hx-post ="/rating_post/" hx-trigger="click delay:0.25s" hx-target="#clear" hx-swap="outerHTML">
+                        {% endif %}
                     {% endfor %}    
                 </span></p>
             </div>

@@ -106,12 +106,15 @@ def bookDetail(request, id):
     id += 3000
     detail = Book.objects.filter(book_id = id).first()
     topicList = Book_Topic.objects.prefetch_related('topic_id').filter(book_id = detail.book_id)
-    
+    user_id = 1
     # xử lý rating
     # truy xuất rating của cuốn sách, thêm checked vào radio của sao đã được rating, thêm nút clear rating
-    
-    
+    Rate = Rating.objects.filter(user_id = user_id, book_id = id).first()
+    rating = None
+    if Rate:
+        rating = Rate.rating
     context = {
+        'rating': str(rating),
         'detail':detail,
         'topicList':topicList,
     }
