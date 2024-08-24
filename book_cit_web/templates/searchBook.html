@@ -27,7 +27,7 @@
         <ul>
             {% for book in page_obj %}
                 {% comment %} chỉnh sửa câu lệnh dưới để hiển thị từng cuốn sách {% endcomment %}
-                <li><a href="/book/detail/id={{book.book_id}}">{{ book.book_title }}</a></li>
+                <li><a href="/book/detail/id={{book.book_id|add:'-3000'}}">{{ book.book_title }}</a></li>
             {% endfor %}
         </ul>
     </div> 

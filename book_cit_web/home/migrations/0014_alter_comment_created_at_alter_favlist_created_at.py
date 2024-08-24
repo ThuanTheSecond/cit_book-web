@@ -19,6 +19,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='favlist',
             name='created_at',
-            field=models.DateTimeField(default=datetime.datetime(2024, 8, 24, 11, 11, 8, 473020)),
+            field=models.DateTimeField(default=datetime.datetime(2024, 8, 24, 10, 33, 57, 9231)),
         ),
     ]
