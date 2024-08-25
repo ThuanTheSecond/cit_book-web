@@ -427,8 +427,8 @@ textarea.input {
 }
 
 .header-links li a {
+  color: #ffffff;
   text-decoration: none;
-  color: #36e713;
 }
 
 .header-links li a:hover {

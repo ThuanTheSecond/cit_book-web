@@ -12,79 +12,10 @@
 	
 {% endblock navTop %}
 	
-
 {% block content %}
 
     <!-- /TOP HEADER -->
     </header>
-    <!-- MAIN HEADER -->
-		<div id="header">
-				<!-- container -->
-				<div class="container">
-					    <!-- row -->
-					    <div class="row">
-						    <!-- LOGO -->
-						    <div class="col-md-3">
-							      <div class="header-logo">
-								        <a href="#" class="logo">
-									      <img  style="height: 70px; width:70px; border-radius: 50%; margin-top: 15%; margin-right: 5px"  src="/static/img/imgBook/logoCIT.jpg" alt="error"></a>
-
-							      </div>
-								<br/>
-							      <span><h3 style="color: #FFFFFF">CIT Library</h3></span>
-							</div>
-							
-							<!-- Thư viện -->
-							<div class="col-md-3 clearfix">
-								<div class="header-ctn">
-									<!-- Wishlist -->
-									<div>
-										<a href="#">
-											<i class="fa fa-heart-o"></i>
-											<span>Your Wishlist</span>
-											<div class="qty">2</div>
-										</a>
-									</div>
-
-									<!-- Thể loại -->
-									<div class="dropdown">
-										
-										<a class="dropdown-toggle" href="/wishlist">
-											<i class="fa fa-star"></i>
-											<span>Show Rated books</span>
-
-										</a>
-								
-									
-									</div>
-									<!-- /Cart -->
-
-									<!-- Menu Toogle -->
-								
-									<!-- /Menu Toogle -->
-								</div>
-							</div>
-
-							{% comment %} Đây là form của thanh tìm kiếm {% endcomment %}
-							<div class="col-md-6">
-								<div class="header-search">
-									<form action="{% url 'search_slug' %}", method='GET'>
-									{% csrf_token %}
-									{{ forms.searchbar.skey.label }}
-									{% render_field forms.searchbar.skey class='search-bar' hx-post="/search_post/" hx-trigger="keyup changed delay:500ms" hx-target='#ssuggest' placeholder="Enter title"%} 
-									<input type="submit" value="Search">
-									</form>
-								</div>
-							</div>
-							{% comment %} danh sach goi y dua theo tu khoa {% endcomment %}
-							<div>
-								<ul id="ssuggest">
-
-								</ul>
-							</div>
-						</div>
-				</div>
-		</div>
 	</header>
 
 {% endblock %}
