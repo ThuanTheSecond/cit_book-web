@@ -2,7 +2,6 @@ from django.db import models
 # from account.models import user
 from django.db.models import Transform, CharField
 from django.contrib.auth.models import User
-import datetime
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 # Create your models here.
@@ -52,13 +51,13 @@ class Comment(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     cmt = models.TextField()
-    created_at = models.DateTimeField(default= datetime.datetime.now())
+    created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
 
 class FavList(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(default= datetime.datetime.now())
+    created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
 
 # Dùng để thêm extension Unaccent của postgresql

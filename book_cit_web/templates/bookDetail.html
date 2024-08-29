@@ -46,6 +46,9 @@
         <li>Publish: {{ detail.book_publish }}</li>
         <li><img src= "{{ detail.bookImage.url }}" alt="image of manga {{myManga.title}}"></li>
     </ul>
+    <div hx-post = "/wishCheck_post/" hx-vals = '{"book_id": {{detail.book_id}}}' hx-trigger="load" hx-target='#wishlist' >
+        <button id='wishlist' hx-post = "/wishList_post/" hx-vals = '{"book_id": {{detail.book_id}}}' hx-trigger="click delay:0.25s" onclick='savingList(this)'>...</button>
+    </div>
     <div>
         <h3>The loai</h3>
         
@@ -57,7 +60,6 @@
     <h3>Your rating</h3>
     <div>
         <form action="">
-            {% csrf_token %}
             <div class="rating">
                 <p>Rating: <span class="star-rating">
                     {% for i in "12345" %} 
@@ -85,6 +87,9 @@
     function hidebutton(button){
         button.type = 'hidden'
     }
+    function savingList(button){
+        button.value ='saving...'
+    } 
 </script>
 {% endblock scripts %}
     

@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from .models import Book, Rating, Book_Topic, Topic
-from django.http import HttpResponse
+from .models import Book, Rating, Book_Topic, Topic, FavList
+from django.http import HttpResponse, JsonResponse
 from .forms import searchForm
 from .utils import normalize_vietnamese, pagePaginator
 from django.shortcuts import redirect
@@ -23,7 +23,7 @@ def rateBook(userid, bookid, point):
     rate.save()
 
 
-# Ajax Response
+# ---------Ajax Response--------
 def searchPost(request):
     skey = request.POST.get('skey')
     # Loại bỏ dấu câu của skey
@@ -77,8 +77,42 @@ def clearRatingPost(request):
     return HttpResponse(f'''
                         <input type="radio" name="rating" id="{val}" hx-vals='{hx_vals_data}' hx-post ="/rating_post/" hx-trigger="click delay:0.25s" hx-target="#clear" hx-swap="outerHTML">
                         ''')
+# @login_required
+def wishListPost(request):
+    book_id = request.POST.get('book_id')
+    hx_data = json.dumps({
+        'book_id': book_id
+    })
+    # user_id = request.user.id
+    check = FavList.objects.filter(user_id = 1, book_id = book_id)
+    # khi nhan vao -> kiem tra -> ko insert
+    if not check:
+        # thuc hien lenh insert
+        fav = FavList(user_id = 1, book_id=book_id)
+        fav.save()
+        # tra ve button saved
+        return HttpResponse(f'''
+                            <button id='wishlist' hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist' hx-swap = 'outerHTML'>Saved</button>
+                            ''')
+    else:
+        check.delete()
+        return HttpResponse(f'''
+                                <button id='wishlist' hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist' hx-swap = 'outerHTML' onclick='savingList(this)'>Want to read</button>
+                                ''')
 
-
+def wishCheckPost(request):
+    book_id = request.POST.get('book_id')
+    hx_data = json.dumps({
+        'book_id': book_id
+    })
+    check = FavList.objects.filter(user_id = 1, book_id = book_id)
+    if check: 
+        return HttpResponse(f'''
+                            <button id='wishlist' hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist' hx-swap = 'outerHTML'>Saved</button>
+                            ''')
+    return HttpResponse(f'''
+                                <button id='wishlist' hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist' hx-swap = 'outerHTML' onclick='savingList(this)'>Want to read</button>
+                                ''')
 # middle logic
 def searchSlug(request):
     skey = request.GET.get('skey')
@@ -130,7 +164,7 @@ def search(request, skey):
     # pagnition
     page_obj = pagePaginator(request, books)
     context = {
-        'form': form,
+        'formSearch': form,
         'page_obj' : page_obj,
     }
     return render(request, 'searchBook.html', context)
@@ -151,3 +185,5 @@ def categoryFilter(request,id):
     }
     # Cần thêm một html để hiển thị filter theo thể loại
     return render(request, 'bookDetail.html', context)
+
+    

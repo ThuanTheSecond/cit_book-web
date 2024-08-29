@@ -14,5 +14,7 @@ htmxpatterns = [
     path('category_post/', views.categoryPost, name='category_post'),
     path('rating_post/', views.ratingPost, name='rating_post'),
     path('clear_rating_post/', views.clearRatingPost, name='clear_rating_post'),
+    path('wishList_post/', views.wishListPost, name='wishList_post'),
+    path('wishCheck_post/', views.wishCheckPost, name='wishCheck_post'),
 ]
 urlpatterns+= htmxpatterns

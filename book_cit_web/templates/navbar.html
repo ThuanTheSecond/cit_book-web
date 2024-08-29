@@ -1,6 +1,5 @@
 {% load static %}
 {% load widget_tweaks %}
-
 <div id="navbar">
     <!-- container -->
     <div class="container">
@@ -11,7 +10,6 @@
                       <div class="navbar-logo">
                             <a href="/" class="logo">
                               <img  style="height: 70px; width:70px; border-radius: 50%; margin-top: 15%"  src="/static/img/imgBook/logoCIT.jpg" alt="error"></a>
-
                       </div>
                     <br/>
                       <span><a href="/" style="color: #000000; text-decoration: none; font-size: 26px; font-family: 'Roboto Slab', serif;
@@ -46,9 +44,8 @@
                 <div class="col-md-4">
                     <div class="navbar-search">
                         <form action="{% url 'search_slug' %}", method='GET'>
-                        {% csrf_token %}
-                        {{ forms.searchbar.skey.label }}
-                        {% render_field forms.searchbar.skey class='search-bar' hx-post="/search_post/" hx-trigger="keyup changed delay:500ms" hx-target='#ssuggest' placeholder="Enter title"%} 
+                        {{ formSearch.skey.label }}
+                        {% render_field formSearch.skey class='search-bar' hx-post="/search_post/" hx-trigger="keyup changed delay:500ms" hx-target='#ssuggest' placeholder="Enter title"%} 
                         <input type="submit" value="Search">
                         </form>
                     </div>
@@ -58,6 +55,10 @@
                     <ul id="ssuggest">
 
                     </ul>
+                </div>
+                <div>
+                    <li><font color="red";>Welcome,{{request.}}</font></li>
+                    <li><a href="{% url 'logout'%}">logout</a></li>  
                 </div>
             </div>
     </div>

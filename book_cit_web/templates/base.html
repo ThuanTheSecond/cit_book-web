@@ -1,4 +1,5 @@
 {% load static %}
+{% load widget_tweaks %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -30,17 +31,19 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" />
+
+  <meta name="csrf-token" content="{{ csrf_token }}">
   <!-- Add bonus component for head -->
   {% block pack %}
   {% endblock pack %}
+
+  {% block scripts %}
+  {% endblock scripts %}
 </head>
 
 <body>
   <!-- HEADER -->
   {% include 'header.html' %}
-  
-  {% block navTop %}
-  {% endblock navTop %}
 
   <div style="text-align: center">
   {% include 'navbar.html' %}
@@ -58,16 +61,21 @@
   {% include 'footer.html' %}
 
   <!-- jQuery Plugins -->
-  <script src="{% static 'Js/jquery.min.js' %}"></script>
+  {% comment %} <script src="{% static 'Js/jquery.min.js' %}"></script>
   <script src="{% static 'Js/bootstrap.min.js'%}"></script>
   <script src="{% static 'Js/slick.min.js'%}"></script>
   <script src="{% static 'Js/nouislider.min.js'%}"></script>
   <script src="{% static 'Js/jquery.zoom.min.js'%}%"></script>
-  <script src="{% static 'Js/main.js'%}"></script>
-  
-  {% block scripts %}
-  {% endblock scripts %}
-    
+  <script src="{% static 'Js/main.js'%}"></script>   {% endcomment %}
+  <script>
+    document.addEventListener("htmx:configRequest", (event) => {
+      const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+      event.detail.headers['X-CSRFToken'] = csrfToken;
+    });
+  </script>
+
+  <script src="https://unpkg.com/htmx.org@2.0.2/dist/htmx.js" integrity="sha384-yZq+5izaUBKcRgFbxgkRYwpHhHHCpp5nseXp0MEQ1A4MTWVMnqkmcuFez8x5qfxr"crossorigin="anonymous"></script> 
+
 </body>
 
 </html>
