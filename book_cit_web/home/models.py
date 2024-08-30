@@ -64,5 +64,5 @@ class FavList(models.Model):
 class Unaccent(Transform):
     lookup_name = 'unaccent'
     function = 'unaccent'
-
+    output_field = CharField()
 CharField.register_lookup(Unaccent)

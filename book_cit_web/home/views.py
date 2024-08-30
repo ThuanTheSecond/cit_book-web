@@ -6,6 +6,8 @@ from .utils import normalize_vietnamese, pagePaginator
 from django.shortcuts import redirect
 import json
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+
 # Logic xử lí
 def checkRate(userid = None, bookid = None):
     rate = Rating.objects.filter(user_id = userid, book_id = bookid).first()
@@ -25,12 +27,23 @@ def rateBook(userid, bookid, point):
 
 # ---------Ajax Response--------
 def searchPost(request):
-    skey = request.POST.get('skey')
+    query = request.POST.get('query')
+    search_type = request.POST.get('search_type')
     # Loại bỏ dấu câu của skey
-    skey = normalize_vietnamese(skey)
-    if len(skey)>=3:
+    query = normalize_vietnamese(query)
+    if len(query)>=3:
         # sử dùng hàm __unaccent để có thể truy xuất băng tiếng việt không dấu
-        books = Book.objects.filter(book_title__unaccent__icontains=skey)[:5]
+        # books = Book.objects.filter(book_title__unaccent__icontains=skey)[:5]
+        # chinh sua o day
+        if search_type == 'all':
+            books = Book.objects.filter(
+                Q(book_title__unaccent__icontains=query) |
+                Q(book_author__unaccent__icontains=query) |
+                Q(book_publish__unaccent__icontains=query)
+            )
+        else:
+            books = Book.objects.filter(**{f"{search_type}__unaccent__icontains": query})
+        books = books[:7]
         if books:
             context = ""
             # Chỉnh sửa phần context để hiển thị ra đúng
@@ -115,11 +128,11 @@ def wishCheckPost(request):
                                 ''')
 # middle logic
 def searchSlug(request):
-    skey = request.GET.get('skey')
-    skey.replace(" ", "+")
-    return redirect('search', skey = skey)
+    query = request.GET.get('query')
+    search_type = request.GET.get('search_type')
+    query.replace(" ", "+")
+    return redirect('search',search_type = search_type ,query = query)
                    
-        
 # Các view để trả về trang HTML theo url.
 def index(request):
     forms = {}
@@ -155,12 +168,23 @@ def bookDetail(request, id):
     return render(request, 'bookDetail.html', context)
 
 # pagepanigtion, su dung lai cau lenh truy xuat book o tren, 
-def search(request, skey):
+def search(request, search_type, query):
     form = searchForm()
     # Take skey and execute query
-    skey.replace('+',' ')
-    skey = normalize_vietnamese(skey)
-    books = Book.objects.filter(book_title__unaccent__icontains=skey)
+    query.replace('+',' ')
+    query = normalize_vietnamese(query)
+    if len(query)>=3:
+        # sử dùng hàm __unaccent để có thể truy xuất băng tiếng việt không dấu
+        # books = Book.objects.filter(book_title__unaccent__icontains=skey)[:5]
+        # chinh sua o day
+        if search_type == 'all':
+            books = Book.objects.filter(
+                Q(book_title__unaccent__icontains=query) |
+                Q(book_author__unaccent__icontains=query) |
+                Q(book_publish__unaccent__icontains=query)
+            )
+        else:
+            books = Book.objects.filter(**{f"{search_type}__unaccent__icontains": query})
     # pagnition
     page_obj = pagePaginator(request, books)
     context = {

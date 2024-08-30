@@ -44,8 +44,8 @@
                 <div class="col-md-4">
                     <div class="navbar-search">
                         <form action="{% url 'search_slug' %}", method='GET'>
-                        {{ formSearch.skey.label }}
-                        {% render_field formSearch.skey class='search-bar' hx-post="/search_post/" hx-trigger="keyup changed delay:500ms" hx-target='#ssuggest' placeholder="Enter title"%} 
+                        {{ formSearch.search_type}}
+                        {% render_field formSearch.query class='search-bar' hx-post="/search_post/" hx-trigger="keyup changed delay:500ms" hx-target='#ssuggest' placeholder="Enter title"%} 
                         <input type="submit" value="Search">
                         </form>
                     </div>

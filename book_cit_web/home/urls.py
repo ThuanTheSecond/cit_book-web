@@ -6,7 +6,7 @@ urlpatterns = [
     path('searchSlug', views.searchSlug, name='search_slug'),
     path('book/detail/id=<int:id>', views.bookDetail, name='book_detail'), 
     path('category/filter/id=<int:id>', views.categoryFilter, name='category'),
-    path('search/<str:skey>', views.search, name='search'),  
+    path('search/<str:search_type>/<str:query>', views.search, name='search'),  
 ]
 
 htmxpatterns = [
