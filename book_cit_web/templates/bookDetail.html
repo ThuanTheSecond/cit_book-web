@@ -46,6 +46,10 @@
         <li>Publish: {{ detail.book_publish }}</li>
         <li><img src= "{{ detail.bookImage.url }}" alt="image of manga {{myManga.title}}"></li>
     </ul>
+    <div class="aveRating">
+        <span class="product-rating">{{ averRate }}</span><span>/5 <span class="fa fa-star"></span>({{ countRate }}-{{ detail.book_view }} lượt xem)</span>
+
+    </div>
     <div hx-post = "/wishCheck_post/" hx-vals = '{"book_id": {{detail.book_id}}}' hx-trigger="load" hx-target='#wishlist' >
         <button id='wishlist' hx-post = "/wishList_post/" hx-vals = '{"book_id": {{detail.book_id}}}' hx-trigger="click delay:0.25s" onclick='savingList(this)'>...</button>
     </div>

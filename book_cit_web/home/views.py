@@ -6,7 +6,7 @@ from .utils import normalize_vietnamese, pagePaginator
 from django.shortcuts import redirect
 import json
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
+from django.db.models import Q, Avg
 
 # Logic xử lí
 def checkRate(userid = None, bookid = None):
@@ -23,6 +23,17 @@ def rateBook(userid, bookid, point):
         return
     rate.rating = point
     rate.save()
+    
+def averRating(book_id):
+    result = Rating.objects.filter(book_id=book_id).aggregate(ave=Avg('rating'))['ave']
+    if result:
+        return result
+    return 0
+def countRating(book_id):
+    result = Rating.objects.filter(book_id=book_id).values('user_id').distinct().count()
+    if result:
+        return str(result) + "người đánh giá"
+    return "Chưa có đánh giá"
 
 
 # ---------Ajax Response--------
@@ -160,10 +171,14 @@ def bookDetail(request, id):
     rating = None
     if Rate:
         rating = Rate.rating
+    averRate = averRating(id)
+    countRate = countRating(id)
     context = {
         'rating': str(rating),
         'detail':detail,
         'topicList':topicList,
+        'averRate': averRate,
+        'countRate': countRate,
     }
     return render(request, 'bookDetail.html', context)
 
