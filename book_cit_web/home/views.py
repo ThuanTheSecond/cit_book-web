@@ -60,7 +60,6 @@ def searchPost(request):
                     for word in keywords
                     ))   
             books = Book.objects.filter(query)
-            print(books.query)
         elif search_type == 'absolute':
             books = Book.objects.filter(
                 Q(book_title__unaccent__icontains=query) |
@@ -217,7 +216,6 @@ def search(request, search_type, query):
                     for word in keywords
                     ))   
             books = Book.objects.filter(query)
-            print(books.query)
             
         elif search_type == 'absolute':
             books = Book.objects.filter(
