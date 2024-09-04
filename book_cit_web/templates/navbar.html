@@ -44,20 +44,29 @@
                     <div class="navbar-search">
                         <form action="{% url 'search_slug' %}", method='GET'>
                         {{ formSearch.search_type}}
-                        {% render_field formSearch.query class='search-bar' hx-post="/search_post/" hx-trigger="keyup changed delay:500ms" hx-target='#ssuggest' placeholder="Enter title"%} 
-                        <input type="submit" value="Search">
+                        {% render_field formSearch.query class='search-bar' hx-post="/search_post/" hx-trigger="keyup changed delay:500ms" hx-target='#ssuggest' placeholder="Search"%} 
+                        <button class="search-btn"><i class="fa fa-search"></i></button>
                         </form>
+                    </div>
+                    <div>
+                        <ul id="ssuggest">
+
+                        </ul>
                     </div>
                 </div>
                 {% comment %} danh sach goi y dua theo tu khoa {% endcomment %}
-                <div>
-                    <ul id="ssuggest">
 
-                    </ul>
+                    
+
+                <div class="col-md-auto">
+                    <div class="navbar-logo">
+                        <a href="/" class="logo">
+                            <img  style="height: 55px; width:55px; margin-top: 16px; margin-left: -50px"  src="/static/img/imgUser/user-square.png" alt="user-image"></a>
+                    </div>
                 </div>
                 <div>
-                    <li><font color="red";>Welcome,{{request.}}</font></li>
-                    <li><a href="{% url 'logout'%}">logout</a></li>  
+                    {% comment %} <li><font color="red";>Welcome,{{request.}}</font></li> {% endcomment %}
+                    {% comment %} <li><a href="{% url 'logout'%}">logout</a></li>   {% endcomment %}
                 </div>
             </div>
     </div>
