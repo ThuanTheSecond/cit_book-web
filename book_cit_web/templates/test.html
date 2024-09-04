@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load filters %}
+
+{% block pack %}
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick-theme.css"/>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick.min.js"></script>
+{% endblock pack %}
+
+
+{% block scripts %}
+    <script>
+        
+    </script>
+{% endblock scripts %}
+    
+
+
+{% block content %}
+<div class="book-slider">
+    {% for book in books %}
+    <div class="book-item">
+        <a href="/book/detail/id={{ book.book_id|subtract:3000 }}"><img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}"></a>
+        <h5 class="mt-2">{{ book.book_title }}</h5>
+    </div>
+    {% endfor %}
+</div>
+{% endblock content %}
+    
+
+    

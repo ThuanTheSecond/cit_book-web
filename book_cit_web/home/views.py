@@ -160,17 +160,13 @@ def searchSlug(request):
                    
 # Các view để trả về trang HTML theo url.
 def index(request):
-    forms = {}
-    # thanh tim kiem
-    forms['searchbar'] = searchForm()
-    
     bookList = {}
-    bookList['popular'] = Book.objects.order_by('book_view')[0:10]  
-    bookList['topVn'] = Book.objects.filter(book_lang = 'Vietnamese').order_by('book_view')[0:10]
-    bookList['topFL'] = Book.objects.filter(book_lang = 'Foreign').order_by('book_view')[0:10]
+    books_query = Book.objects.order_by('book_view')
+    bookList['popular'] = books_query[:10]  
+    bookList['topVn'] = books_query.filter(book_lang = 'Vietnamese')[0:10]
+    bookList['topFl'] = books_query.filter(book_lang = 'Foreign')[0:10]
     context = {
         'bookList' : bookList,
-        'forms' : forms,
     }
     return render(request, 'index.html', context)
     
@@ -216,7 +212,6 @@ def search(request, search_type, query):
                     for word in keywords
                     ))   
             books = Book.objects.filter(query)
-            
         elif search_type == 'absolute':
             books = Book.objects.filter(
                 Q(book_title__unaccent__icontains=query) |
@@ -250,4 +245,16 @@ def categoryFilter(request,id):
     # Cần thêm một html để hiển thị filter theo thể loại
     return render(request, 'bookDetail.html', context)
 
+def test(request):
+    bookList = {}
+    books_query = Book.objects.order_by('book_view')
+    bookList['popular'] = books_query[:10]  
+    bookList['topVn'] = books_query.filter(book_lang = 'Vietnamese')[0:10]
+    bookList['topFL'] = books_query.filter(book_lang = 'Foreign')[0:10]
+    books = Book.objects.order_by('book_view')[0:10]  
+    context = {
+        'bookList' : bookList,
+        'books': books,
+    }
+    return render(request, 'test.html',context)
     
