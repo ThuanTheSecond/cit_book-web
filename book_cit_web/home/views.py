@@ -161,17 +161,12 @@ def searchSlug(request):
                    
 # Các view để trả về trang HTML theo url.
 def index(request):
-    forms = {}
-    # thanh tim kiem
-    forms['searchbar'] = searchForm()
-    
     bookList = {}
     bookList['popular'] = Book.objects.order_by('book_view')[0:10]  
     bookList['topVn'] = Book.objects.filter(book_lang = 'Vietnamese').order_by('book_view')[0:10]
     bookList['topFL'] = Book.objects.filter(book_lang = 'Foreign').order_by('book_view')[0:10]
     context = {
         'bookList' : bookList,
-        'forms' : forms,
     }
     return render(request, 'index.html', context)
     
@@ -252,4 +247,15 @@ def categoryFilter(request,id):
     # Cần thêm một html để hiển thị filter theo thể loại
     return render(request, 'bookDetail.html', context)
 
+def test(request):
+    bookList = {}
+    bookList['popular'] = Book.objects.order_by('book_view')[0:10]  
+    bookList['topVn'] = Book.objects.filter(book_lang = 'Vietnamese').order_by('book_view')[0:10]
+    bookList['topFL'] = Book.objects.filter(book_lang = 'Foreign').order_by('book_view')[0:10]
+    books = Book.objects.order_by('book_view')[0:10]  
+    context = {
+        'bookList' : bookList,
+        'books': books,
+    }
+    return render(request, 'test.html',context)
     

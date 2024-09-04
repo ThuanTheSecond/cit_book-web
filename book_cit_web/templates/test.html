@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% load filters %}
+
+{% block pack %}
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/>
+    <style>
+        .book-slider img {
+            width: 150px;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+                
+        .book-slider {
+            padding: 20px 0;
+        }
+        
+        .book-item {
+            text-align: center;
+        }
+        
+        .book-image {
+            width: 150px;
+            height: 220px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin: 0 auto;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .book-image:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .book-slider {
+            display: flex;
+            gap: 20px;
+            padding: 20px 0;
+        }
+        
+        .book-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .book-item h5 {
+            margin-top: 10px;
+            font-size: 1rem;
+            color: #333;
+        }
+        
+        
+    </style>
+{% endblock pack %}
+
+
+{% block scripts %}
+    <script>
+        $(document).ready(function(){
+            $('.book-slider').slick({
+                slidesToShow: 5,
+                slidesToScroll: 1,
+                autoplay: true,
+                autoplaySpeed: 3000,
+                dots: true,
+                arrows: true,
+                responsive: [
+                    {
+                        breakpoint: 1200,
+                        settings: {
+                            slidesToShow: 4,
+                        }
+                    },
+                    {
+                        breakpoint: 992,
+                        settings: {
+                            slidesToShow: 3,
+                        }
+                    },
+                    {
+                        breakpoint: 768,
+                        settings: {
+                            slidesToShow: 2,
+                        }
+                    },
+                    {
+                        breakpoint: 576,
+                        settings: {
+                            slidesToShow: 1,
+                        }
+                    }
+                ]
+            });
+        });
+        
+    </script>
+{% endblock scripts %}
+    
+
+
+{% block content %}
+<div class="book-slider">
+    {% for book in books %}
+    <div class="book-item">
+        {% comment %} <div class="book-image" style="background-image: url('{{ book.image_url }}');"></div> {% endcomment %}
+        <a href="/book/detail/id={{ book.book_id|subtract:3000 }}"><img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}"></a>
+        <h5 class="mt-2">{{ book.book_title }}</h5>
+    </div>
+    {% endfor %}
+</div>
+{% endblock content %}
+    
+
+    
