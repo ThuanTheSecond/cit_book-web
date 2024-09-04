@@ -41,6 +41,7 @@ def searchPost(request):
     query = request.POST.get('query')
     search_type = request.POST.get('search_type')
     # Loại bỏ dấu câu của skey
+    # Tach cau query thanh cac tu tim kiems
     query = normalize_vietnamese(query)
     if len(query)>=3:
         # sử dùng hàm __unaccent để có thể truy xuất băng tiếng việt không dấu
