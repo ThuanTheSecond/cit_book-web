@@ -7,6 +7,9 @@ from django.shortcuts import redirect
 import json
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Avg
+import re
+from functools import reduce
+from operator import and_
 
 # Logic xử lí
 def checkRate(userid = None, bookid = None):
@@ -48,6 +51,17 @@ def searchPost(request):
         # books = Book.objects.filter(book_title__unaccent__icontains=skey)[:5]
         # chinh sua o day
         if search_type == 'all':
+            keywords = re.split(r'[ ,]+', query)
+            query = Q()
+            query = reduce(and_, (
+                    Q(book_title__unaccent__icontains=word) |
+                    Q(book_author__unaccent__icontains=word) |
+                    Q(book_publish__unaccent__icontains=word)
+                    for word in keywords
+                    ))   
+            books = Book.objects.filter(query)
+            print(books.query)
+        elif search_type == 'absolute':
             books = Book.objects.filter(
                 Q(book_title__unaccent__icontains=query) |
                 Q(book_author__unaccent__icontains=query) |
@@ -194,6 +208,18 @@ def search(request, search_type, query):
         # books = Book.objects.filter(book_title__unaccent__icontains=skey)[:5]
         # chinh sua o day
         if search_type == 'all':
+            keywords = re.split(r'[ ,]+', query)
+            query = Q()
+            query = reduce(and_, (
+                    Q(book_title__unaccent__icontains=word) |
+                    Q(book_author__unaccent__icontains=word) |
+                    Q(book_publish__unaccent__icontains=word)
+                    for word in keywords
+                    ))   
+            books = Book.objects.filter(query)
+            print(books.query)
+            
+        elif search_type == 'absolute':
             books = Book.objects.filter(
                 Q(book_title__unaccent__icontains=query) |
                 Q(book_author__unaccent__icontains=query) |
