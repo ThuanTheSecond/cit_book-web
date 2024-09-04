@@ -413,7 +413,7 @@ textarea.input {
 #top-header {
   padding-top: 5px;
   padding-bottom: 30px;
-  background-color: #202020;
+  background-color: #333;
 }
 
 .header-links li {
@@ -447,7 +447,7 @@ textarea.input {
 #navbar {
   padding-top: 8px;
   padding-bottom: 12px;
-  background-color: #d1ccb9;
+  background-color: #e0dcc6
 }
 
 .navbar-logo {
