@@ -447,7 +447,7 @@ textarea.input {
 #navbar {
   padding-top: 8px;
   padding-bottom: 12px;
-  background-color: #e0dcc6
+  background-color: #e0dcc6;
 }
 
 .navbar-logo {
@@ -472,25 +472,36 @@ textarea.input {
   position: relative;
 }
 
+.navbar-search form .search-selector {
+  background-color: #f2efe8;
+  text-align: center;
+  margin-right: -4px;
+  padding: 10px 0px;
+  font-size: 14px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: bolder;
+  color: rgb(132, 130, 126);
+  border: 1px solid #c0beb2;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
 .navbar-search form .search-bar {
   padding: 8px 8px;
   padding-right: 80px;
   text-align: left;
+  font-weight: 500;
   background-color: #fff;
   transition: transform 250ms ease-in-out;   
   color: #000000;
+  border: 1px solid #c0beb2;
   border-radius: 5px;
-  border-width: 1px;
-  border-color: rgb(120, 126, 100);
+  border-top-left-radius: 0%;
+  border-bottom-left-radius: 0%;
 
   &:focus {
     outline: 0;
   }
-}
-
-.navbar-search form .input {
-  width: calc(100% - 260px);
-  margin-right: -4px;
 }
 
 .navbar-search form .search-btn {
@@ -499,8 +510,47 @@ textarea.input {
   background-color: transparent;
   transition: transform 250ms ease-in-out;
   font-size: 20px;
-  color: #919170;
+  color: #837c73;
   border: none;
+}
+
+.navbar-search form .ssuggest {
+  position: absolute;
+  background-color: white;
+  /* border: 1px solid #ccc; */
+  max-height: 200px;
+  overflow-y: auto;
+  width: 100%;
+  z-index: 1000;
+  /* padding: 10px;
+  cursor: pointer */
+}
+
+.navbar-search form .ssuggest li {
+  border: 1px solid #ccc;
+  text-align: left;
+  display: flex;
+}
+
+.navbar-search form .ssuggest li:hover {
+  background-color: #f0f0f0;
+}
+
+.navbar-search form .ssuggest li a {
+  text-decoration: none;
+} 
+
+.navbar-search form .ssuggest li a:hover {
+  color: #000000;
+}
+
+.navbar-search form .ssuggest li .search-book-image {
+  height: 80px;
+  width: 60px;
+  padding: 6px 6px;
+  overflow-clip-margin: content-box;
+  overflow: clip;
+
 }
 
 /*----------------------------*\

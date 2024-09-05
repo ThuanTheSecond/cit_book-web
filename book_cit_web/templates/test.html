@@ -1,32 +1,156 @@
-{% extends 'base.html' %}
-{% load filters %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Library Responsive</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-{% block pack %}
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick.css"/>
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick-theme.css"/>
-    <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick.min.js"></script>
-{% endblock pack %}
+    <style>
+        .banner {
+            background-color: #f8f9fa;
+            padding: 50px 0;
+            text-align: center;
+        }
 
+        .book-card img {
+            height: 200px;
+            object-fit: cover;
+        }
 
-{% block scripts %}
-    <script>
-        
-    </script>
-{% endblock scripts %}
-    
+        .section-title {
+            margin: 30px 0;
+            font-size: 1.5rem;
+            text-align: center;
+        }
 
+        /* Media queries cho thiết bị nhỏ */
+        @media (max-width: 768px) {
+            .book-card img {
+                height: 150px;
+            }
+        }
 
-{% block content %}
-<div class="book-slider">
-    {% for book in books %}
-    <div class="book-item">
-        <a href="/book/detail/id={{ book.book_id|subtract:3000 }}"><img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}"></a>
-        <h5 class="mt-2">{{ book.book_title }}</h5>
+        @media (max-width: 576px) {
+            .book-card img {
+                height: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Thanh điều hướng (Navbar) -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Open Library</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Sách của tôi</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Duyệt sách</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Đăng nhập</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Phần banner -->
+    <div class="banner">
+        <div class="container">
+            <h1>Chào mừng đến với Open Library</h1>
+            <p>Hàng triệu cuốn sách có sẵn để đọc miễn phí.</p>
+            <a href="#" class="btn btn-primary">Khám phá ngay</a>
+        </div>
     </div>
-    {% endfor %}
-</div>
-{% endblock content %}
-    
 
-    
+    <!-- Phần sách phổ biến -->
+    <div class="container mt-5">
+        <h2 class="section-title">Sách Phổ Biến</h2>
+        <div class="row">
+            <div class="col-6 col-md-3 mb-4">
+                <div class="card book-card">
+                    <img src="https://placekitten.com/200/300" class="card-img-top img-fluid" alt="Sách 1">
+                    <div class="card-body">
+                        <h5 class="card-title">Tên Sách 1</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3 mb-4">
+                <div class="card book-card">
+                    <img src="https://placekitten.com/200/301" class="card-img-top img-fluid" alt="Sách 2">
+                    <div class="card-body">
+                        <h5 class="card-title">Tên Sách 2</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3 mb-4">
+                <div class="card book-card">
+                    <img src="https://placekitten.com/200/302" class="card-img-top img-fluid" alt="Sách 3">
+                    <div class="card-body">
+                        <h5 class="card-title">Tên Sách 3</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3 mb-4">
+                <div class="card book-card">
+                    <img src="https://placekitten.com/200/303" class="card-img-top img-fluid" alt="Sách 4">
+                    <div class="card-body">
+                        <h5 class="card-title">Tên Sách 4</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Phần sách cổ điển -->
+    <div class="container mt-5">
+        <h2 class="section-title">Sách Cổ Điển</h2>
+        <div class="row">
+            <div class="col-6 col-md-3 mb-4">
+                <div class="card book-card">
+                    <img src="https://placekitten.com/200/304" class="card-img-top img-fluid" alt="Sách 5">
+                    <div class="card-body">
+                        <h5 class="card-title">Tên Sách 5</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3 mb-4">
+                <div class="card book-card">
+                    <img src="https://placekitten.com/200/305" class="card-img-top img-fluid" alt="Sách 6">
+                    <div class="card-body">
+                        <h5 class="card-title">Tên Sách 6</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3 mb-4">
+                <div class="card book-card">
+                    <img src="https://placekitten.com/200/306" class="card-img-top img-fluid" alt="Sách 7">
+                    <div class="card-body">
+                        <h5 class="card-title">Tên Sách 7</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3 mb-4">
+                <div class="card book-card">
+                    <img src="https://placekitten.com/200/307" class="card-img-top img-fluid" alt="Sách 8">
+                    <div class="card-body">
+                        <h5 class="card-title">Tên Sách 8</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
