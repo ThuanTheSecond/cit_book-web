@@ -43,7 +43,7 @@
                 <div class="col-md-4">
                     <div class="navbar-search">
                         <form action="{% url 'search_slug' %}", method='GET'>
-                        {{ formSearch.search_type}}
+                        {% render_field formSearch.search_type hx-post="/searchType_post/" hx-trigger="click"%} 
                         {% render_field formSearch.query class='search-bar' hx-post="/search_post/" hx-trigger="keyup changed delay:500ms" hx-target='#ssuggest' placeholder="Search"%} 
                         <button class="search-btn"><i class="fa fa-search"></i></button>
                         </form>

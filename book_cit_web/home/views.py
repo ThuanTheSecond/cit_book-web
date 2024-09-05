@@ -50,8 +50,8 @@ def searchPost(request):
         # sử dùng hàm __unaccent để có thể truy xuất băng tiếng việt không dấu
         # books = Book.objects.filter(book_title__unaccent__icontains=skey)[:5]
         # chinh sua o day
+        keywords = re.split(r'[ ,]+', query)
         if search_type == 'all':
-            keywords = re.split(r'[ ,]+', query)
             query = Q()
             query = reduce(and_, (
                     Q(book_title__unaccent__icontains=word) |
@@ -60,14 +60,11 @@ def searchPost(request):
                     for word in keywords
                     ))   
             books = Book.objects.filter(query)
-        elif search_type == 'absolute':
-            books = Book.objects.filter(
-                Q(book_title__unaccent__icontains=query) |
-                Q(book_author__unaccent__icontains=query) |
-                Q(book_publish__unaccent__icontains=query)
-            )
         else:
-            books = Book.objects.filter(**{f"{search_type}__unaccent__icontains": query})
+            query = Q(**{f"{search_type}__unaccent__icontains": keywords[0]})
+            for word in keywords[1:]:
+                query &= Q(**{f"{search_type}__unaccent__icontains": word})
+            books = Book.objects.filter(query)
         books = books[:7]
         if books:
             context = ""
@@ -77,6 +74,10 @@ def searchPost(request):
                 context+= f'<li><a href="/book/detail/id={book.book_id -3000}">{ book.book_title }</a></li>'
             return HttpResponse(context)
     return HttpResponse('')
+
+def searchTypePost(request):
+    if request.POST.get('search_type') == 'advance':
+        return redirect('index')
 
 def categoryPost(request):
     topics = Topic.objects.all()
@@ -202,8 +203,8 @@ def search(request, search_type, query):
         # sử dùng hàm __unaccent để có thể truy xuất băng tiếng việt không dấu
         # books = Book.objects.filter(book_title__unaccent__icontains=skey)[:5]
         # chinh sua o day
+        keywords = re.split(r'[ ,]+', query)
         if search_type == 'all':
-            keywords = re.split(r'[ ,]+', query)
             query = Q()
             query = reduce(and_, (
                     Q(book_title__unaccent__icontains=word) |
@@ -219,7 +220,10 @@ def search(request, search_type, query):
                 Q(book_publish__unaccent__icontains=query)
             )
         else:
-            books = Book.objects.filter(**{f"{search_type}__unaccent__icontains": query})
+            query = Q(**{f"{search_type}__unaccent__icontains": keywords[0]})
+            for word in keywords[1:]:
+                query &= Q(**{f"{search_type}__unaccent__icontains": word})
+            books = Book.objects.filter(query)
     # pagnition
     page_obj = pagePaginator(request, books)
     context = {
