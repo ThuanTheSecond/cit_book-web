@@ -1,12 +1,39 @@
 {% load static %}
 {% load widget_tweaks %}
+
 <div id="navbar">
     <!-- container -->
-    <div class="container">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+            <img  style="height: 70px; width:70px; border-radius: 50%; margin-top: 15%"  src="/static/img/imgBook/logoCIT.jpg" alt="error"></a>
+            <a href="/" style="color: #000000; text-decoration: none; font-size: 26px; font-family: 'Roboto Slab', serif;
+                font-weight: 500; ">CIT LIBRARY</a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Thư viện</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Thể loại sách</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/" class="logo">
+                        <img  style="height: 55px; width:55px; margin-top: 16px; margin-left: -50px"  src="/static/img/imgUser/user-square.png" alt="user-image"></a>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-3">
             <!-- row -->
             <div class="row justify-content-md-center">
                 <!-- LOGO -->
-                <div class="col-md-3">
+                <div class="col-6 col-md-3 mb-4">
                       <div class="navbar-logo">
                             <a href="/" class="logo">
                               <img  style="height: 70px; width:70px; border-radius: 50%; margin-top: 15%"  src="/static/img/imgBook/logoCIT.jpg" alt="error"></a>
@@ -17,7 +44,7 @@
                 </div>
                 
                 <!-- Thư viện -->
-                <div class="col-md-auto clearfix">
+                <div class="col-6 col-md-3 mb-4">
                     <div class="navbar-ctn">
                         <!-- Wishlist -->
                         <div>
@@ -28,7 +55,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-auto clearfix">
+                <div class="col-6 col-md-3 mb-4">
                         <!-- Thể loại -->
                     <div class="navbar-ctn">
                         <div class="dropdown">                           
@@ -40,7 +67,7 @@
                 </div>      
                     
                 {% comment %} Đây là form của thanh tìm kiếm {% endcomment %}
-                <div class="col-md-4">
+                <div class="col-6 col-md-3 mb-4">
                     <div class="navbar-search">
                         <form action="{% url 'search_slug' %}", method='GET'>
                         <span>
@@ -59,7 +86,7 @@
 
                     
 
-                <div class="col-md-auto">
+                <div class="col-6 col-md-3 mb-4">
                     <div class="navbar-logo">
                         <a href="/" class="logo">
                             <img  style="height: 55px; width:55px; margin-top: 16px; margin-left: -50px"  src="/static/img/imgUser/user-square.png" alt="user-image"></a>
