@@ -460,6 +460,21 @@ textarea.input {
   display: inline-block;
 }
 
+.navbar-collapse {
+  justify-content: center; /* Đảm bảo nội dung của navbar-collapse được căn giữa */
+  width: 300px;
+}
+
+.navbar-nav {
+  justify-content: center;
+  flex-direction: row;
+}
+
+.navbar-item {
+  flex: none;
+  width: 1000px;
+}
+
 /*----------------------------*\
 	Search
 \*----------------------------*/

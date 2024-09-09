@@ -1,156 +1,67 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Open Library Responsive</title>
+    <title>Double Navbar Example</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <style>
-        .banner {
-            background-color: #f8f9fa;
-            padding: 50px 0;
-            text-align: center;
-        }
-
-        .book-card img {
-            height: 200px;
-            object-fit: cover;
-        }
-
-        .section-title {
-            margin: 30px 0;
-            font-size: 1.5rem;
-            text-align: center;
-        }
-
-        /* Media queries cho thiết bị nhỏ */
-        @media (max-width: 768px) {
-            .book-card img {
-                height: 150px;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .book-card img {
-                height: 120px;
-            }
-        }
-    </style>
 </head>
 <body>
 
-    <!-- Thanh điều hướng (Navbar) -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">Open Library</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Sách của tôi</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Duyệt sách</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Đăng nhập</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+    <style>
+        /* Đảm bảo navbar không bị đẩy lên cao khi thu nhỏ */
+        .navbar {
+            flex-wrap: nowrap;
+        }
+    </style>
+    
 
-    <!-- Phần banner -->
-    <div class="banner">
-        <div class="container">
-            <h1>Chào mừng đến với Open Library</h1>
-            <p>Hàng triệu cuốn sách có sẵn để đọc miễn phí.</p>
-            <a href="#" class="btn btn-primary">Khám phá ngay</a>
-        </div>
-    </div>
-
-    <!-- Phần sách phổ biến -->
-    <div class="container mt-5">
-        <h2 class="section-title">Sách Phổ Biến</h2>
-        <div class="row">
-            <div class="col-6 col-md-3 mb-4">
-                <div class="card book-card">
-                    <img src="https://placekitten.com/200/300" class="card-img-top img-fluid" alt="Sách 1">
-                    <div class="card-body">
-                        <h5 class="card-title">Tên Sách 1</h5>
-                    </div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3 mb-4">
-                <div class="card book-card">
-                    <img src="https://placekitten.com/200/301" class="card-img-top img-fluid" alt="Sách 2">
-                    <div class="card-body">
-                        <h5 class="card-title">Tên Sách 2</h5>
-                    </div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3 mb-4">
-                <div class="card book-card">
-                    <img src="https://placekitten.com/200/302" class="card-img-top img-fluid" alt="Sách 3">
-                    <div class="card-body">
-                        <h5 class="card-title">Tên Sách 3</h5>
-                    </div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3 mb-4">
-                <div class="card book-card">
-                    <img src="https://placekitten.com/200/303" class="card-img-top img-fluid" alt="Sách 4">
-                    <div class="card-body">
-                        <h5 class="card-title">Tên Sách 4</h5>
-                    </div>
-                </div>
-            </div>
+<!-- Upper Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Open Library</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarUpper" aria-controls="navbarUpper" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarUpper">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">My Books</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Browse</a>
+                </li>
+            </ul>
+            <form class="d-flex">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
         </div>
     </div>
+</nav>
 
-    <!-- Phần sách cổ điển -->
-    <div class="container mt-5">
-        <h2 class="section-title">Sách Cổ Điển</h2>
-        <div class="row">
-            <div class="col-6 col-md-3 mb-4">
-                <div class="card book-card">
-                    <img src="https://placekitten.com/200/304" class="card-img-top img-fluid" alt="Sách 5">
-                    <div class="card-body">
-                        <h5 class="card-title">Tên Sách 5</h5>
-                    </div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3 mb-4">
-                <div class="card book-card">
-                    <img src="https://placekitten.com/200/305" class="card-img-top img-fluid" alt="Sách 6">
-                    <div class="card-body">
-                        <h5 class="card-title">Tên Sách 6</h5>
-                    </div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3 mb-4">
-                <div class="card book-card">
-                    <img src="https://placekitten.com/200/306" class="card-img-top img-fluid" alt="Sách 7">
-                    <div class="card-body">
-                        <h5 class="card-title">Tên Sách 7</h5>
-                    </div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3 mb-4">
-                <div class="card book-card">
-                    <img src="https://placekitten.com/200/307" class="card-img-top img-fluid" alt="Sách 8">
-                    <div class="card-body">
-                        <h5 class="card-title">Tên Sách 8</h5>
-                    </div>
-                </div>
-            </div>
+<!-- Lower Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarLower" aria-controls="navbarLower" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarLower">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Features</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Pricing</a>
+                </li>
+            </ul>
         </div>
     </div>
+</nav>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
