@@ -1,13 +1,9 @@
 .book-slider img {
-    width: 150px;
-    height: 220px;
+    width: 140px;
+    height: 200px;
     object-fit: cover;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-        
-.book-slider {
-    padding: 20px 0;
 }
 
 .book-item {
@@ -15,8 +11,8 @@
 }
 
 .book-image {
-    width: 150px;
-    height: 220px;
+    width: 140px;
+    height: 200px;
     background-size: cover;
     background-position: center;
     border-radius: 5px;
@@ -24,12 +20,24 @@
     margin: 0 auto;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+
 .book-image:hover {
     transform: scale(1.05);
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+
+.slick-next {
+    background-color: blue !important;
+    margin-left: -100px !important;
+
+    &:hover {
+        color: blue;
+    }
+}
+
 .book-slider {
+    background-color: #f3ecd7;
     display: flex;
     gap: 20px;
     padding: 20px 0;
@@ -44,6 +52,6 @@
 
 .book-item h5 {
     margin-top: 10px;
-    font-size: 1rem;
+    font-size: 0.8rem;
     color: #333;
 }

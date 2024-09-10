@@ -3,8 +3,8 @@ $(document).ready(function(){
         slidesToShow: 5,
         slidesToScroll: 1,
         autoplay: true,
-        autoplaySpeed: 2000,
-        dots: true,
+        autoplaySpeed: 3000,
+        dots: false,
         arrows: true,
         responsive: [
             {
@@ -13,7 +13,7 @@ $(document).ready(function(){
                     slidesToShow: 3,
                     slidesToScroll: 1,
                     infinite: true,
-                    dots: true
+                    dots: false
                 }
             },
             {
