@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from .models import Book, Rating, Book_Topic, Topic, FavList
 from django.http import HttpResponse, JsonResponse
-from .forms import searchForm
-from .utils import normalize_vietnamese, pagePaginator
+from .forms import searchForm, SearchFormset
+from .utils import normalize_vietnamese, pagePaginator, HTTPResponseHXRedirect
 from django.shortcuts import redirect
 import json
 from django.contrib.auth.decorators import login_required
@@ -10,6 +10,7 @@ from django.db.models import Q, Avg
 import re
 from functools import reduce
 from operator import and_
+from django.template.loader import render_to_string
 
 # Logic xử lí
 def checkRate(userid = None, bookid = None):
@@ -77,7 +78,8 @@ def searchPost(request):
 
 def searchTypePost(request):
     if request.POST.get('search_type') == 'advance':
-        return redirect('index')
+          return HTTPResponseHXRedirect(redirect_to='http://127.0.0.1:8000/searchAdvance')
+    return
 
 def categoryPost(request):
     topics = Topic.objects.all()
@@ -152,6 +154,11 @@ def wishCheckPost(request):
     return HttpResponse(f'''
                                 <button id='wishlist' hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist' hx-swap = 'outerHTML' onclick='savingList(this)'>Want to read</button>
                                 ''')
+
+def searchAdvancePost(request):
+    pass
+
+
 # middle logic
 def searchSlug(request):
     query = request.GET.get('query')
@@ -213,12 +220,7 @@ def search(request, search_type, query):
                     for word in keywords
                     ))   
             books = Book.objects.filter(query)
-        elif search_type == 'absolute':
-            books = Book.objects.filter(
-                Q(book_title__unaccent__icontains=query) |
-                Q(book_author__unaccent__icontains=query) |
-                Q(book_publish__unaccent__icontains=query)
-            )
+        
         else:
             query = Q(**{f"{search_type}__unaccent__icontains": keywords[0]})
             for word in keywords[1:]:
@@ -248,6 +250,49 @@ def categoryFilter(request,id):
     }
     # Cần thêm một html để hiển thị filter theo thể loại
     return render(request, 'bookDetail.html', context)
+
+def searchAdvance(request):
+    formset = SearchFormset(request.POST or None)
+    page_obj = 'Yet'
+    final_query = None
+    queries = []
+    subquery = Q()
+    if formset.is_valid():
+        for form in formset:
+            field_name = form.cleaned_data.get('field_name')
+            search_type = form.cleaned_data.get('search_type')
+            value = form.cleaned_data.get('value')
+            value = normalize_vietnamese(value)
+            keywords = re.split(r'[ ,]+', value)
+            
+            if search_type == 'iexact':
+                queries.append(Q(**{f"{field_name}__unaccent__iexact": value}))
+            elif search_type == 'not_icontains':
+                subquery = ~Q(**{f"{field_name}__unaccent__icontains": keywords[0]})
+                for word in keywords[1:]:
+                    subquery &= ~Q(**{f"{field_name}__unaccent__icontains": word})
+                queries.append(subquery)
+            elif search_type == 'icontains':
+                subquery = Q(**{f"{field_name}__unaccent__icontains": keywords[0]})
+                for word in keywords[1:]:
+                    subquery &= Q(**{f"{field_name}__unaccent__icontains": word})
+                queries.append(subquery)
+                
+        if queries:
+            final_query = reduce(and_, queries)
+            books = Book.objects.filter(final_query) 
+            page_obj = pagePaginator(request, books)
+            
+    else:
+        books = Book.objects.all()
+        page_obj = pagePaginator(request, books)
+
+    # Xử lý yêu cầu từ HTMX
+    if request.headers.get('HX-Request'):
+        html = render_to_string('advanceBooks.html', {'page_obj': page_obj})
+        return HttpResponse(html)
+
+    return render(request, 'searchAdvance.html', {'formset': formset, 'page_obj': page_obj})
 
 def test(request):
     bookList = {}

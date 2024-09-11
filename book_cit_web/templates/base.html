@@ -37,8 +37,7 @@
   {% block pack %}
   {% endblock pack %}
 
-  {% block scripts %}
-  {% endblock scripts %}
+ 
 </head>
 
 <body>
@@ -48,7 +47,13 @@
   <div style="text-align: center">
   {% include 'navbar.html' %}
   </div>
+   
+  <div>
     
+    {% block bonusContent %}
+    {% endblock bonusContent %}  
+  </div>
+
   <div style="background-color:cadetblue">
     {% block content %}
     {% endblock content%}
@@ -76,6 +81,8 @@
 
   <script src="https://unpkg.com/htmx.org@2.0.2/dist/htmx.js" integrity="sha384-yZq+5izaUBKcRgFbxgkRYwpHhHHCpp5nseXp0MEQ1A4MTWVMnqkmcuFez8x5qfxr"crossorigin="anonymous"></script> 
 
+  {% block scripts %}
+  {% endblock scripts %}
 </body>
 
 </html>
