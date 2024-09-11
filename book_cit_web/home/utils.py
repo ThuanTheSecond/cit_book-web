@@ -1,5 +1,6 @@
 import unicodedata
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.http import HttpResponseRedirect
 
 
 def normalize_vietnamese(text):
@@ -21,3 +22,9 @@ def pagePaginator(request, books):
         # Nếu vượt qua trang cuối cùng, load trang cuối cùng
         page_obj = paginator.page(paginator.num_pages)
     return page_obj
+
+class HTTPResponseHXRedirect(HttpResponseRedirect):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self['HX-Redirect']=self['Location']
+    status_code = 200

@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+
+
+{% block pack %}
+    
+{% endblock pack %}
+
+
+{% block bonusContent %}
+<form method="post" action="{% url 'searchAdvance' %}" hx-post="{% url 'searchAdvance' %}" hx-target="#book-content" hx-swap="outerHTML">
+    {% csrf_token %}
+    {{ formset.management_form }}
+    <table>
+        <thead>
+            <tr>
+                <th>Field</th>
+                <th>Condition</th>
+                <th>Value</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for form in formset %}
+            <tr>
+                <td>{% render_field form.field_name %}</td>
+                <td>{% render_field form.search_type %}</td>
+                <td>{% render_field form.value %}</td>
+                <td><button type="button" class="remove-field">Remove</button></td> 
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button type="submit" >Tìm Kiếm</button>
+    <button type="button" id="add-field">Thêm trường</button>
+</form>
+{% endblock bonusContent %}
+
+{% block content %}
+    <div id="book-list">
+        {% include 'advanceBooks.html' %}
+    </div>
+{% endblock content %}
+{% block scripts %}
+<script>
+    // Hàm để thêm trường mới
+    document.getElementById('add-field').addEventListener('click', function(e) {
+        e.preventDefault();
+        // Đếm số lượng dòng hiện tại
+        var form_idx = document.querySelectorAll('tbody tr').length;
+        // Clone dòng đầu tiên
+        var new_form = document.querySelector('tbody tr:first-child').cloneNode(true);
+
+        // Reset các giá trị của input và select
+        new_form.querySelectorAll('input, select').forEach(function(input) {
+            input.name = input.name.replace(/\d+/, form_idx);
+            input.id = input.id.replace(/\d+/, form_idx);
+            input.value = '';  // Reset giá trị
+        });
+        var totalForms = document.getElementById('id_form-TOTAL_FORMS');
+        totalForms.value = form_idx + 1;
+        // Đặt giá trị mặc định cho 'field_name' và 'search_type'
+        var fieldNameSelect = new_form.querySelector('select[name$="field_name"]');
+        var searchTypeSelect = new_form.querySelector('select[name$="search_type"]');
+
+        if (fieldNameSelect) {
+            fieldNameSelect.value = 'book_title'; // Giá trị mặc định cho 'field_name'
+        }
+        if (searchTypeSelect) {
+            searchTypeSelect.value = 'icontains'; // Giá trị mặc định cho 'search_type'
+        }
+
+        // Thêm sự kiện xóa cho nút remove
+        var remove_button = new_form.querySelector('.remove-field');
+        remove_button.addEventListener('click', removeField);
+        
+        // Thêm dòng mới vào tbody
+        document.querySelector('tbody').appendChild(new_form);
+       
+    });
+
+    // Hàm để xóa trường
+    function removeField(e) {
+        e.preventDefault();
+        var totalRows = document.querySelectorAll('tbody tr').length;
+
+        // Chỉ xóa nếu có hơn 1 dòng
+        if (totalRows > 1) {
+            this.closest('tr').remove();
+            var form_idx = document.getElementById('id_form-TOTAL_FORMS');
+            form_idx.value = totalRows -1;
+            // cập nhật lại số hiêu của các form sau khi xóa
+            document.querySelectorAll('tbody tr').forEach(function(tr, index) {
+                tr.querySelectorAll('input, select').forEach(function(input) {
+                    // Thay thế chỉ số hiện tại bằng chỉ số mới dựa trên index
+                    input.name = input.name.replace(/form-\d+-/, `form-${index}-`);  
+                    input.id = input.id.replace(/form-\d+-/, `form-${index}-`);
+                });
+            });
+        } else {
+            alert('Phải có ít nhất một trường!');
+        }
+    }
+
+    // Thêm sự kiện cho nút "Remove" mặc định
+    document.querySelectorAll('.remove-field').forEach(function(button) {
+        button.addEventListener('click', removeField);
+    });
+</script>
+
+{% endblock scripts %}
+    
+    
+    
