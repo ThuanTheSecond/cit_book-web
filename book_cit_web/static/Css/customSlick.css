@@ -28,12 +28,27 @@
 }
 
 .slick-next {
-    background-color: blue !important;
-    margin-left: -100px !important;
+    background-color: transparent !important;
+    padding-right: 60px;
+    height: 30px;
+    width: 30px;
+    color: rgb(184, 206, 212);
+}
 
-    &:hover {
-        color: blue;
-    }
+.slick-prev {
+    padding-left: 50px;
+}
+
+.slick-prev:before, .slick-next:before {
+    height: 30px !important;
+    width: 30px !important;
+    font-family: 'slick' !important;
+    font-size: 20px !important;
+    line-height: 1 !important;
+    opacity: .75 !important;
+    color: rgb(184, 206, 212) !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 .book-slider {
@@ -41,9 +56,18 @@
     display: flex;
     gap: 20px;
     padding: 20px 0;
+    padding-left: 30px;
+    padding-right: 30px;
+    margin-left: -12px;
+    margin-right: -12px;
+    border: 1px solid #e6e0cb;
+    border-right: 0;
+    border-left: 0;
 }
 
 .book-item {
+    padding-right: 30px;
+    padding-left: 30px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -51,6 +75,7 @@
 }
 
 .book-item h5 {
+    padding-top: 0;
     margin-top: 10px;
     font-size: 0.8rem;
     color: #333;
