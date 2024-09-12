@@ -72,7 +72,10 @@ def searchPost(request):
             # Chỉnh sửa phần context để hiển thị ra đúng
             for book in books:
                 # chỉnh sủa để hiển thị suggest dựa theo từ khóa
-                context+= f'<li><a href="/book/detail/id={book.book_id -3000}">{ book.book_title }</a></li>'
+                context+= f'''
+                <li><img class="search-book-image" src="{ book.bookImage.url }" alt="{ book.book_title }">
+                <a href="/book/detail/id={book.book_id -3000}">{ book.book_title }</a></li>
+                '''
             return HttpResponse(context)
     return HttpResponse('')
 

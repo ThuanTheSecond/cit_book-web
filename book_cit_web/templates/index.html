@@ -15,11 +15,11 @@
 
 
 {% block content %}
-<div class="test-body">
-  <div class="content-body">
+<div class="body">
+  <div class="container-fluid justify-content-center">
     {% comment %} book-slider la phan se slide {% endcomment %}
     {% comment %} Chinh sua tren file customSlick.css và customSlick.js {% endcomment %}
-    <h5><a href="#">Trending</a></h5>
+    <h5 ><a id="container-header" href="#">Trending Books</a></h5>
     <div class="book-slider">
       {% for book in bookList.popular %}
       <div class="book-item">
@@ -28,7 +28,7 @@
       </div>
       {% endfor %}
     </div>
-    <h5><a href="#">Ngoại Văn</a></h5>
+    <h5 ><a id="container-header" href="#">Ngoại Văn</a></h5>
     <div class="book-slider">
       {% for book in bookList.topFl %}
       <div class="book-item">
@@ -37,7 +37,7 @@
       </div>
       {% endfor %}
     </div>
-    <h5><a href="#">Sách Tiếng Việt</a></h5>
+    <h5 ><a id="container-header" href="#">Sách Tiếng Việt</a></h5>
     <div class="book-slider">
       {% for book in bookList.topVn %}
       <div class="book-item">

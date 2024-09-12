@@ -1,13 +1,9 @@
 .book-slider img {
-    width: 150px;
-    height: 220px;
+    width: 140px;
+    height: 200px;
     object-fit: cover;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-        
-.book-slider {
-    padding: 20px 0;
 }
 
 .book-item {
@@ -15,8 +11,8 @@
 }
 
 .book-image {
-    width: 150px;
-    height: 220px;
+    width: 140px;
+    height: 200px;
     background-size: cover;
     background-position: center;
     border-radius: 5px;
@@ -24,18 +20,54 @@
     margin: 0 auto;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+
 .book-image:hover {
     transform: scale(1.05);
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+
+.slick-next {
+    background-color: transparent !important;
+    padding-right: 60px;
+    height: 30px;
+    width: 30px;
+    color: rgb(184, 206, 212);
+}
+
+.slick-prev {
+    padding-left: 50px;
+}
+
+.slick-prev:before, .slick-next:before {
+    height: 30px !important;
+    width: 30px !important;
+    font-family: 'slick' !important;
+    font-size: 20px !important;
+    line-height: 1 !important;
+    opacity: .75 !important;
+    color: rgb(184, 206, 212) !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale;
+}
+
 .book-slider {
+    background-color: #f3ecd7;
     display: flex;
     gap: 20px;
     padding: 20px 0;
+    padding-left: 30px;
+    padding-right: 30px;
+    margin-left: -12px;
+    margin-right: -12px;
+    border: 1px solid #e6e0cb;
+    border-right: 0;
+    border-left: 0;
 }
 
 .book-item {
+    padding-right: 30px;
+    padding-left: 30px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -43,7 +75,8 @@
 }
 
 .book-item h5 {
+    padding-top: 0;
     margin-top: 10px;
-    font-size: 1rem;
+    font-size: 0.8rem;
     color: #333;
 }
