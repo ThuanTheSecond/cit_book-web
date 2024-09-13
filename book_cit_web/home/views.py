@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Book, Rating, Book_Topic, Topic, FavList
+from .models import Book, Rating, Book_Topic, Topic, FavList, ContentBook
 from django.http import HttpResponse, JsonResponse
 from .forms import searchForm, SearchFormset
 from .utils import normalize_vietnamese, pagePaginator, HTTPResponseHXRedirect
