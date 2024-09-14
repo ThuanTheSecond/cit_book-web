@@ -183,7 +183,9 @@ def index(request):
     
 def bookDetail(request, id):
     id += 3000
-    detail = Book.objects.filter(book_id = id).first()
+    
+    books = Book.objects.all().order_by('book_id')
+    detail = books.filter(book_id = id).first()
     topicList = Book_Topic.objects.prefetch_related('topic_id').filter(book_id = detail.book_id)
     # xử lý rating
     # truy xuất rating của cuốn sách, thêm checked vào radio của sao đã được rating, thêm nút clear rating
@@ -194,12 +196,23 @@ def bookDetail(request, id):
         rating = Rate.rating
     averRate = averRating(id)
     countRate = countRating(id)
+    
+    # lay goi y sach co noi dung tuong tu
+    from .utils import getRecommend_content
+    books_index = getRecommend_content(book_id= id)
+    print(books_index)
+    # bookRecommendList = []
+    # for i in books:
+    #     bookRecommendList.append(books[i])
+    bookRecommendList = books.filter(book_id__in = books_index)
+    print(bookRecommendList)
     context = {
         'rating': str(rating),
         'detail':detail,
         'topicList':topicList,
         'averRate': averRate,
         'countRate': countRate,
+        'bookList': bookRecommendList,
     }
     return render(request, 'bookDetail.html', context)
 

@@ -108,7 +108,31 @@ def updateContentRecommend():
         pickle.dump(cosine_similarity, f)
     print('updated content after delete')
 
+def getRecommend_content(book_id):
+    from home.models import ContentBook
+    import pickle
+    import pandas as pd
+    
+    bookContents = ContentBook.objects.all().order_by('book_id').values('book_id')
+    book_df = pd.DataFrame(bookContents)
+    # Thao tac de truy xuat index cua book_id trong dataframe book_df
+    book_df.set_index('book_id', inplace=True)
+    book_index = book_df.index.get_loc(book_id)
+    
+    # lay ham cosine_similartity ra de tinh toan goi y voi tham so la index cua book_id
+    with open('./home/recommend/book_cosine_similarity.pkl', 'rb') as f:
+        cosine_similarity = pickle.load(f)
+    choice = book_index
+    similarity_scores = list(enumerate(cosine_similarity[choice]))
+    similarity_scores = sorted(similarity_scores, key=lambda x: x[1], reverse=True)
+    similarity_scores = similarity_scores[1:6]
 
+    # Get the similar books index
+    books_index = [i[0] for i in similarity_scores]
+    books_index_real = []
+    for i in books_index:
+        books_index_real.append(i+3000) 
+    return books_index_real
     
 
     
