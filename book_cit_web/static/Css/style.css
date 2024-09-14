@@ -815,9 +815,101 @@ textarea.input {
 
 
 /*=========================================================
-	05 -> HOT DEAL
+	05 -> BOOK DETAIL
 ===========================================================*/
+.body .container {
+  width: 70%;
+  background-color: #fff;
+  border: 1px solid #c0beb2;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  border-bottom: 0;
+}
 
+/* .img-book-detail {
+  padding: 20px 20px;
+  max-width: 100%;
+  height: auto;    
+} */
+
+.left-container {
+  padding-top: 20px;
+}
+
+.book-detail-image {
+  width: 100%; /* Đảm bảo hình ảnh không vượt quá chiều rộng của container */
+  height: auto;
+  background-size: cover;
+  background-position: center;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  margin: 0 auto;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.book-detail-image:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Màn hình có chiều rộng dưới 600px */
+@media (max-width: 600px) {
+  book-detail-image {
+      width: 100%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
+  }
+}
+
+/* Màn hình có chiều rộng từ 601px đến 900px */
+@media (min-width: 601px) and (max-width: 900px) {
+  book-detail-image {
+      width: 80%; /* Giảm kích thước hình ảnh xuống trên các màn hình vừa */
+  }
+}
+
+/* Màn hình có chiều rộng lớn hơn 900px */
+@media (min-width: 901px) {
+  book-detail-image {
+      width: 50%; /* Giảm kích thước hình ảnh xuống trên các màn hình lớn */
+  }
+}
+
+.wishlist {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  text-align: center;
+}
+
+#wishlist {
+  padding: 5px 5px;
+  background-color: #ededed;
+  border: 1px solid #b0b0b0;
+  border-radius: 5px;
+  font-size: 18px;
+  text-align: center;
+}
+
+#wishlist button {
+  border: none;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.right-container {
+  padding-top: 20px;
+}
+
+.book-tittle {
+  color: #000000;
+  font-size: 2rem; 
+  font-family: 'Roboto Slab', serif; 
+  font-weight: 600;
+}
+
+.book-info {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+}
 
 /*=========================================================
 	06 -> PRODUCT

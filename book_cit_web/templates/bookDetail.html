@@ -38,7 +38,52 @@
     
 
 {% block content %}
-    <h2>Book Detail</h2>
+<div class="body">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="left-container col-md-3 justify-content-center">
+                <img src="{{ detail.bookImage.url }}" alt="image of book {{myManga.title}}" class="book-detail-image">
+                
+                <div class="wishlist">
+                    <div hx-post = "/wishCheck_post/" hx-vals = '{"book_id": {{detail.book_id}}}' hx-trigger="load" hx-target='#wishlist'>
+                        <button id='wishlist' hx-post = "/wishList_post/" hx-vals = '{"book_id": {{detail.book_id}}}' hx-trigger="click delay:0.25s" onclick='savingList(this)'></button>
+                    </div>
+                </div>
+
+                <div>
+                    <form action="">
+                        <div class="rating">
+                            <p><span class="star-rating">
+                                {% for i in "12345" %} 
+                                    {% if i == rating %}
+                                        <label for="rate-{{i}}" style="--i: {{i}}"><i class="fa fa-star" title="{{i}} star"></i></label>
+                                        <input type="radio" name="rating" id="rate-{{i}}" hx-vals='{"rate": {{i}}, "book_id": {{detail.book_id}}}' hx-post ="/rating_post/" hx-trigger="load click delay:0.25s" hx-target="#clear" hx-swap="outerHTML" checked>
+                                    {% else %}
+                                        <label for="rate-{{i}}" style="--i: {{i}}"><i class="fa fa-star" title="{{i}} star"></i></label>
+                                        <input type="radio" name="rating" id="rate-{{i}}" hx-vals='{"rate": {{i}}, "book_id": {{detail.book_id}}}' hx-post ="/rating_post/" hx-trigger="click delay:0.25s" hx-target="#clear" hx-swap="outerHTML">
+                                    {% endif %}
+                                {% endfor %}    
+                            </span></p>
+                        </div>
+                        <div class="clear_rating">
+                            <input style="display: none;" type="button"  name="clear" id="clear" >
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="right-container col-md-auto">
+                <h1 class="book-tittle">{{detail.book_title}}</h1>
+                <p class="book-info"><strong>Author:</strong> {{detail.book_author}}</p>
+                <p class="book-info"><strong>Position: </strong> {{ detail.book_position }}</p>
+                <p class="book-info"><strong>Publish: </strong> {{ detail.book_publish }}</p>
+                <p class="book-info"><strong>MFN: </strong> {{ detail.book_MFN }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    {% comment %} <h2>Book Detail</h2>
     <ul>
         <li>Title: {{detail.book_title}}</li>
         <li>Author: {{detail.book_author}}</li>
@@ -81,7 +126,7 @@
                 <input style="display: none;" type="button"  name="clear" id="clear" >
             </div>
         </form>
-    </div>
+    </div> {% endcomment %}
 {% endblock content %}
 
 

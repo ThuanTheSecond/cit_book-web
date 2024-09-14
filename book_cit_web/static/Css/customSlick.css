@@ -11,14 +11,35 @@
 }
 
 .book-image {
-    width: 140px;
-    height: 200px;
+    width: 100%; /* Đảm bảo hình ảnh không vượt quá chiều rộng của container */
+    height: auto;
     background-size: cover;
     background-position: center;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     margin: 0 auto;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Màn hình có chiều rộng dưới 600px */
+@media (max-width: 600px) {
+    book-image {
+        width: 100%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
+    }
+}
+
+/* Màn hình có chiều rộng từ 601px đến 900px */
+@media (min-width: 601px) and (max-width: 900px) {
+    book-image {
+        width: 80%; /* Giảm kích thước hình ảnh xuống trên các màn hình vừa */
+    }
+}
+
+/* Màn hình có chiều rộng lớn hơn 900px */
+@media (min-width: 901px) {
+    book-image {
+        width: 50%; /* Giảm kích thước hình ảnh xuống trên các màn hình lớn */
+    }
 }
 
 .book-image:hover {
@@ -55,7 +76,7 @@
     background-color: #f3ecd7;
     display: flex;
     gap: 20px;
-    padding: 20px 0;
+    padding-top: 20px;
     padding-left: 30px;
     padding-right: 30px;
     margin-left: -12px;
