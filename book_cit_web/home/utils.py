@@ -1,17 +1,13 @@
-import unicodedata
-from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import HttpResponseRedirect
-from sklearn.metrics.pairwise import linear_kernel
-
-
-
 def normalize_vietnamese(text):
+    import unicodedata
     text = unicodedata.normalize('NFKD', text)
     rawText =  ''.join(c for c in text if not unicodedata.combining(c))
     rawText = rawText.replace('đ','d').replace('Đ', 'D')
     return rawText
 
 def pagePaginator(request, books):
+    from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
     paginator = Paginator(books, 7)
     
     page_number = request.GET.get('page')
@@ -26,6 +22,7 @@ def pagePaginator(request, books):
     return page_obj
 
 class HTTPResponseHXRedirect(HttpResponseRedirect):
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self['HX-Redirect']=self['Location']
