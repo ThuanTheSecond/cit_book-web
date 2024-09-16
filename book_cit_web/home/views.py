@@ -12,6 +12,7 @@ from functools import reduce
 from operator import and_
 from django.template.loader import render_to_string
 
+
 # Logic xử lí
 def checkRate(userid = None, bookid = None):
     rate = Rating.objects.filter(user_id = userid, book_id = bookid).first()
@@ -159,8 +160,11 @@ def wishCheckPost(request):
                                 ''')
 
 def topicListPost(request):
-    pass
-
+    topicList = Topic.objects.all().order_by('topic_name')
+    context = ''
+    for topic in topicList:
+        context += f'<li><a class="dropdown-item" id="t-{int(topic.topic_id) - 3000}" href="/topicFilter/{str((topic.topic_id) - 3000)}/1">{topic.topic_name}</a></li>'
+    return HttpResponse(context)
 
 def searchAdvancePost(request):
     pass
@@ -237,7 +241,6 @@ def search(request, search_type, query):
                     for word in keywords
                     ))   
             books = Book.objects.filter(query)
-        
         else:
             query = Q(**{f"{search_type}__unaccent__icontains": keywords[0]})
             for word in keywords[1:]:
@@ -252,8 +255,9 @@ def search(request, search_type, query):
     return render(request, 'searchBook.html', context)
 
 def topicFilter(request,tid, type = 1):
-    tid += 3000
-    bookTopic = Book_Topic.objects.prefetch_related('topic_id').filter(topic_id = tid)
+    from home.utils import filterBasedType
+    id = int(tid) + 3000
+    bookTopic = Book_Topic.objects.prefetch_related('topic_id').filter(topic_id = id)
     topicName = None
     bid = []
     for id in bookTopic:
@@ -261,28 +265,13 @@ def topicFilter(request,tid, type = 1):
             topicName = id.topic_id.topic_name
         bid.append(id.book_id.book_id)
     books = Book.objects.filter(book_id__in = bid)
-    
-    # loc danh sach
-    if type == 1:
-        books = books.order_by('book_view')
-    if type == 2:
-        from django.db.models import IntegerField
-        from django.db.models.functions import Cast,  Substr, Length
-        books = books.annotate(
-                year = Cast(Substr('book_publish', Length('book_publish') - 3),output_field=IntegerField())
-        ).order_by("-year")
-    if type == 3:
-        from django.db.models import Count
-        books = books.annotate(
-            ratecount = Count('rating')
-        ).order_by('-ratecount')
-    if type == 4:
-        books = books.annotate(
-        ratecount = Avg('rating__rating')
-    ).order_by('ratecount')
 
-    page_obj = pagePaginator(books)
+    # phan loai dua vao loc
+    books = filterBasedType(books=books,type=type)
+
+    page_obj = pagePaginator(request, books)
     context = {
+        'tid': tid,
         'topicName': topicName,
         'page_obj': page_obj,
     }
@@ -346,6 +335,7 @@ def test(request):
     return render(request, 'test.html',context)
 
 def categoryFilter(request,cid,type = 1):
+    from home.utils import filterBasedType
     books = Book.objects.all()
     # phan loai dua vao category
     if cid != 'Trending':
@@ -354,23 +344,7 @@ def categoryFilter(request,cid,type = 1):
             lang = 'Vietnamese'
         books = books.filter(book_lang = lang)
     # phan loai dua vao loc
-    if type == 1:
-        books = books.order_by('book_view')
-    if type == 2:
-        from django.db.models import IntegerField
-        from django.db.models.functions import Cast,  Substr, Length
-        books = books.annotate(
-                year = Cast(Substr('book_publish', Length('book_publish') - 3),output_field=IntegerField())
-        ).order_by("-year")
-    if type == 3:
-        from django.db.models import Count
-        books = books.annotate(
-            ratecount = Count('rating')
-        ).order_by('-ratecount')
-    if type == 4:
-        books = books.annotate(
-        ratecount = Avg('rating__rating')
-    ).order_by('ratecount')
+    books = filterBasedType(books=books,type=type)
     # phan trang
     page_obj = pagePaginator(request, books)
     context = {

@@ -9,12 +9,29 @@
 
 
 {% block bonusContent %}
+
+{% if cid %}
+    <h3><i>#{{ cid }}</i></h3>
+{% elif tid %}
+    <h3><i>#{{ topicName }}</i></h3>
+{% endif %}
+    
+
 <div class="filter">
     <span>Lọc theo: </span>
-    <span><a href="/categoryFilter/{{cid}}/1">Lượt xem</a></span>
-    <span><a href="/categoryFilter/{{cid}}/2">Xuất bản gần đây</a></span>
-    <span><a href="/categoryFilter/{{cid}}/3">Đánh giá nhiều</a></span>
-    <span><a href="/categoryFilter/{{cid}}/4">Đánh giá tốt nhất</a></span>
+    
+    {% if cid %}
+        <span><a href="/categoryFilter/{{cid}}/1">Lượt xem</a></span>
+        <span><a href="/categoryFilter/{{cid}}/2">Xuất bản gần đây</a></span>
+        <span><a href="/categoryFilter/{{cid}}/3">Đánh giá nhiều</a></span>
+        <span><a href="/categoryFilter/{{cid}}/4">Đánh giá tốt nhất</a></span> 
+    {% elif tid %}
+        <span><a href="/topicFilter/{{tid}}/1">Lượt xem</a></span>
+        <span><a href="/topicFilter/{{tid}}/2">Xuất bản gần đây</a></span>
+        <span><a href="/topicFilter/{{tid}}/3">Đánh giá nhiều</a></span>
+        <span><a href="/topicFilter/{{tid}}/4">Đánh giá tốt nhất</a></span> 
+    {% endif %}
+    
 </div>
 {% endblock bonusContent %}  
 
