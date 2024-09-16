@@ -3,6 +3,9 @@ from django.db import models
 from django.db.models import Transform, CharField
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+from .utils import createBookContent, updateContentRecommend, updateBookContent
 
 # Create your models here.
 class Topic(models.Model):
@@ -32,6 +35,8 @@ class Book(models.Model):
     book_lang = models.CharField(max_length=10, choices=Language.choices, default=Language.FL)
     bookImage = models.ImageField(upload_to='imgBooks\\', default='imgBooks\\nothumb.jpg')
     is_active = models.BooleanField(default= True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
         return f'{self.book_id-3000}-{self.book_title},{self.book_author},{self.book_publish},{self.book_position},{self.book_MFN},{self.is_active}' 
@@ -60,9 +65,26 @@ class FavList(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
 
+class ContentBook(models.Model):
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    content = models.CharField(max_length= 300)
+
 # Dùng để thêm extension Unaccent của postgresql
 class Unaccent(Transform):
     lookup_name = 'unaccent'
     function = 'unaccent'
     output_field = CharField()
 CharField.register_lookup(Unaccent)
+
+@receiver(post_save, sender=Book)
+def createBookContent_signal(sender, instance, created, **kwargs):
+    if created:
+        createBookContent()
+        print('create new book content')
+    else:
+        updateBookContent()
+        print('update book content')
+
+    
+        
+        
