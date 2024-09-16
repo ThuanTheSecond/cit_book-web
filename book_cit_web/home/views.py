@@ -247,7 +247,7 @@ def search(request, search_type, query):
     }
     return render(request, 'searchBook.html', context)
 
-def categoryFilter(request,id):
+def topicFilter(request,id, type):
     id += 3000
     Book_TopicList = Book_Topic.objects.prefetch_related('topic_id').filter(topic_id = id)
     bookList = None
@@ -319,4 +319,36 @@ def test(request):
         'books': books,
     }
     return render(request, 'test.html',context)
-    
+
+def categoryFilter(request,cid,type = 1):
+    books = Book.objects.all()
+    # phan loai dua vao category
+    if cid != 'Trending':
+        lang = 'Foreign'
+        if cid == 'Tiếng Việt':
+            lang = 'Vietnamese'
+        books = books.filter(book_lang = lang)
+    # phan loai dua vao loc
+    if type == 1:
+        books = books.order_by('book_view')
+    if type == 2:
+        from django.db.models import IntegerField
+        from django.db.models.functions import Cast,  Substr, Length
+        books = books.annotate(
+                year = Cast(Substr('book_publish', Length('book_publish') - 3),output_field=IntegerField())
+        ).order_by("-year")
+    if type == 3:
+        from django.db.models import Count
+        books = books.annotate(
+            ratecount = Count('rating')
+        ).order_by('-ratecount')
+    if type == 4:
+        books = books.annotate(
+        ratecount = Avg('rating__rating')
+    ).order_by('ratecount')
+    page_obj = pagePaginator(request, books)
+    context = {
+        'cid': cid,
+        'page_obj': page_obj
+    }
+    return render(request, 'filterBook.html', context)

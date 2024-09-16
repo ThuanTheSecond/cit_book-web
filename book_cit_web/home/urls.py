@@ -8,6 +8,7 @@ urlpatterns = [
     path('category/filter/id=<int:id>', views.categoryFilter, name='category'),
     path('search/<str:search_type>/<str:query>', views.search, name='search'),  
     path('searchAdvance/', views.searchAdvance, name='searchAdvance'),  
+    path('categoryFilter/<str:cid>/<int:type>', views.categoryFilter, name='categoryFilter'), 
     path('test', views.test, name='test'),  
 ]
 

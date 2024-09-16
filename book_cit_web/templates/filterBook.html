@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% load filters %}
+
+{% block pack %}
+    
+{% endblock pack %}
+
+
+{% block bonusContent %}
+<div class="filter">
+    <span>Lọc theo: </span>
+    <span><a href="/categoryFilter/{{cid}}/1">Lượt xem</a></span>
+    <span><a href="/categoryFilter/{{cid}}/2">Xuất bản gần đây</a></span>
+    <span><a href="/categoryFilter/{{cid}}/3">Đánh giá nhiều</a></span>
+    <span><a href="/categoryFilter/{{cid}}/4">Đánh giá tốt nhất</a></span>
+</div>
+{% endblock bonusContent %}  
+
+{% block content %}
+
+    <div>
+        <ul>
+            {% comment %} thông tin sách {% endcomment %}
+            {% for book in page_obj %}
+                {% comment %} chỉnh sửa câu lệnh dưới để hiển thị từng cuốn sách {% endcomment %}
+                <li><a href="/book/detail/id={{book.book_id|add:'-3000'}}">{{ book.book_title }}</a></li>
+            {% endfor %}
+        </ul>
+    </div> 
+    
+{% endblock content %}
+
+
+{% block navBot %} 
+{% comment %} Đây là thanh phân trang {% endcomment %}
+    <nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page=1" aria-label="First">
+            <span aria-hidden="true">&laquo;&laquo;</span>
+            </a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">&laquo;&laquo;</span>
+        </li>
+        <li class="page-item disabled">
+            <span class="page-link">&laquo;</span>
+        </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+        {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
+            <span aria-hidden="true">&raquo;&raquo;</span>
+            </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">&raquo;</span>
+        </li>
+        <li class="page-item disabled">
+            <span class="page-link">&raquo;&raquo;</span>
+        </li>
+        {% endif %}
+    </ul>
+    </nav>  
+{% endblock navBot %}
+    
+
+{% block scripts %}
+{% endblock scripts %}
+    
+    
+    
