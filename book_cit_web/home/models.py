@@ -81,17 +81,10 @@ def createBookContent_signal(sender, instance, created, **kwargs):
     if created:
         createBookContent()
         print('create new book content')
-        updateContentRecommend()
-        print('updated content recommend')
     else:
         updateBookContent()
         print('update book content')
-        updateContentRecommend()
-        print('updated content recommend')
 
-@receiver(post_delete, sender=Book)
-def deleteBookContent_signal(sender, instance, **kwargs):
-    updateContentRecommend()
     
         
         

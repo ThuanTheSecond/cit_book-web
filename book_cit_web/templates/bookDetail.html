@@ -91,7 +91,7 @@
         {% comment %} book-slider la phan se slide {% endcomment %}
         {% comment %} Chinh sua tren file customSlick.css và customSlick.js {% endcomment %}
         <div class="book-slider">
-          {% for book in bookList %}
+          {% for book in bookList reversed %}
           <div class="book-item">
               <a href="/book/detail/id={{ book.book_id|subtract:3000 }}"><img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}"></a>
               <h5 class="mt-2">{{ book.book_title }}</h5>

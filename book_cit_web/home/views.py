@@ -199,13 +199,10 @@ def bookDetail(request, id):
     
     # lay goi y sach co noi dung tuong tu
     from .utils import getRecommend_content
-    books_index = getRecommend_content(book_id= id)
-    print(books_index)
-    # bookRecommendList = []
-    # for i in books:
-    #     bookRecommendList.append(books[i])
-    bookRecommendList = books.filter(book_id__in = books_index)
-    print(bookRecommendList)
+    books_indexes = getRecommend_content(book_id= id)
+
+    bookRecommendList = books.filter(book_id__in = books_indexes)
+
     context = {
         'rating': str(rating),
         'detail':detail,
