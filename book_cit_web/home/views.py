@@ -158,6 +158,10 @@ def wishCheckPost(request):
                                 <button id='wishlist' hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist' hx-swap = 'outerHTML' onclick='savingList(this)'>Want to read</button>
                                 ''')
 
+def topicListPost(request):
+    pass
+
+
 def searchAdvancePost(request):
     pass
 
@@ -247,22 +251,43 @@ def search(request, search_type, query):
     }
     return render(request, 'searchBook.html', context)
 
-def topicFilter(request,id, type):
-    id += 3000
-    Book_TopicList = Book_Topic.objects.prefetch_related('topic_id').filter(topic_id = id)
-    bookList = None
-    topicTitle =False
-    for book in Book_TopicList:
-        if not topicTitle:
-            topicTitle = book.topic_id.topic_name
-        # Chinh sua hien thi cho cac quyen sach
-        bookList+= f'<li><a href="/book/detail/id={book.book_id -3000}">{ book.book_id.book_title }</a></li>'
+def topicFilter(request,tid, type = 1):
+    tid += 3000
+    bookTopic = Book_Topic.objects.prefetch_related('topic_id').filter(topic_id = tid)
+    topicName = None
+    bid = []
+    for id in bookTopic:
+        if topicName == None:
+            topicName = id.topic_id.topic_name
+        bid.append(id.book_id.book_id)
+    books = Book.objects.filter(book_id__in = bid)
+    
+    # loc danh sach
+    if type == 1:
+        books = books.order_by('book_view')
+    if type == 2:
+        from django.db.models import IntegerField
+        from django.db.models.functions import Cast,  Substr, Length
+        books = books.annotate(
+                year = Cast(Substr('book_publish', Length('book_publish') - 3),output_field=IntegerField())
+        ).order_by("-year")
+    if type == 3:
+        from django.db.models import Count
+        books = books.annotate(
+            ratecount = Count('rating')
+        ).order_by('-ratecount')
+    if type == 4:
+        books = books.annotate(
+        ratecount = Avg('rating__rating')
+    ).order_by('ratecount')
+
+    page_obj = pagePaginator(books)
     context = {
-        'topicTitle': topicTitle,
-        'bookList': bookList
+        'topicName': topicName,
+        'page_obj': page_obj,
     }
     # Cần thêm một html để hiển thị filter theo thể loại
-    return render(request, 'bookDetail.html', context)
+    return render(request, 'filterBook.html', context)
 
 def searchAdvance(request):
     formset = SearchFormset(request.POST or None)
@@ -346,6 +371,7 @@ def categoryFilter(request,cid,type = 1):
         books = books.annotate(
         ratecount = Avg('rating__rating')
     ).order_by('ratecount')
+    # phan trang
     page_obj = pagePaginator(request, books)
     context = {
         'cid': cid,

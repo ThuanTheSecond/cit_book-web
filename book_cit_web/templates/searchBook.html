@@ -9,7 +9,12 @@
             {% comment %} thông tin sách {% endcomment %}
             {% for book in page_obj %}
                 {% comment %} chỉnh sửa câu lệnh dưới để hiển thị từng cuốn sách {% endcomment %}
-                <li><a href="/book/detail/id={{book.book_id|add:'-3000'}}">{{ book.book_title }}</a></li>
+                {% comment %} Cần chỉnh sửa lại wishlist post {% endcomment %}
+                <li><a href="/book/detail/id={{book.book_id|add:'-3000'}}">{{ book.book_title }}</a> 
+                    <div hx-post = "/wishCheck_post/" id= {{book.book_id}} hx-vals = '{"book_id": {{book.book_id}}}' hx-trigger="load" hx-target='#wishlist' >
+                    <button id='wishlist' hx-post = "/wishList_post/" hx-vals = '{"book_id": {{book.book_id}}}' hx-trigger="click delay:0.25s">...</button>
+                    </div>
+                </li>
             {% endfor %}
         </ul>
     </div> 

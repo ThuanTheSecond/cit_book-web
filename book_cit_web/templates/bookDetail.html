@@ -54,7 +54,7 @@
     </div>
     {% comment %} nuts wishlist {% endcomment %}
     <div hx-post = "/wishCheck_post/" hx-vals = '{"book_id": {{detail.book_id}}}' hx-trigger="load" hx-target='#wishlist' >
-        <button id='wishlist' hx-post = "/wishList_post/" hx-vals = '{"book_id": {{detail.book_id}}}' hx-trigger="click delay:0.25s" onclick='savingList(this)'>...</button>
+        <button id='wishlist' hx-post = "/wishList_post/" hx-vals = '{"book_id": {{detail.book_id}}}' hx-trigger="click delay:0.25s">...</button>
     </div>
     <div>
         <h3>The loai</h3>
