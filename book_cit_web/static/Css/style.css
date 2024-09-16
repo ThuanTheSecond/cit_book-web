@@ -813,6 +813,27 @@ textarea.input {
   }
 }
 
+@media (max-width: 600px) {
+  .body .container-fluid {
+      width: 100%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
+  }
+}
+
+/* Màn hình có chiều rộng từ 601px đến 900px */
+@media (min-width: 601px) and (max-width: 900px) {
+  .body .container-fluid {
+      width: 70%; /* Giảm kích thước hình ảnh xuống trên các màn hình vừa */
+  }
+}
+
+/* Màn hình có chiều rộng lớn hơn 900px */
+@media (min-width: 901px) {
+  .body .container-fluid {
+      width: 70%; /* Giảm kích thước hình ảnh xuống trên các màn hình lớn */
+  }
+}
+
+
 
 /*=========================================================
 	05 -> BOOK DETAIL
@@ -827,13 +848,17 @@ textarea.input {
 }
 
 /* .img-book-detail {
-  padding: 20px 20px;
+  
   max-width: 100%;
   height: auto;    
 } */
 
 .left-container {
-  padding-top: 20px;
+  padding: 20px 20px;
+  margin-inline-start: 1rem;
+  margin-top: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
 .book-detail-image {
@@ -843,7 +868,7 @@ textarea.input {
   background-position: center;
   border-radius: 5px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  margin: 0 auto;
+  margin: auto;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -853,27 +878,6 @@ textarea.input {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Màn hình có chiều rộng dưới 600px */
-@media (max-width: 600px) {
-  book-detail-image {
-      width: 100%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
-  }
-}
-
-/* Màn hình có chiều rộng từ 601px đến 900px */
-@media (min-width: 601px) and (max-width: 900px) {
-  book-detail-image {
-      width: 80%; /* Giảm kích thước hình ảnh xuống trên các màn hình vừa */
-  }
-}
-
-/* Màn hình có chiều rộng lớn hơn 900px */
-@media (min-width: 901px) {
-  book-detail-image {
-      width: 50%; /* Giảm kích thước hình ảnh xuống trên các màn hình lớn */
-  }
-}
-
 .wishlist {
   padding-top: 20px;
   padding-bottom: 20px;
@@ -881,7 +885,9 @@ textarea.input {
 }
 
 #wishlist {
-  padding: 5px 5px;
+  padding: 3px 3px;
+  padding-left: 10px;
+  padding-right: 10px;
   background-color: #ededed;
   border: 1px solid #b0b0b0;
   border-radius: 5px;
@@ -893,6 +899,54 @@ textarea.input {
   border: none;
   display: inline-block;
   vertical-align: middle;
+}
+
+#rating {
+  text-align: center;
+}
+
+.star-rating {
+  white-space: nowrap;
+}
+
+.star-rating [type="radio"] {
+  appearance: none;
+}
+
+.star-rating i {
+  font-size: 1.5em;
+  transition: 0.3s;
+  color: #ccc;
+}
+
+.star-rating label:is(:hover, :has(~ :hover)) i {
+  transform: scale(1.35);
+  color: #f8cf08;
+  animation: jump 0.5s calc(0.3s + (var(--i) - 1) * 0.15s) alternate infinite;
+}
+
+.star-rating label:has(~ :checked) i {
+  color: #f8cf08;
+  text-shadow: 0 0 2px #ffffff, 0 0 10px #ffee58;
+}
+
+#clear-rating {
+  color: #96a0a7;
+  background-color: #fff;
+  border: none;
+  font-size: 14px;
+}
+
+@keyframes jump {
+
+  0%,
+  50% {
+    transform: translatey(0) scale(1.35);
+  }
+
+  100% {
+    transform: translatey(-15%) scale(1.35);
+  }
 }
 
 .right-container {
@@ -909,6 +963,48 @@ textarea.input {
 .book-info {
   font-family: 'Montserrat', sans-serif;
   font-size: 16px;
+}
+
+.aveRating {
+  padding-top: 10px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.aveRating-start {
+  color: #f8cf08;
+  font-size: 14px;
+}
+
+.body .suggestBook .container-fluid{
+  border-top: 0;
+}
+
+
+/* Màn hình có chiều rộng dưới 600px */
+@media (max-width: 600px) {
+  book-detail-image {
+      width: 100%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
+  }
+
+  .left-container {
+    margin-inline-start: 0;
+    border: none;
+  }
+}
+
+/* Màn hình có chiều rộng từ 601px đến 900px */
+@media (min-width: 601px) and (max-width: 900px) {
+  book-detail-image {
+      width: 80%; /* Giảm kích thước hình ảnh xuống trên các màn hình vừa */
+  }
+}
+
+/* Màn hình có chiều rộng lớn hơn 900px */
+@media (min-width: 901px) {
+  book-detail-image {
+      width: 50%; /* Giảm kích thước hình ảnh xuống trên các màn hình lớn */
+  }
 }
 
 /*=========================================================
@@ -1155,6 +1251,26 @@ textarea.input {
 
 .footer-links li a:hover {
   color: #000000;
+}
+
+@media (max-width: 600px) {
+  #footer .container-fluid {
+      width: 100%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
+  }
+}
+
+/* Màn hình có chiều rộng từ 601px đến 900px */
+@media (min-width: 601px) and (max-width: 900px) {
+  #footer .container-fluid {
+      width: 70%; /* Giảm kích thước hình ảnh xuống trên các màn hình vừa */
+  }
+}
+
+/* Màn hình có chiều rộng lớn hơn 900px */
+@media (min-width: 901px) {
+  #footer .container-fluid {
+      width: 70%; /* Giảm kích thước hình ảnh xuống trên các màn hình lớn */
+  }
 }
 
 #bottom-footer .container-fluid {

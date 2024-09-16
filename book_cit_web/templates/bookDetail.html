@@ -1,41 +1,16 @@
-{% extends 'base.html' %}
-
+{% extends "base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% load filters %}
 
 {% block pack %}
-<style>
-    .star-rating {
-        white-space: nowrap;
-    }
-    .star-rating [type="radio"] {
-        appearance: none;
-    }
-    .star-rating i {
-        font-size: 1.2em;
-        transition: 0.3s;
-    }
-    
-    .star-rating label:is(:hover, :has(~ :hover)) i {
-        transform: scale(1.35);
-        color: #fffdba;
-        animation: jump 0.5s calc(0.3s + (var(--i) - 1) * 0.15s) alternate infinite;
-    }
-    .star-rating label:has(~ :checked) i {
-        color: #faec1b;
-        text-shadow: 0 0 2px #ffffff, 0 0 10px #ffee58;
-    }
-    
-    @keyframes jump {
-        0%,
-        50% {
-            transform: translatey(0) scale(1.35);
-        }
-        100% {
-            transform: translatey(-15%) scale(1.35);
-        }
-    }
-</style>
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick.css"/>
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick-theme.css"/>
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick.min.js"></script>
+  <link rel="stylesheet" href="{% static 'Css/customSlick.css' %}">
 {% endblock pack %}
-    
+
 
 {% block content %}
 <div class="body">
@@ -43,6 +18,10 @@
         <div class="row">
             <div class="left-container col-md-3 justify-content-center">
                 <img src="{{ detail.bookImage.url }}" alt="image of book {{myManga.title}}" class="book-detail-image">
+
+                <div class="mfn">
+                    <a href="/book/detail/id={{ detail.book_MFN }}">Read</a>
+                </div>
                 
                 <div class="wishlist">
                     <div hx-post = "/wishCheck_post/" hx-vals = '{"book_id": {{detail.book_id}}}' hx-trigger="load" hx-target='#wishlist'>
@@ -50,7 +29,7 @@
                     </div>
                 </div>
 
-                <div>
+                <div id="rating">
                     <form action="">
                         <div class="rating">
                             <p><span class="star-rating">
@@ -78,55 +57,31 @@
                 <p class="book-info"><strong>Position: </strong> {{ detail.book_position }}</p>
                 <p class="book-info"><strong>Publish: </strong> {{ detail.book_publish }}</p>
                 <p class="book-info"><strong>MFN: </strong> {{ detail.book_MFN }}</p>
+
+                <div class="aveRating">
+                    <span class="product-rating">{{ averRate }}</span><span>/5 <span class="fa fa-star aveRating-start"></span> ({{ countRate }} - {{ detail.book_view }} lượt xem)</span>
+            
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="suggestBook">
+        <div class="container-fluid justify-content-center">
+            {% comment %} book-slider la phan se slide {% endcomment %}
+            {% comment %} Chinh sua tren file customSlick.css và customSlick.js {% endcomment %}
+            <h5 ><a id="container-header" href="#">You might also like</a></h5>
+            <div class="book-slider">
+                {% for book in bookList.popular %}
+                <div class="book-item">
+                    <a href="/book/detail/id={{ book.book_id|subtract:3000 }}"><img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}"></a>
+                    <h5 class="mt-2">{{ book.book_title }}</h5>
+                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
 </div>
 
-    {% comment %} <h2>Book Detail</h2>
-    <ul>
-        <li>Title: {{detail.book_title}}</li>
-        <li>Author: {{detail.book_author}}</li>
-        <li>Position: {{ detail.book_position }}</li>
-        <li>Publish: {{ detail.book_publish }}</li>
-        <li><img src= "{{ detail.bookImage.url }}" alt="image of manga {{myManga.title}}"></li>
-    </ul>
-    <div class="aveRating">
-        <span class="product-rating">{{ averRate }}</span><span>/5 <span class="fa fa-star"></span>({{ countRate }}-{{ detail.book_view }} lượt xem)</span>
-
-    </div>
-    <div hx-post = "/wishCheck_post/" hx-vals = '{"book_id": {{detail.book_id}}}' hx-trigger="load" hx-target='#wishlist' >
-        <button id='wishlist' hx-post = "/wishList_post/" hx-vals = '{"book_id": {{detail.book_id}}}' hx-trigger="click delay:0.25s" onclick='savingList(this)'>...</button>
-    </div>
-    <div>
-        <h3>The loai</h3>
-        
-        {% for topic in topicList %}
-            <a href="">{{ topic.topic_id.topic_name }}</a>
-            <br>
-        {% endfor %}
-    </div>
-    <h3>Your rating</h3>
-    <div>
-        <form action="">
-            <div class="rating">
-                <p>Rating: <span class="star-rating">
-                    {% for i in "12345" %} 
-                        {% if i == rating %}
-                            <label for="rate-{{i}}" style="--i: {{i}}"><i class="fa fa-star" title="{{i}} star"></i></label>
-                            <input type="radio" name="rating" id="rate-{{i}}" hx-vals='{"rate": {{i}}, "book_id": {{detail.book_id}}}' hx-post ="/rating_post/" hx-trigger="load click delay:0.25s" hx-target="#clear" hx-swap="outerHTML" checked>
-                        {% else %}
-                            <label for="rate-{{i}}" style="--i: {{i}}"><i class="fa fa-star" title="{{i}} star"></i></label>
-                            <input type="radio" name="rating" id="rate-{{i}}" hx-vals='{"rate": {{i}}, "book_id": {{detail.book_id}}}' hx-post ="/rating_post/" hx-trigger="click delay:0.25s" hx-target="#clear" hx-swap="outerHTML">
-                        {% endif %}
-                    {% endfor %}    
-                </span></p>
-            </div>
-            <div class="clear_rating">
-                <input style="display: none;" type="button"  name="clear" id="clear" >
-            </div>
-        </form>
-    </div> {% endcomment %}
 {% endblock content %}
 
 
@@ -140,5 +95,6 @@
         button.value ='saving...'
     } 
 </script>
+<script src="{% static 'Js/customSlick.js' %}"></script>
 {% endblock scripts %}
     
