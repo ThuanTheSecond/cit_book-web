@@ -107,7 +107,7 @@ def ratingPost(request):
                                })
     val = "rate-" + rate
     return HttpResponse(f'''
-                        <input type="button" onclick="hidebutton(this)" name="clear" id="clear" hx-post ='/clear_rating_post/' hx-trigger="click delay:0.25s" hx-target='#{val}' hx-swap = "outerHTML" value="Clear Rating" hx-vals ='{hx_vals_data}'>
+                        <input type="button" onclick="hidebutton(this)" name="clear" id="clear-rating" hx-post ='/clear_rating_post/' hx-trigger="click delay:0.25s" hx-target='#{val}' hx-swap = "outerHTML" value="Clear My Rating" hx-vals ='{hx_vals_data}'>
                         ''')
 
 def clearRatingPost(request):
@@ -119,7 +119,7 @@ def clearRatingPost(request):
     val = "rate-" + rate
     hx_vals_data = json.dumps({"rate": int(rate), "book_id": int(book_id)})
     return HttpResponse(f'''
-                        <input type="radio" name="rating" id="{val}" hx-vals='{hx_vals_data}' hx-post ="/rating_post/" hx-trigger="click delay:0.25s" hx-target="#clear" hx-swap="outerHTML">
+                        <input type="radio" name="rating" id="{val}" hx-vals='{hx_vals_data}' hx-post ="/rating_post/" hx-trigger="click delay:0.25s" hx-target="#clear-rating" hx-swap="outerHTML">
                         ''')
 # @login_required
 def wishListPost(request):
@@ -141,7 +141,7 @@ def wishListPost(request):
     else:
         check.delete()
         return HttpResponse(f'''
-                                <button id='wishlist' hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist' hx-swap = 'outerHTML' onclick='savingList(this)'>Want to read</button>
+                                <button id='wishlist' hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist' hx-swap = 'outerHTML' onclick='savingList(this)'>Want To Read</button>
                                 ''')
 
 def wishCheckPost(request):
@@ -155,7 +155,7 @@ def wishCheckPost(request):
                             <button id='wishlist' hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist' hx-swap = 'outerHTML'>Saved</button>
                             ''')
     return HttpResponse(f'''
-                                <button id='wishlist' hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist' hx-swap = 'outerHTML' onclick='savingList(this)'>Want to read</button>
+                                <button id='wishlist' hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist' hx-swap = 'outerHTML' onclick='savingList(this)'>Want To Read</button>
                                 ''')
 
 def searchAdvancePost(request):

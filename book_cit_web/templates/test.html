@@ -1,67 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Double Navbar Example</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-
     <style>
-        /* Đảm bảo navbar không bị đẩy lên cao khi thu nhỏ */
-        .navbar {
-            flex-wrap: nowrap;
+        .container {
+            margin-top: 20px;
+        }
+    
+        img {
+            max-width: 100%; /* ensures the image is responsive */
+        }
+    
+        h1 {
+            color: #0056b3; /* Dark blue, you can choose any color you like */
+        }
+    
+        .btn-primary {
+            background-color: #1e90ff; /* DodgerBlue */
         }
     </style>
     
 
-<!-- Upper Navbar -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">Open Library</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarUpper" aria-controls="navbarUpper" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarUpper">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#">My Books</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Browse</a>
-                </li>
-            </ul>
-            <form class="d-flex">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
-            </form>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Eye of the World - Book Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-4">
+                <img src="https://covers.openlibrary.org/b/id/7984916-L.jpg" alt="The Eye of the World Cover" class="img-fluid">
+            </div>
+            <div class="col-md-8">
+                <h1>The Eye of the World (The Wheel of Time, Book 1)</h1>
+                <p><strong>Author:</strong> Robert Jordan</p>
+                <p><strong>Published:</strong> January 15, 1990</p>
+                <p><strong>ISBN:</strong> 9780312850098</p>
+                <p><strong>Genres:</strong> Fantasy</p>
+                <p><strong>Description:</strong> The first novel in the Wheel of Time series - one of the most influential and popular fantasy epics ever published.</p>
+                <button class="btn btn-primary">Borrow this book</button>
+            </div>
         </div>
     </div>
-</nav>
 
-<!-- Lower Navbar -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container-fluid">
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarLower" aria-controls="navbarLower" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarLower">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Features</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Pricing</a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
