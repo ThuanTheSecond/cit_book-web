@@ -20,7 +20,7 @@
                 <img src="{{ detail.bookImage.url }}" alt="image of book {{myManga.title}}" class="book-detail-image">
 
                 <div class="mfn">
-                    <a href="/book/detail/id={{ detail.book_MFN }}">Read</a>
+                    <a href="{{ detail.book_MFN }}">View</a>
                 </div>
                 
                 <div class="wishlist">
@@ -74,6 +74,36 @@
                 {% for book in bookList.popular %}
                 <div class="book-item">
                     <a href="/book/detail/id={{ book.book_id|subtract:3000 }}"><img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}"></a>
+                    <h5 class="mt-2">{{ book.book_title }}</h5>
+                </div>
+                {% endfor %}
+            </div>
+
+            <h5 ><a id="container-header" href="#">You might also like</a></h5>
+            <div class="book-slider">
+                {% for book in bookList.popular %}
+                <div class="book-item">
+                    <img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}">
+                    <h5 class="mt-2">{{ book.book_title }}</h5>
+                </div>
+                {% endfor %}
+            </div>
+
+            <h5 ><a id="container-header" href="#">You might also like</a></h5>
+            <div class="book-slider">
+                {% for book in bookList.popular %}
+                <div class="book-item">
+                    <img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}"></a>
+                    <h5 class="mt-2">{{ book.book_title }}</h5>
+                </div>
+                {% endfor %}
+            </div>
+
+            <h5 ><a id="container-header" href="#">You might also like</a></h5>
+            <div class="book-slider">
+                {% for book in bookList.popular %}
+                <div class="book-item">
+                    <img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}"></a>
                     <h5 class="mt-2">{{ book.book_title }}</h5>
                 </div>
                 {% endfor %}
