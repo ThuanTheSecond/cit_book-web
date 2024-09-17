@@ -1,31 +1,8 @@
-
+{% extends "base.html" %}
 {% load static %}
-                        <li><a href="{% url 'login' %}"><i class="fa fa-user-o"></i> login</a></li>
-                        <li><a href="{% url 'register' %}"><i class="fa fa-user-o"></i> Register</a></li>
-  <!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <!-- Required meta tags-->
 
-    <!-- Title Page-->
-    <title>registeration form</title>
-
-    <!-- Icons font CSS-->
-    <link href="{% static 'Css/material-design-iconic-font08.min.css' %}" rel="stylesheet" media="all">
-    <link href="{% static 'Css/font-awesome08.min.css' %}" rel="stylesheet" media="all">
-    <!-- Font special for pages-->
-    <link href="https://fonts.googleapis.com/css?family=Poppins:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
-
-    <!-- Vendor CSS-->
-    <link href="{% static 'Css/select2.min08.css' %}" rel="stylesheet" media="all">
-    <link href="{% static 'Css/daterangepicker08.css' %}" rel="stylesheet" media="all">
-
-    <!-- Main CSS-->
-    <link href="{% static 'Css/main08.css' %}" rel="stylesheet" media="all">
-</head>
-
-<body>
+{% block content %}
     <div class="page-wrapper bg-gra-02 p-t-130 p-b-100 font-poppins">
         <div class="wrapper wrapper--w680">
             <div class="card card-4">
@@ -82,17 +59,36 @@
             </div>
         </div>
     </div>
-     <script src="{% static 'vendor/jquery.min.js' %}"></script>
+
+    
+<footer id="footer">
+    <div id="bottom-footer" class="section">
+        <div class="container-fluid justify-content-center">
+            <div class="bottom-footer">
+
+                <span class="copyright">
+                    <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                    Copyright &copy;
+                    <script>document.write(new Date().getFullYear());</script> All rights reserved | This website template
+                    is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by our team{% comment %} <a href="https://colorlib.com"
+                    target="_blank">TDRCE Team</a> and website back-end is made with <i class="fa fa-heart-o"
+                    aria-hidden="true"></i> by Trupti Langalia. {% endcomment %}
+                </span>
+            </div>
+        </div>
+    </div>
+</footer>
+{% endblock content %}
+
+     <script src="{% static 'Js/vendor/jquery/jquery.min.js' %}"></script>
     <!-- Vendor JS-->
-    <script src="{% static 'vendor/select2.min.js' %}"></script>
-    <script src="{% static 'vendor/moment.min.js' %}"></script>
+    <script src="{% static 'Js/vendor/select2/select2.full.min.js' %}"></script>
+    <script src="{% static 'Js/vendor/moment/moment.min.js' %}"></script>
     <script src="{% static 'vendor/daterangepicker.js' %}"></script>
 
     <!-- Main JS-->
     <script src="{% static 'vendor/global.js' %}"></script>
-</body>
 
-</html>
 
 
 

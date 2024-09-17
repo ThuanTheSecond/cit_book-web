@@ -1,39 +1,71 @@
-{% comment %} {% extends "base.html" %}
-
-{% block navbar%}
-                        <li><a href="{% url 'login' %}"><i class="fa fa-user-o"></i> login</a></li>
-                        <li><a href="{% url 'register' %}"><i class="fa fa-user-o"></i> Register</a></li>
-                        
-{% endblock%}
-    
-{% block blk %} {% endcomment %}
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Login form</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-<!--===============================================================================================-->  
-    <link rel="icon" type="image/png" href="images/icons/favicon.ico"/>
-<!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap9.min.css' %}">
-<!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="{% static 'css/font-awesome9.min.css' %}">
-<!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="{% static 'css/animate.css' %}">
-<!--===============================================================================================-->  
-    <link rel="stylesheet" type="text/css" href="{% static 'css/hamburgers.min.css' %}">
-<!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="{% static 'css/select2.min.css' %}">
-<!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="{% static 'css/util8.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/main8.css' %}">
-<!--===============================================================================================-->
-</head>
-<body>
+
+
+{% block content %}
+<div id="login">
+    <div class="container-fluid">
+        <div class="login-overall row justify-content-center align-items-center" style="height:auto">
+            <div class="left-login col-md-5">
+                <h3 class="card-title text-left">Login</h3><br>
+                <p class="card-description text-left">Login to use your CIT Library card to see suggested books from our website</p>
+            </div>
+
+            <div class="right-login col-md-4">
+                <div class="card">
+                    <article class="card-body">
+                        <form class="login-form" action="{% url 'login' %}" method="POST">
+                            <div class="form-group">
+
+                                {% csrf_token %} 
+
+                                <h6>Please enter your email and password to access your CIT Library account.</h6><br>
+                                <span>Email or  Username:</span>
+                                <div class="input-group mb-3">
+                                    <input name="username" class="form-control" placeholder="Email or Username" type="text" required>
+                                </div>
+
+                                <span>Password:</span>
+                                <div class="input-group mb-3">  
+                                    <input name="password" class="form-control" placeholder="Password" type="password" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <button type="submit" class="login-btn btn btn-primary btn-block"> Login  </button>
+                                </div>
+                                <br>
+                                <div class="other">
+                                    <p>Don't have an account? <a class="link-register" href="{% url 'register' %}">Sign up now</a></p>
+                                </div>
+                            </div>
+                        </form>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer id="footer">
+    <div id="bottom-footer" class="section">
+        <div class="container-fluid justify-content-center">
+            <div class="bottom-footer">
+
+                <span class="copyright">
+                    <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                    Copyright &copy;
+                    <script>document.write(new Date().getFullYear());</script> All rights reserved | This website template
+                    is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by our team{% comment %} <a href="https://colorlib.com"
+                    target="_blank">TDRCE Team</a> and website back-end is made with <i class="fa fa-heart-o"
+                    aria-hidden="true"></i> by Trupti Langalia. {% endcomment %}
+                </span>
+            </div>
+        </div>
+    </div>
+</footer>
     
-    <div class="limiter">
+    {% comment %} <div class="limiter">
+
         <div class="container-login100">
             <div class="wrap-login100">
                 <div class="login100-pic js-tilt" data-tilt>
@@ -94,7 +126,11 @@
             </div>
         </div>  
     </div>
-</div>      
+</div>     {% endcomment %}
+{% endblock content %}
+
+
+{% block scripts %}
 <script>
     $('#myForm').submit(function(){
         var action = $(this).attr('action');
@@ -110,8 +146,5 @@
         return false;
     });
 </script>
-        
-    </body>
-    </head>
-    {% comment %} {% endblock %} {% endcomment %}
+{% endblock scripts %}
     
