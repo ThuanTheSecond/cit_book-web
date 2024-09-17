@@ -227,6 +227,7 @@ def search(request, search_type, query):
     # Take skey and execute query
     query.replace('+',' ')
     query = normalize_vietnamese(query)
+    pquery = query
     if len(query)>=3:
         # sử dùng hàm __unaccent để có thể truy xuất băng tiếng việt không dấu
         # books = Book.objects.filter(book_title__unaccent__icontains=skey)[:5]
@@ -246,13 +247,50 @@ def search(request, search_type, query):
             for word in keywords[1:]:
                 query &= Q(**{f"{search_type}__unaccent__icontains": word})
             books = Book.objects.filter(query)
+            
     # pagnition
     page_obj = pagePaginator(request, books)
     context = {
         'formSearch': form,
+        'query': pquery,
+        'search_type': search_type,
         'page_obj' : page_obj,
     }
     return render(request, 'searchBook.html', context)
+
+def searchFilter(request, type):
+    form = searchForm()
+    query = request.GET.get('query',' ')
+    search_type = request.GET.get('search_type', 'all')
+    
+    keywords = re.split(r'[ ,]+', query)
+    if search_type == 'all':
+        query = Q()
+        query = reduce(and_, (
+                Q(book_title__unaccent__icontains=word) |
+                Q(book_author__unaccent__icontains=word) |
+                Q(book_publish__unaccent__icontains=word)
+                for word in keywords
+                ))   
+        books = Book.objects.filter(query)
+    else:
+        query = Q(**{f"{search_type}__unaccent__icontains": keywords[0]})
+        for word in keywords[1:]:
+            query &= Q(**{f"{search_type}__unaccent__icontains": word})
+        books = Book.objects.filter(query)
+        
+    if type != 5:
+        from home.utils import filterBasedType
+        books = filterBasedType(request, books)
+    print(books)    
+    page_obj = pagePaginator(request, books)
+    context = {
+        'formSearch': form,
+        'query': query,
+        'page_obj' : page_obj,
+    }
+    return render(request, 'searchBook.html', context)
+
 
 def topicFilter(request,tid, type = 1):
     from home.utils import filterBasedType

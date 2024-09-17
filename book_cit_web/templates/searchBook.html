@@ -4,6 +4,17 @@
 
 
 
+{% block bonusContent %}
+    <div class="filter">
+    <span>Lọc theo: </span>
+        <span><a href="{% url 'searchFilter' type=5 %}?query={{ query }}&search_type={{ search_type}}">Liên quan nhất</a></span>
+        <span><a href="{% url 'searchFilter' type=1 %}?query={{ query }}&search_type={{ search_type}}">Lượt xem</a></span>
+        <span><a href="{% url 'searchFilter' type=2 %}?query={{ query }}&search_type={{ search_type}}">Xuất bản gần đây</a></span>
+        <span><a href="{% url 'searchFilter' type=3 %}?query={{ query }}&search_type={{ search_type}}">Đánh giá nhiều</a></span>
+        <span><a href="{% url 'searchFilter' type=4 %}?query={{ query }}&search_type={{ search_type}}">Đánh giá tốt nhất</a></span> 
+</div>
+{% endblock bonusContent %}
+    
 
 {% block content %}
     {% if page_obj %}
