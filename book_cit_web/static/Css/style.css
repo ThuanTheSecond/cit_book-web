@@ -560,6 +560,37 @@ textarea.input {
   overflow: clip;
 }
 
+/* Responsive */
+@media (max-width: 770px) {
+  .school-logo {
+    text-align: left;
+      width: 15%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
+  }
+
+  .search-form {
+    width: 10%;
+  }
+
+  .user-logo {
+    text-align: right;
+    width: 25%;
+  }
+}
+
+/* Màn hình có chiều rộng từ 601px đến 1300px */
+@media (min-width: 771px) and (max-width: 1300px) {
+  .body .container-fluid {
+      width: 100%; /* Giảm kích thước hình ảnh xuống trên các màn hình vừa */
+  }
+}
+
+/* Màn hình có chiều rộng lớn hơn 1300px */
+@media (min-width: 1301px) {
+  .body .container-fluid {
+      width: 70%; /* Giảm kích thước hình ảnh xuống trên các màn hình lớn */
+  }
+}
+
 /*----------------------------*\
 	Cart
 \*----------------------------*/
@@ -689,99 +720,6 @@ textarea.input {
 }
 
 /*=========================================================
-	03 -> Navigation
-===========================================================*/
-
-#navigation {
-  background: #FFF;
-  border-bottom: 2px solid #E4E7ED;
-  border-top: 3px solid #D10024;
-}
-
-/*----------------------------*\
-	Main nav
-\*----------------------------*/
-
-.main-nav>li+li {
-  margin-left: 30px
-}
-
-.main-nav>li>a {
-  padding: 20px 0px;
-}
-
-.main-nav>li>a:hover, .main-nav>li>a:focus, .main-nav>li.active>a {
-  color: #D10024;
-  background-color: transparent;
-}
-
-.main-nav>li>a:after {
-  content: "";
-  display: block;
-  width: 0%;
-  height: 2px;
-  background-color: #D10024;
-  -webkit-transition: 0.2s all;
-  transition: 0.2s all;
-}
-
-.main-nav>li>a:hover:after, .main-nav>li>a:focus:after, .main-nav>li.active>a:after {
-  width: 100%;
-}
-
-.header-ctn li.nav-toggle {
-  display: none;
-}
-
-/*----------------------------*\
-	responsive nav
-\*----------------------------*/
-
-@media only screen and (max-width: 991px) {
-  .header-ctn .menu-toggle {
-    display: inline-block;
-  }
-  #responsive-nav {
-    position: fixed;
-    left: 0;
-    top: 0;
-    background: #15161D;
-    height: 100vh;
-    max-width: 250px;
-    width: 0%;
-    overflow: hidden;
-    z-index: 22;
-    padding-top: 60px;
-    -webkit-transform: translateX(-100%);
-    -ms-transform: translateX(-100%);
-    transform: translateX(-100%);
-    -webkit-transition: 0.2s all;
-    transition: 0.2s all;
-  }
-  #responsive-nav.active {
-    -webkit-transform: translateX(0%);
-    -ms-transform: translateX(0%);
-    transform: translateX(0%);
-    width: 100%;
-  }
-  .main-nav {
-    margin: 0px;
-    float: none;
-  }
-  .main-nav>li {
-    display: block;
-    float: none;
-  }
-  .main-nav>li+li {
-    margin-left: 0px;
-  }
-  .main-nav>li>a {
-    padding: 15px;
-    color: #FFF;
-  }
-}
-
-/*=========================================================
 	04 -> CONTAINER
 ===========================================================*/
 .body {
@@ -813,27 +751,26 @@ textarea.input {
   }
 }
 
+/* Responsive */
 @media (max-width: 600px) {
   .body .container-fluid {
       width: 100%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
   }
 }
 
-/* Màn hình có chiều rộng từ 601px đến 900px */
-@media (min-width: 601px) and (max-width: 900px) {
+/* Màn hình có chiều rộng từ 601px đến 1300px */
+@media (min-width: 601px) and (max-width: 1300px) {
   .body .container-fluid {
-      width: 70%; /* Giảm kích thước hình ảnh xuống trên các màn hình vừa */
+      width: 100%; /* Giảm kích thước hình ảnh xuống trên các màn hình vừa */
   }
 }
 
-/* Màn hình có chiều rộng lớn hơn 900px */
-@media (min-width: 901px) {
+/* Màn hình có chiều rộng lớn hơn 1300px */
+@media (min-width: 1301px) {
   .body .container-fluid {
       width: 70%; /* Giảm kích thước hình ảnh xuống trên các màn hình lớn */
   }
 }
-
-
 
 /*=========================================================
 	05 -> BOOK DETAIL
@@ -846,12 +783,6 @@ textarea.input {
   border-top-right-radius: 5px;
   border-bottom: 0;
 }
-
-/* .img-book-detail {
-  
-  max-width: 100%;
-  height: auto;    
-} */
 
 .left-container {
   padding: 20px 20px;
@@ -981,214 +912,175 @@ textarea.input {
 }
 
 
-/* Màn hình có chiều rộng dưới 600px */
-@media (max-width: 600px) {
-  book-detail-image {
-      width: 100%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
+/* Responsive */
+/* Màn hình có chiều rộng dưới 770px */
+@media (max-width: 770px) {
+  .book-detail-image {
+      width: 50%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
   }
 
   .left-container {
     margin-inline-start: 0;
     border: none;
+    text-align: center;
+  }
+
+
+}
+
+/* Màn hình có chiều rộng từ 771px đến 1300px */
+@media (min-width: 771px) and (max-width: 1300px) {
+
+  
+  .book-detail-image {
+    width: 100%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
+  }
+
+  .left-container {
+    margin-inline-start: 0;
+    border: none;
+    text-align: center;
   }
 }
 
-/* Màn hình có chiều rộng từ 601px đến 900px */
-@media (min-width: 601px) and (max-width: 900px) {
-  book-detail-image {
-      width: 80%; /* Giảm kích thước hình ảnh xuống trên các màn hình vừa */
-  }
-}
-
-/* Màn hình có chiều rộng lớn hơn 900px */
-@media (min-width: 901px) {
+/* Màn hình có chiều rộng lớn hơn 1300px */
+@media (min-width: 1301px) {
   book-detail-image {
       width: 50%; /* Giảm kích thước hình ảnh xuống trên các màn hình lớn */
   }
 }
 
 /*=========================================================
-	06 -> PRODUCT
+	06 -> SEARCH PAGE
 ===========================================================*/
 
 /*=========================================================
-	07 -> PRODUCTS PAGE
+	07 -> LOGIN PAGE
 ===========================================================*/
+#login {
+  font-family: 'Lato', sans-serif;
+}
+
+
+#login .container-fluid {
+  width: 70%;
+  border: 1px solid #c0beb2;
+  border-radius: 5px;
+}
+
+.login-overall {
+  background-color: #f9f9f9;
+  
+}
+
+.left-login {
+  padding: 20px 20px;
+  padding-left: 10%;
+  width: 55%;
+}
+
+.left-login h3{
+  font-weight: 600;
+  font-size: 45px;
+  color: rgb(12, 12, 12);
+}
+
+.left-login p {
+  color: #6c6868;
+  font-size: 28px;
+}
+
+.right-login {
+  padding: 20px 20px;
+  padding-top: 40px;
+  width: 45%;
+  height: auto;
+  background-color: #fff;
+}
+
+.card {
+  border: none;
+}
+
+.login-form h6 {
+  color: #000000;
+  font-weight: 500;
+  font-size: 20px;
+}
+
+.login-form span {
+  font-weight: 600;
+}
+
+.form-control {
+  padding-left: 0;
+  font-weight: 500;
+}
+
+.login-btn {
+  width: 100%;
+  background-color: #0376b7;
+  font-size: 16px;
+
+  &:hover {
+    background-color: #333;
+  }
+}
+
+.other {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.link-register {
+  color: #0376b7;
+
+  &:hover {
+    text-decoration: underline;
+    color: #0376b7;
+  }
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .right-login {
+      width: 100%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
+  }
+  .left-login {
+    display: none;
+  }
+  #footer .container-fluid {
+    width: 100%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
+  }
+}
+
+/* Màn hình có chiều rộng từ 601px đến 900px */
+@media (min-width: 601px) and (max-width: 900px) {
+  .right-login {
+    width: 100%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
+  }
+  .left-login {
+    display: none;
+  }
+  #footer .container-fluid {
+    width: 70%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
+  }
+}
+
+/* Màn hình có chiều rộng lớn hơn 900px */
+@media (min-width: 901px) {
+  #login .container-fluid {
+      width: 70%; /* Giảm kích thước hình ảnh xuống trên các màn hình lớn */
+  }
+  #footer .container-fluid {
+    width: 70%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
+  }
+}
 
 /*=========================================================
-	08 -> PRODUCT DETAILS PAGE
+	08 -> REGISTER PAGE
 ===========================================================*/
 
-/*-- Rating --*/
-
-.rating-avg {
-  font-size: 24px;
-  font-weight: 700;
-  margin-bottom: 15px;
-}
-
-.rating-avg .rating-stars {
-  margin-left: 10px;
-}
-
-.rating-avg .rating-stars, .rating .rating-stars {
-  display: inline-block;
-}
-
-.rating-avg .rating-stars>i, .rating .rating-stars>i {
-  color: #E4E7ED;
-}
-
-.rating-avg .rating-stars>i.fa-star, .rating .rating-stars>i.fa-star {
-  color: #D10024;
-}
-
-.rating li {
-  margin: 5px 0px;
-}
-
-.rating .rating-progress {
-  position: relative;
-  display: inline-block;
-  height: 9px;
-  background-color: #E4E7ED;
-  width: 120px;
-  margin: 0px 10px;
-  border-radius: 5px;
-}
-
-.rating .rating-progress>div {
-  background-color: #D10024;
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  border-radius: 5px;
-}
-
-.rating .sum {
-  display: inline-block;
-  font-size: 12px;
-  color: #8D99AE;
-}
-
-/*-- Reviews --*/
-
-.reviews li {
-  position: relative;
-  padding-left: 145px;
-  margin-bottom: 30px;
-}
-
-.reviews .review-heading {
-  position: absolute;
-  width: 130px;
-  left: 0;
-  top: 0;
-  height: 70px;
-}
-
-.reviews .review-body {
-  min-height: 70px;
-}
-
-.reviews .review-heading .name {
-  margin-bottom: 5px;
-  margin-top: 0px;
-}
-
-.reviews .review-heading .date {
-  color: #8D99AE;
-  font-size: 10px;
-  margin: 0;
-}
-
-.reviews .review-heading .review-rating {
-  margin-top: 5px;
-}
-
-.reviews .review-heading .review-rating>i {
-  color: #E4E7ED;
-}
-
-.reviews .review-heading .review-rating>i.fa-star {
-  color: #D10024;
-}
-
-.reviews-pagination {
-  text-align: center;
-}
-
-.reviews-pagination li {
-  display: inline-block;
-  width: 35px;
-  height: 35px;
-  line-height: 35px;
-  text-align: center;
-  background-color: #FFF;
-  border: 1px solid #E4E7ED;
-  -webkit-transition: 0.2s all;
-  transition: 0.2s all;
-}
-
-.reviews-pagination li:hover {
-  background-color: #E4E7ED;
-  color: #D10024;
-}
-
-.reviews-pagination li.active {
-  background-color: #D10024;
-  border-color: #D10024;
-  color: #FFF;
-  cursor: default;
-}
-
-.reviews-pagination li a {
-  display: block;
-}
-
-/*-- Review Form --*/
-
-.review-form .input {
-  margin-bottom: 15px;
-}
-
-.review-form .input-rating {
-  margin-bottom: 15px;
-}
-
-.review-form .input-rating .stars {
-  display: inline-block;
-  vertical-align: top;
-}
-
-.review-form .input-rating .stars input[type="radio"] {
-  display: none;
-}
-
-.review-form .input-rating .stars>label {
-  float: right;
-  cursor: pointer;
-  padding: 0px 3px;
-  margin: 0px;
-}
-
-.review-form .input-rating .stars>label:before {
-  content: "\f006";
-  font-family: FontAwesome;
-  color: #E4E7ED;
-  -webkit-transition: 0.2s all;
-  transition: 0.2s all;
-}
-
-.review-form .input-rating .stars>label:hover:before, .review-form .input-rating .stars>label:hover~label:before {
-  color: #D10024;
-}
-
-.review-form .input-rating .stars>input:checked label:before, .review-form .input-rating .stars>input:checked~label:before {
-  content: "\f005";
-  color: #D10024;
-}
 
 /*=========================================================
 	09 -> CHECKOUT PAGE
