@@ -175,7 +175,7 @@ def searchSlug(request):
     query = request.GET.get('query')
     search_type = request.GET.get('search_type')
     query.replace(" ", "+")
-    return redirect('search',search_type = search_type ,query = query)
+    return redirect('search',search_type = search_type ,query = query, ftype = 5)
                    
 # Các view để trả về trang HTML theo url.
 def index(request):
@@ -222,32 +222,35 @@ def bookDetail(request, id):
     return render(request, 'bookDetail.html', context)
 
 # pagepanigtion, su dung lai cau lenh truy xuat book o tren, 
-def search(request, search_type, query):
+def search(request, search_type, query, ftype):
     form = searchForm()
     # Take skey and execute query
     query.replace('+',' ')
     query = normalize_vietnamese(query)
     pquery = query
-    if len(query)>=3:
+    print(pquery)
         # sử dùng hàm __unaccent để có thể truy xuất băng tiếng việt không dấu
         # books = Book.objects.filter(book_title__unaccent__icontains=skey)[:5]
         # chinh sua o day
-        keywords = re.split(r'[ ,]+', query)
-        if search_type == 'all':
-            query = Q()
-            query = reduce(and_, (
-                    Q(book_title__unaccent__icontains=word) |
-                    Q(book_author__unaccent__icontains=word) |
-                    Q(book_publish__unaccent__icontains=word)
-                    for word in keywords
-                    ))   
-            books = Book.objects.filter(query)
-        else:
-            query = Q(**{f"{search_type}__unaccent__icontains": keywords[0]})
-            for word in keywords[1:]:
-                query &= Q(**{f"{search_type}__unaccent__icontains": word})
-            books = Book.objects.filter(query)
-            
+    keywords = re.split(r'[ ,]+', query)
+    if search_type == 'all':
+        query = Q()
+        query = reduce(and_, (
+                Q(book_title__unaccent__icontains=word) |
+                Q(book_author__unaccent__icontains=word) |
+                Q(book_publish__unaccent__icontains=word)
+                for word in keywords
+            ))   
+        books = Book.objects.filter(query)
+    else:
+        query = Q(**{f"{search_type}__unaccent__icontains": keywords[0]})
+        for word in keywords[1:]:
+            query &= Q(**{f"{search_type}__unaccent__icontains": word})        
+    books = Book.objects.filter(query)
+    
+    if ftype !=5:
+        from home.utils import filterBasedType
+        books = filterBasedType(books, ftype)     
     # pagnition
     page_obj = pagePaginator(request, books)
     context = {
@@ -257,40 +260,6 @@ def search(request, search_type, query):
         'page_obj' : page_obj,
     }
     return render(request, 'searchBook.html', context)
-
-def searchFilter(request, type):
-    form = searchForm()
-    query = request.GET.get('query',' ')
-    search_type = request.GET.get('search_type', 'all')
-    
-    keywords = re.split(r'[ ,]+', query)
-    if search_type == 'all':
-        query = Q()
-        query = reduce(and_, (
-                Q(book_title__unaccent__icontains=word) |
-                Q(book_author__unaccent__icontains=word) |
-                Q(book_publish__unaccent__icontains=word)
-                for word in keywords
-                ))   
-        books = Book.objects.filter(query)
-    else:
-        query = Q(**{f"{search_type}__unaccent__icontains": keywords[0]})
-        for word in keywords[1:]:
-            query &= Q(**{f"{search_type}__unaccent__icontains": word})
-        books = Book.objects.filter(query)
-        
-    if type != 5:
-        from home.utils import filterBasedType
-        books = filterBasedType(request, books)
-    print(books)    
-    page_obj = pagePaginator(request, books)
-    context = {
-        'formSearch': form,
-        'query': query,
-        'page_obj' : page_obj,
-    }
-    return render(request, 'searchBook.html', context)
-
 
 def topicFilter(request,tid, type = 1):
     from home.utils import filterBasedType
@@ -308,6 +277,7 @@ def topicFilter(request,tid, type = 1):
     books = filterBasedType(books=books,type=type)
 
     page_obj = pagePaginator(request, books)
+    
     context = {
         'tid': tid,
         'topicName': topicName,
