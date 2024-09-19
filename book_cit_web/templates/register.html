@@ -1,14 +1,126 @@
-{% extends "base.html" %}
 {% load static %}
+{% load widget_tweaks %}
+<!DOCTYPE html>
+<html lang="en">
 
 
-{% block content %}
-    <div class="page-wrapper bg-gra-02 p-t-130 p-b-100 font-poppins">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>CIT - Book recommender system</title>
+
+  <!-- Google font -->
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet">
+
+  <!--Bootstrap-->
+  <link type="text/css" rel="stylesheet" href="{% static 'Css/bootstrap.min.css' %}" />
+
+  <!-- Slick -->
+  <link type="text/css" rel="stylesheet" href="{% static 'Css/slick.css' %}" />
+  <link type="text/css" rel="stylesheet" href="{% static 'Css/slick-theme.css' %}" />
+
+  <!-- nouislider -->
+  <link type="text/css" rel="stylesheet" href="{% static 'Css/nouislider.min.css' %}" />
+
+  <!-- Font Awesome Icon -->
+  <link rel="stylesheet" href="{% static 'Css/font-awesome.min.css' %}">
+
+  <!-- Custom stlylesheet -->
+  <link type="text/css" rel="stylesheet" href="{% static 'Css/style.css' %}" />
+  <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" />
+  
+  <meta name="csrf-token" content="{{ csrf_token }}">
+</head>
+
+<body id="register">
+    <header>
+        <!-- TOP HEADER -->
+        <div id="top-header">
+            <div class="container">
+                <ul class="header-links pull-left">
+                    <li><a href="/">CIT LIBRARY</li>
+                    {% comment %} <li><a href="#"><i class="fa fa-phone"></i> +91 911111113664</a></li> {% endcomment %}
+                    <li><a href="#"><i class="fa fa-envelope-o"></i> Khang1@gmail.com</a></li>
+                    <li><a href="#"><i class="fa fa-map-marker"></i> Ninh Kieu, Can Tho</a></li>
+                </ul>
+                
+                <ul class="header-links pull-right">
+                    <li class="active"><a href="{% url 'index' %}">Home</a></li>
+                    <li><a href="{% url 'login' %}"><i class="fa fa-user-o"></i> Login</a></li>
+    
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <div class="empty-block">
+        <p></p>
+    </div>
+
+    <div class="container-fluid">
+        <div class="register-overall row justify-content-center align-items-center" style="height:auto">
+            <div class="left-register col-md-5">
+                <h3 class="card-title text-left">Sign Up</h3><br>
+                <p class="card-description text-left">Get your CIT Library card and see suggested books from the website</p>
+            </div>
+
+            <div class="right-register col-md-4">
+                <div class="card">
+                    <article class="card-body">
+                        <h4 class="card-title text-center mb-4">Create Account</h4>
+                        <br>
+                        <form class="register-form" action="{% url 'register' %}" method="POST">
+                            <div class="form-group">
+
+                                {% csrf_token %} 
+
+                                <span>Email:</span>
+                                <div class="input-group mb-3">
+                                    <input name="email" class="form-control" placeholder="Enter Email" type="text" required>
+                                </div>
+
+                                <span>Username:</span>
+                                <div class="input-group mb-3">
+                                    <input name="username" class="form-control" placeholder="Enter Username" type="text" required>
+                                </div>
+
+                                <span>Password:</span>
+                                <div class="input-group mb-3">  
+                                    <input name="password1" class="form-control" placeholder="Enter Password" type="password" required>
+                                </div>
+                            
+                                <span>Confirm Password:</span>
+                                <div class="input-group mb-3">  
+                                    <input name="password2" class="form-control" placeholder="Enter Password" type="password" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <button type="submit" class="register-btn btn btn-primary btn-block"> Sign Up  </button>
+                                </div>
+                                <br>
+                                <div class="other">
+                                    <p>Already have an account? <a class="link-login" href="{% url 'login' %}">Log in</a></p>
+                                </div>
+                            </div>
+                        </form>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    {% comment %} <div class="page-wrapper bg-gra-02 p-t-130 p-b-100 font-poppins">
         <div class="wrapper wrapper--w680">
             <div class="card card-4">
                 <div class="card-body">
                     <h2 class="title">Create Account</h2>
                     <form  action="register" method="POST" id="signup-form" class="signup-form">
+
                         {% csrf_token %} 
                          <!-- <div class="row row-space">
                             <div class="col-2"> -->
@@ -58,37 +170,27 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> {% endcomment %}
 
     
-<footer id="footer">
-    <div id="bottom-footer" class="section">
-        <div class="container-fluid justify-content-center">
-            <div class="bottom-footer">
+    <footer id="footer">
+        <div id="bottom-footer" class="section">
+            <div class="container-fluid justify-content-center">
+                <div class="bottom-footer">
 
-                <span class="copyright">
-                    <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                    Copyright &copy;
-                    <script>document.write(new Date().getFullYear());</script> All rights reserved | This website template
-                    is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by our team{% comment %} <a href="https://colorlib.com"
-                    target="_blank">TDRCE Team</a> and website back-end is made with <i class="fa fa-heart-o"
-                    aria-hidden="true"></i> by Trupti Langalia. {% endcomment %}
-                </span>
+                    <span class="copyright">
+                        <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                        Copyright &copy;
+                        <script>document.write(new Date().getFullYear());</script> All rights reserved | This website template
+                        is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by our team{% comment %} <a href="https://colorlib.com"
+                        target="_blank">TDRCE Team</a> and website back-end is made with <i class="fa fa-heart-o"
+                        aria-hidden="true"></i> by Trupti Langalia. {% endcomment %}
+                    </span>
+                </div>
             </div>
         </div>
-    </div>
-</footer>
-{% endblock content %}
+    </footer>
 
-     <script src="{% static 'Js/vendor/jquery/jquery.min.js' %}"></script>
-    <!-- Vendor JS-->
-    <script src="{% static 'Js/vendor/select2/select2.full.min.js' %}"></script>
-    <script src="{% static 'Js/vendor/moment/moment.min.js' %}"></script>
-    <script src="{% static 'vendor/daterangepicker.js' %}"></script>
+</body>
 
-    <!-- Main JS-->
-    <script src="{% static 'vendor/global.js' %}"></script>
-
-
-
-
+</html>

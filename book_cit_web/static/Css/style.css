@@ -752,21 +752,21 @@ textarea.input {
 }
 
 /* Responsive */
-@media (max-width: 600px) {
+@media (max-width: 48rem) {
   .body .container-fluid {
       width: 100%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
   }
 }
 
 /* Màn hình có chiều rộng từ 601px đến 1300px */
-@media (min-width: 601px) and (max-width: 1300px) {
+@media (min-width: 48.1rem) and (max-width: 79rem) {
   .body .container-fluid {
       width: 100%; /* Giảm kích thước hình ảnh xuống trên các màn hình vừa */
   }
 }
 
 /* Màn hình có chiều rộng lớn hơn 1300px */
-@media (min-width: 1301px) {
+@media (min-width: 79rem) {
   .body .container-fluid {
       width: 70%; /* Giảm kích thước hình ảnh xuống trên các màn hình lớn */
   }
@@ -914,7 +914,7 @@ textarea.input {
 
 /* Responsive */
 /* Màn hình có chiều rộng dưới 770px */
-@media (max-width: 770px) {
+@media (max-width: 48rem) {
   .book-detail-image {
       width: 50%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
   }
@@ -925,13 +925,10 @@ textarea.input {
     text-align: center;
   }
 
-
 }
 
 /* Màn hình có chiều rộng từ 771px đến 1300px */
-@media (min-width: 771px) and (max-width: 1300px) {
-
-  
+@media (min-width: 48.1rem) and (max-width: 80rem) {
   .book-detail-image {
     width: 100%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
   }
@@ -944,7 +941,7 @@ textarea.input {
 }
 
 /* Màn hình có chiều rộng lớn hơn 1300px */
-@media (min-width: 1301px) {
+@media (min-width: 80rem) {
   book-detail-image {
       width: 50%; /* Giảm kích thước hình ảnh xuống trên các màn hình lớn */
   }
@@ -1042,45 +1039,171 @@ textarea.input {
 }
 
 /* Responsive */
-@media (max-width: 600px) {
+@media (max-width: 48rem) {
   .right-login {
       width: 100%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
   }
+
   .left-login {
     display: none;
   }
+
   #footer .container-fluid {
     width: 100%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
   }
 }
 
-/* Màn hình có chiều rộng từ 601px đến 900px */
-@media (min-width: 601px) and (max-width: 900px) {
+/* Màn hình có chiều rộng từ 601px đến 1300px */
+@media (min-width: 48.1rem) and (max-width: 80rem) {
   .right-login {
     width: 100%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
   }
+
   .left-login {
     display: none;
   }
+
   #footer .container-fluid {
     width: 70%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
   }
 }
 
-/* Màn hình có chiều rộng lớn hơn 900px */
-@media (min-width: 901px) {
+/* Màn hình có chiều rộng lớn hơn 1300px */
+@media (min-width: 80rem) {
   #login .container-fluid {
       width: 70%; /* Giảm kích thước hình ảnh xuống trên các màn hình lớn */
   }
+
   #footer .container-fluid {
     width: 70%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
   }
+
 }
 
 /*=========================================================
 	08 -> REGISTER PAGE
 ===========================================================*/
+#register {
+  font-family: 'Lato', sans-serif;
+}
 
+#register header {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+}
+
+#register .container-fluid {
+  width: 70%;
+  border: 1px solid #c0beb2;
+  border-radius: 5px;
+}
+
+.empty-block {
+  padding-bottom: 5%;
+  width: 70%;
+  display: block;
+  border: 0;
+}
+
+.register-overall {
+  background-color: #f9f9f9;
+  
+}
+
+.left-register {
+  padding: 20px 20px;
+  padding-left: 10%;
+  width: 55%;
+}
+
+.left-register h3{
+  font-weight: 600;
+  font-size: 45px;
+  color: rgb(12, 12, 12);
+}
+
+.left-register p {
+  color: #6c6868;
+  font-size: 28px;
+}
+
+.right-register {
+  padding: 20px 20px;
+  padding-top: 40px;
+  width: 45%;
+  height: auto;
+  background-color: #fff;
+}
+
+.register-form h6 {
+  color: #000000;
+  font-weight: 500;
+  font-size: 20px;
+}
+
+.register-form span {
+  font-weight: 600;
+}
+
+.register-btn {
+  width: 100%;
+  background-color: #0376b7;
+  font-size: 16px;
+
+  &:hover {
+    background-color: #333;
+  }
+}
+
+.link-login {
+  color: #0376b7;
+
+  &:hover {
+    text-decoration: underline;
+    color: #0376b7;
+  }
+}
+
+/* Responsive */
+@media (max-width: 48rem) {
+  .right-register {
+      width: 100%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
+  }
+
+  .left-register {
+    display: none;
+  }
+
+  #footer .container-fluid {
+    width: 100%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
+  }
+}
+
+/* Màn hình có chiều rộng từ 601px đến 1300px */
+@media (min-width: 48.1rem) and (max-width: 80rem) {
+  .right-register {
+    width: 100%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
+  }
+
+  .left-register {
+    display: none;
+  }
+
+  #footer .container-fluid {
+    width: 70%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
+  }
+}
+
+/* Màn hình có chiều rộng lớn hơn 1300px */
+@media (min-width: 80rem) {
+  #register .container-fluid {
+      width: 70%; /* Giảm kích thước hình ảnh xuống trên các màn hình lớn */
+  }
+
+  #footer .container-fluid {
+    width: 70%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
+  }
+}
 
 /*=========================================================
 	09 -> CHECKOUT PAGE
@@ -1145,21 +1268,21 @@ textarea.input {
   color: #000000;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 48rem) {
   #footer .container-fluid {
       width: 100%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
   }
 }
 
 /* Màn hình có chiều rộng từ 601px đến 900px */
-@media (min-width: 601px) and (max-width: 900px) {
+@media (min-width: 48.1rem) and (max-width: 80rem) {
   #footer .container-fluid {
       width: 70%; /* Giảm kích thước hình ảnh xuống trên các màn hình vừa */
   }
 }
 
 /* Màn hình có chiều rộng lớn hơn 900px */
-@media (min-width: 901px) {
+@media (min-width: 80rem) {
   #footer .container-fluid {
       width: 70%; /* Giảm kích thước hình ảnh xuống trên các màn hình lớn */
   }
