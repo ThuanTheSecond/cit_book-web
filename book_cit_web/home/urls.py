@@ -6,8 +6,10 @@ urlpatterns = [
     path('searchSlug', views.searchSlug, name='search_slug'),
     path('book/detail/id=<int:id>', views.bookDetail, name='book_detail'), 
     path('category/filter/id=<int:id>', views.categoryFilter, name='category'),
-    path('search/<str:search_type>/<str:query>', views.search, name='search'),  
+    path('search/<str:search_type>/<int:ftype>/<str:query>', views.search, name='search'),  
     path('searchAdvance/', views.searchAdvance, name='searchAdvance'),  
+    path('categoryFilter/<str:cid>/<int:type>', views.categoryFilter, name='categoryFilter'), 
+    path('topicFilter/<str:tid>/<int:type>', views.topicFilter, name='topicFilter'), 
     path('test', views.test, name='test'),  
 ]
 
@@ -19,5 +21,6 @@ htmxpatterns = [
     path('wishList_post/', views.wishListPost, name='wishList_post'),
     path('wishCheck_post/', views.wishCheckPost, name='wishCheck_post'),
     path('searchType_post/', views.searchTypePost, name='searchType_post'),
+    path('topicList_post/', views.topicListPost, name='topicList_post'),
 ]
 urlpatterns+= htmxpatterns

@@ -12,6 +12,7 @@ from functools import reduce
 from operator import and_
 from django.template.loader import render_to_string
 
+
 # Logic xử lí
 def checkRate(userid = None, bookid = None):
     rate = Rating.objects.filter(user_id = userid, book_id = bookid).first()
@@ -158,6 +159,13 @@ def wishCheckPost(request):
                                 <button id='wishlist' hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist' hx-swap = 'outerHTML' onclick='savingList(this)'>Want To Read</button>
                                 ''')
 
+def topicListPost(request):
+    topicList = Topic.objects.all().order_by('topic_name')
+    context = ''
+    for topic in topicList:
+        context += f'<li><a class="dropdown-item" id="t-{int(topic.topic_id) - 3000}" href="/topicFilter/{str((topic.topic_id) - 3000)}/1">{topic.topic_name}</a></li>'
+    return HttpResponse(context)
+
 def searchAdvancePost(request):
     pass
 
@@ -167,7 +175,7 @@ def searchSlug(request):
     query = request.GET.get('query')
     search_type = request.GET.get('search_type')
     query.replace(" ", "+")
-    return redirect('search',search_type = search_type ,query = query)
+    return redirect('search',search_type = search_type ,query = query, ftype = 5)
                    
 # Các view để trả về trang HTML theo url.
 def index(request):
@@ -214,55 +222,69 @@ def bookDetail(request, id):
     return render(request, 'bookDetail.html', context)
 
 # pagepanigtion, su dung lai cau lenh truy xuat book o tren, 
-def search(request, search_type, query):
+def search(request, search_type, query, ftype):
     form = searchForm()
     # Take skey and execute query
     query.replace('+',' ')
     query = normalize_vietnamese(query)
-    if len(query)>=3:
+    pquery = query
+    print(pquery)
         # sử dùng hàm __unaccent để có thể truy xuất băng tiếng việt không dấu
         # books = Book.objects.filter(book_title__unaccent__icontains=skey)[:5]
         # chinh sua o day
-        keywords = re.split(r'[ ,]+', query)
-        if search_type == 'all':
-            query = Q()
-            query = reduce(and_, (
-                    Q(book_title__unaccent__icontains=word) |
-                    Q(book_author__unaccent__icontains=word) |
-                    Q(book_publish__unaccent__icontains=word)
-                    for word in keywords
-                    ))   
-            books = Book.objects.filter(query)
-        
-        else:
-            query = Q(**{f"{search_type}__unaccent__icontains": keywords[0]})
-            for word in keywords[1:]:
-                query &= Q(**{f"{search_type}__unaccent__icontains": word})
-            books = Book.objects.filter(query)
+    keywords = re.split(r'[ ,]+', query)
+    if search_type == 'all':
+        query = Q()
+        query = reduce(and_, (
+                Q(book_title__unaccent__icontains=word) |
+                Q(book_author__unaccent__icontains=word) |
+                Q(book_publish__unaccent__icontains=word)
+                for word in keywords
+            ))   
+        books = Book.objects.filter(query)
+    else:
+        query = Q(**{f"{search_type}__unaccent__icontains": keywords[0]})
+        for word in keywords[1:]:
+            query &= Q(**{f"{search_type}__unaccent__icontains": word})        
+    books = Book.objects.filter(query)
+    
+    if ftype !=5:
+        from home.utils import filterBasedType
+        books = filterBasedType(books, ftype)     
     # pagnition
     page_obj = pagePaginator(request, books)
     context = {
         'formSearch': form,
+        'query': pquery,
+        'search_type': search_type,
         'page_obj' : page_obj,
     }
     return render(request, 'searchBook.html', context)
 
-def categoryFilter(request,id):
-    id += 3000
-    Book_TopicList = Book_Topic.objects.prefetch_related('topic_id').filter(topic_id = id)
-    bookList = None
-    topicTitle =False
-    for book in Book_TopicList:
-        if not topicTitle:
-            topicTitle = book.topic_id.topic_name
-        # Chinh sua hien thi cho cac quyen sach
-        bookList+= f'<li><a href="/book/detail/id={book.book_id -3000}">{ book.book_id.book_title }</a></li>'
+def topicFilter(request,tid, type = 1):
+    from home.utils import filterBasedType
+    id = int(tid) + 3000
+    bookTopic = Book_Topic.objects.prefetch_related('topic_id').filter(topic_id = id)
+    topicName = None
+    bid = []
+    for id in bookTopic:
+        if topicName == None:
+            topicName = id.topic_id.topic_name
+        bid.append(id.book_id.book_id)
+    books = Book.objects.filter(book_id__in = bid)
+
+    # phan loai dua vao loc
+    books = filterBasedType(books=books,type=type)
+
+    page_obj = pagePaginator(request, books)
+    
     context = {
-        'topicTitle': topicTitle,
-        'bookList': bookList
+        'tid': tid,
+        'topicName': topicName,
+        'page_obj': page_obj,
     }
     # Cần thêm một html để hiển thị filter theo thể loại
-    return render(request, 'bookDetail.html', context)
+    return render(request, 'filterBook.html', context)
 
 def searchAdvance(request):
     formset = SearchFormset(request.POST or None)
@@ -319,4 +341,22 @@ def test(request):
         'books': books,
     }
     return render(request, 'test.html',context)
-    
+
+def categoryFilter(request,cid,type = 1):
+    from home.utils import filterBasedType
+    books = Book.objects.all()
+    # phan loai dua vao category
+    if cid != 'Trending':
+        lang = 'Foreign'
+        if cid == 'Tiếng Việt':
+            lang = 'Vietnamese'
+        books = books.filter(book_lang = lang)
+    # phan loai dua vao loc
+    books = filterBasedType(books=books,type=type)
+    # phan trang
+    page_obj = pagePaginator(request, books)
+    context = {
+        'cid': cid,
+        'page_obj': page_obj
+    }
+    return render(request, 'filterBook.html', context)

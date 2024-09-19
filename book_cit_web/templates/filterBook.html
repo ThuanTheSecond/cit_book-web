@@ -1,49 +1,57 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% load static %}
 {% load widget_tweaks %}
+{% load filters %}
 
-
+{% block pack %}
+    
+{% endblock pack %}
 
 
 {% block bonusContent %}
-    <div class="filter">
-    <span>Lọc theo: </span>
-        <span><a href="{% url 'search' ftype=5 query=query search_type=search_type %}">Liên quan nhất</a></span>
-        <span><a href="{% url 'search' ftype=1 query=query search_type=search_type %}">Lượt xem</a></span>
-        <span><a href="{% url 'search' ftype=2 query=query search_type=search_type %}">Xuất bản gần đây</a></span>
-        <span><a href="{% url 'search' ftype=3 query=query search_type=search_type %}">Đánh giá nhiều</a></span>
-        <span><a href="{% url 'search' ftype=4 query=query search_type=search_type %}">Đánh giá tốt nhất</a></span> 
-</div>
-{% endblock bonusContent %}
+
+{% if cid %}
+    <h3><i>#{{ cid }}</i></h3>
+{% elif tid %}
+    <h3><i>#{{ topicName }}</i></h3>
+{% endif %}
     
 
+<div class="filter">
+    <span>Lọc theo: </span>
+    
+    {% if cid %}
+        <span><a href="/categoryFilter/{{cid}}/1">Lượt xem</a></span>
+        <span><a href="/categoryFilter/{{cid}}/2">Xuất bản gần đây</a></span>
+        <span><a href="/categoryFilter/{{cid}}/3">Đánh giá nhiều</a></span>
+        <span><a href="/categoryFilter/{{cid}}/4">Đánh giá tốt nhất</a></span> 
+    {% elif tid %}
+        <span><a href="/topicFilter/{{tid}}/1">Lượt xem</a></span>
+        <span><a href="/topicFilter/{{tid}}/2">Xuất bản gần đây</a></span>
+        <span><a href="/topicFilter/{{tid}}/3">Đánh giá nhiều</a></span>
+        <span><a href="/topicFilter/{{tid}}/4">Đánh giá tốt nhất</a></span> 
+    {% endif %}
+    
+</div>
+{% endblock bonusContent %}  
+
 {% block content %}
-    {% if page_obj %}
+
     <div>
         <ul>
             {% comment %} thông tin sách {% endcomment %}
             {% for book in page_obj %}
                 {% comment %} chỉnh sửa câu lệnh dưới để hiển thị từng cuốn sách {% endcomment %}
-                {% comment %} Cần chỉnh sửa lại wishlist post {% endcomment %}
-                <li><a href="/book/detail/id={{book.book_id|add:'-3000'}}">{{ book.book_title }}</a> 
-                    <div hx-post = "/wishCheck_post/" id= {{book.book_id}} hx-vals = '{"book_id": {{book.book_id}}}' hx-trigger="load" hx-target='#wishlist' >
-                    <button id='wishlist' hx-post = "/wishList_post/" hx-vals = '{"book_id": {{book.book_id}}}' hx-trigger="click delay:0.25s">...</button>
-                    </div>
-                </li>
+                <li><a href="/book/detail/id={{book.book_id|add:'-3000'}}">{{ book.book_title }}</a></li>
             {% endfor %}
         </ul>
     </div> 
-    {% comment %} Đây là thanh phân trang {% endcomment %}
-    {% elif not page_obj%}
-    {% comment %} Chỉnh sửa thông báo khi không tìm thấy sách {% endcomment %}
-            <div style="color:red">
-                Can not found book with your search key
-            </div>
-    {% endif %}
-{% endblock content %}
     
+{% endblock content %}
 
-{% block navBot %}
-    {% comment %} Đây là thanh phân trang {% endcomment %}
+
+{% block navBot %} 
+{% comment %} Đây là thanh phân trang {% endcomment %}
     <nav aria-label="Page navigation example">
     <ul class="pagination justify-content-center">
         {% if page_obj.has_previous %}
@@ -94,10 +102,12 @@
         </li>
         {% endif %}
     </ul>
-    </nav>
-    
+    </nav>  
 {% endblock navBot %}
+    
 
 {% block scripts %}
-<script src="https://unpkg.com/htmx.org@2.0.2/dist/htmx.js" integrity="sha384-yZq+5izaUBKcRgFbxgkRYwpHhHHCpp5nseXp0MEQ1A4MTWVMnqkmcuFez8x5qfxr"crossorigin="anonymous"></script>
 {% endblock scripts %}
+    
+    
+    
