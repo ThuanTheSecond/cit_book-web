@@ -9,7 +9,7 @@
 
 
 {% block bonusContent %}
-<form method="post" action="{% url 'searchAdvance' %}" hx-post="{% url 'searchAdvance' %}" hx-target="#book-content" hx-swap="outerHTML">
+<form method="post" action="{% url 'searchAdvance' %}">
     {% csrf_token %}
     {{ formset.management_form }}
     <table>
@@ -38,10 +38,22 @@
 {% endblock bonusContent %}
 
 {% block content %}
-    <div id="book-list">
+    {% if page_obj %}
+    <div style="border: 2px red solid;">
         {% include 'advanceBooks.html' %}
     </div>
+    {% else %}
+    <div style="color:red">
+        Can not found book with your search key
+    </div>
+    {% endif %}
 {% endblock content %}
+
+{% block navBot %}
+{% comment %} <div hx-get="?page={{ page_obj.next_page_number }}" hx-trigger="revealed" hx-swap="beforeend" class="load-more"></div> {% endcomment %}
+    {% include 'pagintion_partial.html' %}
+{% endblock navBot %}
+
 {% block scripts %}
 <script>
     // Hàm để thêm trường mới

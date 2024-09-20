@@ -288,7 +288,6 @@ def topicFilter(request,tid, type = 1):
 
 def searchAdvance(request):
     formset = SearchFormset(request.POST or None)
-    page_obj = 'Yet'
     final_query = None
     queries = []
     subquery = Q()
@@ -315,18 +314,17 @@ def searchAdvance(request):
                 
         if queries:
             final_query = reduce(and_, queries)
-            books = Book.objects.filter(final_query) 
-            page_obj = pagePaginator(request, books)
-            
+            books = Book.objects.filter(final_query)  
     else:
         books = Book.objects.all()
-        page_obj = pagePaginator(request, books)
+    page_obj = pagePaginator(request, books)
 
     # Xử lý yêu cầu từ HTMX
     if request.headers.get('HX-Request'):
         html = render_to_string('advanceBooks.html', {'page_obj': page_obj})
         return HttpResponse(html)
-
+        # return render(request, 'advanceBooks.html', {'page_obj': page_obj})
+    
     return render(request, 'searchAdvance.html', {'formset': formset, 'page_obj': page_obj})
 
 def test(request):
