@@ -286,19 +286,63 @@ def topicFilter(request,tid, type = 1):
     # Cần thêm một html để hiển thị filter theo thể loại
     return render(request, 'filterBook.html', context)
 
+# def searchAdvance(request):
+#     formset = SearchFormset(request.POST or None)
+#     final_query = None
+#     queries = []
+#     subquery = Q()
+#     if formset.is_valid():
+#         for form in formset:
+#             field_name = form.cleaned_data.get('field_name')
+#             search_type = form.cleaned_data.get('search_type')
+#             value = form.cleaned_data.get('value')
+#             value = normalize_vietnamese(value)
+#             keywords = re.split(r'[ ,]+', value)
+            
+#             if search_type == 'iexact':
+#                 queries.append(Q(**{f"{field_name}__unaccent__iexact": value}))
+#             elif search_type == 'not_icontains':
+#                 subquery = ~Q(**{f"{field_name}__unaccent__icontains": keywords[0]})
+#                 for word in keywords[1:]:
+#                     subquery &= ~Q(**{f"{field_name}__unaccent__icontains": word})
+#                 queries.append(subquery)
+#             elif search_type == 'icontains':
+#                 subquery = Q(**{f"{field_name}__unaccent__icontains": keywords[0]})
+#                 for word in keywords[1:]:
+#                     subquery &= Q(**{f"{field_name}__unaccent__icontains": word})
+#                 queries.append(subquery)
+                
+#         if queries:
+#             final_query = reduce(and_, queries)
+#             books = Book.objects.filter(final_query)  
+#     else:
+#         books = Book.objects.all()
+#     page_obj = pagePaginator(request, books)
+
+#     # Xử lý yêu cầu từ HTMX
+#     if request.headers.get('HX-Request'):
+#         html = render_to_string('advanceBooks.html', {'page_obj': page_obj})
+#         return HttpResponse(html)
+#         # return render(request, 'advanceBooks.html', {'page_obj': page_obj})
+    
+#     return render(request, 'searchAdvance.html', {'formset': formset, 'page_obj': page_obj})
+
 def searchAdvance(request):
     formset = SearchFormset(request.POST or None)
     final_query = None
     queries = []
     subquery = Q()
+    i = 1
+    # Lưu các tham số tìm kiếm vào session nếu form hợp lệ
     if formset.is_valid():
         for form in formset:
+            
             field_name = form.cleaned_data.get('field_name')
             search_type = form.cleaned_data.get('search_type')
             value = form.cleaned_data.get('value')
             value = normalize_vietnamese(value)
             keywords = re.split(r'[ ,]+', value)
-            
+
             if search_type == 'iexact':
                 queries.append(Q(**{f"{field_name}__unaccent__iexact": value}))
             elif search_type == 'not_icontains':
@@ -311,21 +355,64 @@ def searchAdvance(request):
                 for word in keywords[1:]:
                     subquery &= Q(**{f"{field_name}__unaccent__icontains": word})
                 queries.append(subquery)
-                
+         
+            # Lưu vào session
+            request.session[f'search_params{i}'] = {
+                'field_name': field_name,
+                'search_type': search_type,
+                'value': value
+            }
+            i += 1
         if queries:
             final_query = reduce(and_, queries)
-            books = Book.objects.filter(final_query)  
+            books = Book.objects.filter(final_query)
+            request.session['paramslen'] = {
+                'paramslen': i-1
+            }
+        else:
+            books = Book.objects.all()
     else:
-        books = Book.objects.all()
+        # Lấy các tham số tìm kiếm từ session nếu tồn tại
+        paramslen = request.session.get('paramslen')
+        for i in range(1,paramslen['paramslen']+1):
+            search_params = request.session.get(f'search_params{i}')    
+            print(search_params)
+            
+            field_name = search_params['field_name']
+            search_type = search_params['search_type']
+            value = search_params['value']
+            
+            keywords = re.split(r'[ ,]+', value)
+
+            # Xây dựng lại query dựa trên session
+            if search_type == 'iexact':
+                queries.append(Q(**{f"{field_name}__unaccent__iexact": value}))
+            elif search_type == 'icontains':
+                subquery = Q(**{f"{field_name}__unaccent__icontains": keywords[0]})
+                for word in keywords[1:]:
+                    subquery &= Q(**{f"{field_name}__unaccent__icontains": word})
+                queries.append(subquery)
+            elif search_type == 'not_icontains':
+                subquery = ~Q(**{f"{field_name}__unaccent__icontains": keywords[0]})
+                for word in keywords[1:]:
+                    subquery &= ~Q(**{f"{field_name}__unaccent__icontains": word})
+                queries.append(subquery)
+            print(queries)
+            
+        final_query = reduce(and_, queries)
+        books = Book.objects.filter(final_query)
+            
+    
+    # Phân trang
     page_obj = pagePaginator(request, books)
 
-    # Xử lý yêu cầu từ HTMX
+    # Xử lý yêu cầu HTMX
     if request.headers.get('HX-Request'):
         html = render_to_string('advanceBooks.html', {'page_obj': page_obj})
         return HttpResponse(html)
-        # return render(request, 'advanceBooks.html', {'page_obj': page_obj})
-    
+
     return render(request, 'searchAdvance.html', {'formset': formset, 'page_obj': page_obj})
+
 
 def test(request):
     bookList = {}

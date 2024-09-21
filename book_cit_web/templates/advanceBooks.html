@@ -4,4 +4,7 @@
                 <li><a href="/book/detail/id={{book.book_id|add:'-3000'}}">{{ book.book_title }}</a></li>
             {% endfor %}
         </ul> 
+        <div id="pagination">
+        {% include 'pagintion_partial.html' %}
+        </div>
     </div>
