@@ -376,7 +376,6 @@ def searchAdvance(request):
         paramslen = request.session.get('paramslen')
         for i in range(1,paramslen['paramslen']+1):
             search_params = request.session.get(f'search_params{i}')    
-            print(search_params)
             
             field_name = search_params['field_name']
             search_type = search_params['search_type']
@@ -397,7 +396,6 @@ def searchAdvance(request):
                 for word in keywords[1:]:
                     subquery &= ~Q(**{f"{field_name}__unaccent__icontains": word})
                 queries.append(subquery)
-            print(queries)
             
         final_query = reduce(and_, queries)
         books = Book.objects.filter(final_query)
