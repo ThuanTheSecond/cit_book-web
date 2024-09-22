@@ -3,99 +3,131 @@
 
 
 
-
 {% block bonusContent %}
-    <div class="filter">
-    <span>Lọc theo: </span>
-        <span><a href="{% url 'search' ftype=5 query=query search_type=search_type %}">Liên quan nhất</a></span>
-        <span><a href="{% url 'search' ftype=1 query=query search_type=search_type %}">Lượt xem</a></span>
-        <span><a href="{% url 'search' ftype=2 query=query search_type=search_type %}">Xuất bản gần đây</a></span>
-        <span><a href="{% url 'search' ftype=3 query=query search_type=search_type %}">Đánh giá nhiều</a></span>
-        <span><a href="{% url 'search' ftype=4 query=query search_type=search_type %}">Đánh giá tốt nhất</a></span> 
+<div class="body">
+    <div class="overall container-fluid justify-content-center">
+        <h3>Search Books</h3>
+        <div class="filter">
+            <span>Lọc theo: </span>
+                <span><a href="{% url 'search' ftype=5 query=query search_type=search_type %}">Liên quan nhất</a> | </span>
+                <span><a href="{% url 'search' ftype=1 query=query search_type=search_type %}">Lượt xem</a> | </span>
+                <span><a href="{% url 'search' ftype=2 query=query search_type=search_type %}">Xuất bản gần đây</a> | </span>
+                <span><a href="{% url 'search' ftype=3 query=query search_type=search_type %}">Đánh giá nhiều</a> | </span>
+                <span><a href="{% url 'search' ftype=4 query=query search_type=search_type %}">Đánh giá tốt nhất</a></span> 
+        </div>
+    </div>
 </div>
 {% endblock bonusContent %}
     
 
 {% block content %}
+<div class="search-result">
     {% if page_obj %}
-    <div>
-        <ul>
+    <div class="search-book-content container-fluid justify-content-center">
+        <ul id="book-form">
             {% comment %} thông tin sách {% endcomment %}
             {% for book in page_obj %}
                 {% comment %} chỉnh sửa câu lệnh dưới để hiển thị từng cuốn sách {% endcomment %}
                 {% comment %} Cần chỉnh sửa lại wishlist post {% endcomment %}
-                <li><a href="/book/detail/id={{book.book_id|add:'-3000'}}">{{ book.book_title }}</a> 
-                    <div hx-post = "/wishCheck_post/" id= {{book.book_id}} hx-vals = '{"book_id": {{book.book_id}}}' hx-trigger="load" hx-target='#wishlist' >
-                    <button id='wishlist' hx-post = "/wishList_post/" hx-vals = '{"book_id": {{book.book_id}}}' hx-trigger="click delay:0.25s">...</button>
-                    </div>
-                </li>
+                <div class="book-found">
+                    <li>
+                        <div class="row">
+                            <div class="left-content col-md-2 justify-content-center">
+                                <a href="/book/detail/id={{book.book_id|add:'-3000'}}"><img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}"></a>
+                            </div>
+
+                            <div class="middle-content col-md-7">
+                                <a class="book-name" href="/book/detail/id={{book.book_id|add:'-3000'}}">{{ book.book_title }}</a> 
+                                <p class="book-author">by {{book.book_author}}</p>
+                                <p class="book-published">Fist published in {{ book.book_publish }}</p>
+                                
+                                <div class="aveRating">
+                                    <span class="product-rating">{{ aveRate }}</span><span>/5 <span class="fa fa-star aveRating-start"></span> ({{ countRate }} - {{ book.book_view }} lượt xem)</span>
+                            
+                                </div>
+                            </div>
+
+                            <div class="right-content col-md-3">
+                                <div hx-post = "/wishCheck_post/" id= {{book.book_id}} hx-vals = '{"book_id": {{book.book_id}}}' hx-trigger="load" hx-target='#wishlist' >
+                                <button id='wishlist' hx-post = "/wishList_post/" hx-vals = '{"book_id": {{book.book_id}}}' hx-trigger="click delay:0.25s">...</button>
+                            </div>
+                    </li><br>
+                </div>
             {% endfor %}
         </ul>
     </div> 
-    {% comment %} Đây là thanh phân trang {% endcomment %}
+
+    {% comment %} Đây là khi khong tim thay sach {% endcomment %}
     {% elif not page_obj%}
     {% comment %} Chỉnh sửa thông báo khi không tìm thấy sách {% endcomment %}
             <div style="color:red">
                 Can not found book with your search key
             </div>
     {% endif %}
+</div>
 {% endblock content %}
     
 
 {% block navBot %}
-    {% comment %} Đây là thanh phân trang {% endcomment %}
-    <nav aria-label="Page navigation example">
-    <ul class="pagination justify-content-center">
-        {% if page_obj.has_previous %}
-        <li class="page-item">
-            <a class="page-link" href="?page=1" aria-label="First">
-            <span aria-hidden="true">&laquo;&laquo;</span>
-            </a>
-        </li>
-        <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
-            <span aria-hidden="true">&laquo;</span>
-            </a>
-        </li>
-        {% else %}
-        <li class="page-item disabled">
-            <span class="page-link">&laquo;&laquo;</span>
-        </li>
-        <li class="page-item disabled">
-            <span class="page-link">&laquo;</span>
-        </li>
-        {% endif %}
+<div class="search-result">
+    <div class="search-book-content container-fluid justify-content-center">
+        {% comment %} Đây là thanh phân trang {% endcomment %}
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+                {% comment %} Trang truoc {% endcomment %}
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1" aria-label="First">
+                    <span aria-hidden="true">First</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">First</span>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">&laquo;</span>
+                </li>
+                {% endif %}
 
-        {% for num in page_obj.paginator.page_range %}
-        {% if page_obj.number == num %}
-            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
-        {% endif %}
-        {% endfor %}
+                {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                {% endif %}
+                {% endfor %}
 
-        {% if page_obj.has_next %}
-        <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
-            <span aria-hidden="true">&raquo;</span>
-            </a>
-        </li>
-        <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
-            <span aria-hidden="true">&raquo;&raquo;</span>
-            </a>
-        </li>
-        {% else %}
-        <li class="page-item disabled">
-            <span class="page-link">&raquo;</span>
-        </li>
-        <li class="page-item disabled">
-            <span class="page-link">&raquo;&raquo;</span>
-        </li>
-        {% endif %}
-    </ul>
-    </nav>
-    
+                {% comment %} Trang sau {% endcomment %}
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
+                    <span aria-hidden="true">Last</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">&raquo;</span>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">Last</span>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+</div>
+
 {% endblock navBot %}
 
 {% block scripts %}

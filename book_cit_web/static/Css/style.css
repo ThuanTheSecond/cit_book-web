@@ -55,7 +55,7 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  color: #fff;
+  color: #000000;
   font-weight: 700;
   margin: 0 0 10px;
 }
@@ -577,19 +577,6 @@ textarea.input {
   }
 }
 
-/* Màn hình có chiều rộng từ 601px đến 1300px */
-@media (min-width: 771px) and (max-width: 1300px) {
-  .body .container-fluid {
-      width: 100%; /* Giảm kích thước hình ảnh xuống trên các màn hình vừa */
-  }
-}
-
-/* Màn hình có chiều rộng lớn hơn 1300px */
-@media (min-width: 1301px) {
-  .body .container-fluid {
-      width: 70%; /* Giảm kích thước hình ảnh xuống trên các màn hình lớn */
-  }
-}
 
 /*----------------------------*\
 	Cart
@@ -727,7 +714,7 @@ textarea.input {
 }
 
 .body .container-fluid {
-  width: 70%;
+  width: 70vw;
   background-color: #fff;
   border: 1px solid #c0beb2;
   border-top-left-radius: 5px;
@@ -950,6 +937,143 @@ textarea.input {
 /*=========================================================
 	06 -> SEARCH PAGE
 ===========================================================*/
+.search-result .container-fluid {
+  width: 70%;
+  background-color: #fff;
+  border: 1px solid #c0beb2;
+  border-top: 0;
+  border-bottom: 0;
+  vertical-align: middle;
+}
+
+.overall {
+  padding: 20px 20px;
+}
+
+h3 {
+  color: #676469;
+  font-size: 35px;
+}
+
+.filter a {
+  text-decoration: none;
+  color: #0376b7;
+
+  &:hover {
+    color: #000;
+  }
+}
+
+#book-form li {
+  padding: 10px 10px;
+  text-align: left;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.book-found li {
+  background-color: #f9f9f9;
+}
+
+.book-found li a {
+  text-decoration: none;
+  color: #000;
+} 
+
+.left-content {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.left-content .book-image {
+  width: 100%; /* Đảm bảo hình ảnh không vượt quá chiều rộng của container */
+  height: auto;
+  background-size: cover;
+  background-position: center;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  margin-left: 1rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.middle-content {
+  padding: 20px 20px;
+}
+
+.middle-content .book-name {
+  font-weight: 600;
+  font-size: 18px;
+
+  &:hover {
+    color: #0376b7;
+  }
+}
+
+.middle-content .book-author {
+  font-weight: 500;
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+.middle-content .book-published {
+  color: #807e83;
+  font-size: 13px;
+}
+
+.right-content {
+  padding: 20px 20px;
+  align-content: center;
+}
+
+.pagination .page-link {
+  border: none;
+  font-family: 'Lato', sans-serif;
+  font-size: 15px;
+
+  &:hover {
+    color: #fff;
+    background-color: #095885;
+  }
+}
+
+
+@media (max-width: 48rem) {
+  .search-result .container-fluid {
+      width: 100%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
+  }
+
+  .left-content {
+    text-align: center;
+  }
+
+  .left-content .book-image {
+    width: 40%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
+    margin-inline-start: 0;
+  }
+  
+  .right-content {
+    text-align: center;
+  }
+}
+
+/* Màn hình có chiều rộng từ 601px đến 1300px */
+@media (min-width: 48.1rem) and (max-width: 79rem) {
+  .search-result .container-fluid {
+      width: 100%; /* Giảm kích thước hình ảnh xuống trên các màn hình vừa */
+  }
+
+  .left-content .book-image {
+    width: 100%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
+  }
+
+}
+
+/* Màn hình có chiều rộng lớn hơn 1300px */
+@media (min-width: 79rem) {
+  .search-result .container-fluid {
+      width: 70%; /* Giảm kích thước hình ảnh xuống trên các màn hình lớn */
+  }
+}
 
 /*=========================================================
 	07 -> LOGIN PAGE
@@ -1277,7 +1401,7 @@ textarea.input {
 /* Màn hình có chiều rộng từ 601px đến 900px */
 @media (min-width: 48.1rem) and (max-width: 80rem) {
   #footer .container-fluid {
-      width: 70%; /* Giảm kích thước hình ảnh xuống trên các màn hình vừa */
+      width: 100%; /* Giảm kích thước hình ảnh xuống trên các màn hình vừa */
   }
 }
 
@@ -1363,31 +1487,6 @@ textarea.input {
 
 .slick-next {
   right: -20px;
-}
-
-/*----------------------------*\
-	Dots
-\*----------------------------*/
-
-.slick-dots li, .slick-dots li button, .slick-dots li button:before {
-  width: 10px;
-  height: 10px;
-}
-
-.slick-dots li button:before {
-  content: "";
-  opacity: 1;
-  background: #E4E7ED;
-  border-radius: 50%;
-}
-
-.slick-dots li.slick-active button:before {
-  background-color: #D10024;
-}
-
-.custom-dots .slick-dots {
-  position: static;
-  margin: 15px 0px;
 }
 
 /*=========================================================
