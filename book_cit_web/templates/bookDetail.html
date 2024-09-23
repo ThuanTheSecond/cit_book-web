@@ -36,16 +36,16 @@
                                 {% for i in "12345" %} 
                                     {% if i == rating %}
                                         <label for="rate-{{i}}" style="--i: {{i}}"><i class="fa fa-star" title="{{i}} star"></i></label>
-                                        <input type="radio" name="rating" id="rate-{{i}}" hx-vals='{"rate": {{i}}, "book_id": {{detail.book_id}}}' hx-post ="/rating_post/" hx-trigger="load click delay:0.25s" hx-target="#clear" hx-swap="outerHTML" checked>
+                                        <input type="radio" name="rating" id="rate-{{i}}" hx-vals='{"rate": {{i}}, "book_id": {{detail.book_id}}}' hx-post ="/rating_post/" hx-trigger="load click delay:0.25s" hx-target="#clear-rating" hx-swap="outerHTML" checked>
                                     {% else %}
                                         <label for="rate-{{i}}" style="--i: {{i}}"><i class="fa fa-star" title="{{i}} star"></i></label>
-                                        <input type="radio" name="rating" id="rate-{{i}}" hx-vals='{"rate": {{i}}, "book_id": {{detail.book_id}}}' hx-post ="/rating_post/" hx-trigger="click delay:0.25s" hx-target="#clear" hx-swap="outerHTML">
+                                        <input type="radio" name="rating" id="rate-{{i}}" hx-vals='{"rate": {{i}}, "book_id": {{detail.book_id}}}' hx-post ="/rating_post/" hx-trigger="click delay:0.25s" hx-target="#clear-rating" hx-swap="outerHTML">
                                     {% endif %}
                                 {% endfor %}    
                             </span></p>
                         </div>
                         <div class="clear_rating">
-                            <input style="display: none;" type="button"  name="clear" id="clear" >
+                            <input style="display: none;" type="button"  name="clear" id="clear-rating" >
                         </div>
                     </form>
                 </div>
