@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
+{% load filters %}
 
 
 
@@ -39,11 +40,10 @@
                             <div class="middle-content col-md-7">
                                 <a class="book-name" href="/book/detail/id={{book.book_id|add:'-3000'}}">{{ book.book_title }}</a> 
                                 <p class="book-author">by {{book.book_author}}</p>
-                                <p class="book-published">Fist published in {{ book.book_publish }}</p>
+                                <p class="book-published">First published in {{ book.book_publish }}</p>
                                 
                                 <div class="aveRating">
-                                    <span class="product-rating">{{ aveRate }}</span><span>/5 <span class="fa fa-star aveRating-start"></span> ({{ countRate }} - {{ book.book_view }} lượt xem)</span>
-                            
+                                    <span class="product-rating">{{ averRates|get_item:book.book_id }}</span><span>/5 <span class="fa fa-star aveRating-start"></span> ({{ countRates|get_item:book.book_id }} - {{ book.book_view }} lượt xem)</span>
                                 </div>
                             </div>
 

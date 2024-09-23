@@ -250,7 +250,14 @@ def search(request, search_type, query, ftype):
     
     if ftype !=5:
         from home.utils import filterBasedType
-        books = filterBasedType(books, ftype)     
+        books = filterBasedType(books, ftype)  
+        
+    countRates = {}
+    averRates = {}
+    for book in books:
+        book_id = book.book_id
+        countRates[book_id] = countRating(book_id=book_id)  # Lưu số lượng đánh giá của từng sách
+        averRates[book_id] = averRating(book_id=book_id)
     # pagnition
     page_obj = pagePaginator(request, books)
     context = {
@@ -258,6 +265,8 @@ def search(request, search_type, query, ftype):
         'query': pquery,
         'search_type': search_type,
         'page_obj' : page_obj,
+        'countRates': countRates,
+        'averRates': averRates,
     }
     return render(request, 'searchBook.html', context)
 
