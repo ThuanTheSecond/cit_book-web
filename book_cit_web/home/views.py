@@ -372,34 +372,38 @@ def searchAdvance(request):
         else:
             books = Book.objects.all()
     else:
+        books = None
         # Lấy các tham số tìm kiếm từ session nếu tồn tại
         paramslen = request.session.get('paramslen')
-        for i in range(1,paramslen['paramslen']+1):
-            search_params = request.session.get(f'search_params{i}')    
-            
-            field_name = search_params['field_name']
-            search_type = search_params['search_type']
-            value = search_params['value']
-            
-            keywords = re.split(r'[ ,]+', value)
+        if paramslen != None:
+            for i in range(1,paramslen['paramslen']+1):
+                search_params = request.session.get(f'search_params{i}')    
+                
+                field_name = search_params['field_name']
+                search_type = search_params['search_type']
+                value = search_params['value']
+                
+                keywords = re.split(r'[ ,]+', value)
 
-            # Xây dựng lại query dựa trên session
-            if search_type == 'iexact':
-                queries.append(Q(**{f"{field_name}__unaccent__iexact": value}))
-            elif search_type == 'icontains':
-                subquery = Q(**{f"{field_name}__unaccent__icontains": keywords[0]})
-                for word in keywords[1:]:
-                    subquery &= Q(**{f"{field_name}__unaccent__icontains": word})
-                queries.append(subquery)
-            elif search_type == 'not_icontains':
-                subquery = ~Q(**{f"{field_name}__unaccent__icontains": keywords[0]})
-                for word in keywords[1:]:
-                    subquery &= ~Q(**{f"{field_name}__unaccent__icontains": word})
-                queries.append(subquery)
+                # Xây dựng lại query dựa trên session
+                if search_type == 'iexact':
+                    queries.append(Q(**{f"{field_name}__unaccent__iexact": value}))
+                elif search_type == 'icontains':
+                    subquery = Q(**{f"{field_name}__unaccent__icontains": keywords[0]})
+                    for word in keywords[1:]:
+                        subquery &= Q(**{f"{field_name}__unaccent__icontains": word})
+                    queries.append(subquery)
+                elif search_type == 'not_icontains':
+                    subquery = ~Q(**{f"{field_name}__unaccent__icontains": keywords[0]})
+                    for word in keywords[1:]:
+                        subquery &= ~Q(**{f"{field_name}__unaccent__icontains": word})
+                    queries.append(subquery)
             
-        final_query = reduce(and_, queries)
-        books = Book.objects.filter(final_query)
-            
+            final_query = reduce(and_, queries)
+            books = Book.objects.filter(final_query)
+        else:
+            books = Book.objects.all()
+                
     
     # Phân trang
     page_obj = pagePaginator(request, books)
