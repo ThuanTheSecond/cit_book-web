@@ -37,7 +37,7 @@ def averRating(book_id):
 def countRating(book_id):
     result = Rating.objects.filter(book_id=book_id).values('user_id').distinct().count()
     if result:
-        return str(result) + "người đánh giá"
+        return str(result) + " người đánh giá"
     return "Chưa có đánh giá"
 
 
@@ -284,13 +284,21 @@ def topicFilter(request,tid, type = 1):
 
     # phan loai dua vao loc
     books = filterBasedType(books=books,type=type)
-
+    countRates = {}
+    averRates = {}
+    for book in books:
+        book_id = book.book_id
+        countRates[book_id] = countRating(book_id=book_id)  # Lưu số lượng đánh giá của từng sách
+        averRates[book_id] = averRating(book_id=book_id)
     page_obj = pagePaginator(request, books)
     
     context = {
         'tid': tid,
         'topicName': topicName,
         'page_obj': page_obj,
+        'countRates': countRates,
+        'averRates': averRates,
+        
     }
     # Cần thêm một html để hiển thị filter theo thể loại
     return render(request, 'filterBook.html', context)
@@ -407,10 +415,20 @@ def categoryFilter(request,cid,type = 1):
         books = books.filter(book_lang = lang)
     # phan loai dua vao loc
     books = filterBasedType(books=books,type=type)
+    
+    countRates = {}
+    averRates = {}
+    for book in books:
+        book_id = book.book_id
+        countRates[book_id] = countRating(book_id=book_id)  # Lưu số lượng đánh giá của từng sách
+        averRates[book_id] = averRating(book_id=book_id)
+        
     # phan trang
     page_obj = pagePaginator(request, books)
     context = {
         'cid': cid,
-        'page_obj': page_obj
+        'page_obj': page_obj,
+        'countRates': countRates,
+        'averRates': averRates,
     }
     return render(request, 'filterBook.html', context)

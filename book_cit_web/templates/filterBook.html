@@ -10,43 +10,77 @@
 
 {% block bonusContent %}
 
-{% if cid %}
-    <h3><i>#{{ cid }}</i></h3>
-{% elif tid %}
-    <h3><i>#{{ topicName }}</i></h3>
-{% endif %}
-    
-
-<div class="filter">
-    <span>Lọc theo: </span>
-    
-    {% if cid %}
-        <span><a href="/categoryFilter/{{cid}}/1">Lượt xem</a></span>
-        <span><a href="/categoryFilter/{{cid}}/2">Xuất bản gần đây</a></span>
-        <span><a href="/categoryFilter/{{cid}}/3">Đánh giá nhiều</a></span>
-        <span><a href="/categoryFilter/{{cid}}/4">Đánh giá tốt nhất</a></span> 
-    {% elif tid %}
-        <span><a href="/topicFilter/{{tid}}/1">Lượt xem</a></span>
-        <span><a href="/topicFilter/{{tid}}/2">Xuất bản gần đây</a></span>
-        <span><a href="/topicFilter/{{tid}}/3">Đánh giá nhiều</a></span>
-        <span><a href="/topicFilter/{{tid}}/4">Đánh giá tốt nhất</a></span> 
-    {% endif %}
-    
+<div class="body">
+    <div class="overall container-fluid justify-content-center">
+        {% if cid %}
+            <h3><i>#{{ cid }}</i></h3>
+        {% elif tid %}
+            <h3><i>#{{ topicName }}</i></h3>
+        {% endif %}
+        <div class="filter">
+            <span>Lọc theo: </span>
+            
+            {% if cid %}
+                <span><a href="/categoryFilter/{{cid}}/1">Lượt xem</a> | </span>
+                <span><a href="/categoryFilter/{{cid}}/2">Xuất bản gần đây</a> | </span>
+                <span><a href="/categoryFilter/{{cid}}/3">Đánh giá nhiều</a> | </span>
+                <span><a href="/categoryFilter/{{cid}}/4">Đánh giá tốt nhất</a> | </span> 
+            {% elif tid %}
+                <span><a href="/topicFilter/{{tid}}/1">Lượt xem</a> | </span>
+                <span><a href="/topicFilter/{{tid}}/2">Xuất bản gần đây</a> | </span>
+                <span><a href="/topicFilter/{{tid}}/3">Đánh giá nhiều</a> | </span>
+                <span><a href="/topicFilter/{{tid}}/4">Đánh giá tốt nhất</a> | </span> 
+            {% endif %}
+        </div>
+     </div>
 </div>
 {% endblock bonusContent %}  
 
 {% block content %}
-
-    <div>
-        <ul>
+<div class="search-result">
+    {% if page_obj %}
+    <div class="search-book-content container-fluid justify-content-center">
+        <ul id="book-form">
             {% comment %} thông tin sách {% endcomment %}
             {% for book in page_obj %}
                 {% comment %} chỉnh sửa câu lệnh dưới để hiển thị từng cuốn sách {% endcomment %}
-                <li><a href="/book/detail/id={{book.book_id|add:'-3000'}}">{{ book.book_title }}</a></li>
+                {% comment %} Cần chỉnh sửa lại wishlist post {% endcomment %}
+                <div class="book-found">
+                    <li>
+                        <div class="row">
+                            <div class="left-content col-md-2 justify-content-center">
+                                <a href="/book/detail/id={{book.book_id|add:'-3000'}}"><img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}"></a>
+                            </div>
+
+                            <div class="middle-content col-md-7">
+                                <a class="book-name" href="/book/detail/id={{book.book_id|add:'-3000'}}">{{ book.book_title }}</a> 
+                                <p class="book-author">by {{book.book_author}}</p>
+                                <p class="book-published">First published in {{ book.book_publish }}</p>
+                                
+                                <div class="aveRating">
+                                    <span class="product-rating">{{ averRates|get_item:book.book_id }}</span><span>/5 <span class="fa fa-star aveRating-start"></span> ({{ countRates|get_item:book.book_id }} - {{ book.book_view }} lượt xem)</span>
+                                </div>
+                            </div>
+
+                            <div class="right-content col-md-3">
+                                <div id='wishlist{{book.book_id}}' hx-post = "/wishCheck_post/"  hx-vals = '{"book_id": {{book.book_id}}}' hx-trigger="load" hx-target="#wishlist{{book.book_id}}">
+                                    <button hx-post = "/wishList_post/" hx-vals = '{"book_id": {{book.book_id}}}' hx-trigger="click delay:0.25s">...</button>
+                                </div>
+                            </div>
+                    </li><br>
+                </div>
             {% endfor %}
         </ul>
     </div> 
-    
+
+    {% comment %} Đây là khi khong tim thay sach {% endcomment %}
+    {% elif not page_obj%}
+    {% comment %} Chỉnh sửa thông báo khi không tìm thấy sách {% endcomment %}
+            <div style="color:red">
+                Can not found book with your search key
+            </div>
+    {% endif %}
+</div>
 {% endblock content %}
 
 
