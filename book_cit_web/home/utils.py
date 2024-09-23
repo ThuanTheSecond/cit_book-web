@@ -8,7 +8,7 @@ def normalize_vietnamese(text):
 
 def pagePaginator(request, books):
     from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-    paginator = Paginator(books, 7)
+    paginator = Paginator(books, 5)
     
     page_number = request.GET.get('page')
     try:
