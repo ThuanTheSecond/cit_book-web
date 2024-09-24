@@ -9,44 +9,51 @@
 
 
 {% block bonusContent %}
-<form method="post" action="{% url 'searchAdvance' %}">
-    {% csrf_token %}
-    {{ formset.management_form }}
-    <table>
-        <thead>
-            <tr>
-                <th>Field</th>
-                <th>Condition</th>
-                <th>Value</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for form in formset %}
-            <tr>
-                <td>{% render_field form.field_name %}</td>
-                <td>{% render_field form.search_type %}</td>
-                <td>{% render_field form.value %}</td>
-                <td><button type="button" class="remove-field">Remove</button></td> 
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <button type="submit" >Tìm Kiếm</button>
-    <button type="button" id="add-field">Thêm trường</button>
-</form>
+<div class="body">
+    <div class="overall container-fluid justify-content-center">
+        <form method="post" action="{% url 'searchAdvance' %}">
+            {% csrf_token %}
+            {{ formset.management_form }}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Condition</th>
+                        <th>Value</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for form in formset %}
+                    <tr>
+                        <td>{% render_field form.field_name %}</td>
+                        <td>{% render_field form.search_type %}</td>
+                        <td>{% render_field form.value %}</td>
+                        <td><button type="button" class="remove-field">Remove</button></td> 
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button type="submit" >Tìm Kiếm</button>
+            <button type="button" id="add-field">Thêm trường</button>
+        </form>
+    </div>
+</div>
 {% endblock bonusContent %}
 
 {% block content %}
+<div class="search-result">
     {% if page_obj %}
-    <div style="border: 2px red solid;">
+    <div class="search-book-content container-fluid justify-content-center" style="border: 2px red solid;">
         {% include 'advanceBooks.html' %}
     </div>
     {% else %}
-    <div style="color:red">
+    <div class="search-book-content container-fluid justify-content-center" style="color:red">
         Can not found book with your search key
     </div>
     {% endif %}
+</div>
 {% endblock content %}
 
 {% block scripts %}

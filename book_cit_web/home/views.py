@@ -141,12 +141,12 @@ def wishListPost(request):
         fav.save()
         # tra ve button saved
         return HttpResponse(f'''
-                            <button hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist{book_id}' hx-swap = 'innerHTML'>Saved</button>
+                            <button class="btn-wishlist" hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist{book_id}' hx-swap = 'innerHTML'>Saved</button>
                             ''')
     else:
         check.delete()
         return HttpResponse(f'''
-                                <button hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist{book_id}' hx-swap = 'innerHTML' onclick='savingList(this)'>Want To Read</button>
+                                <button class="btn-wishlist" hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist{book_id}' hx-swap = 'innerHTML' onclick='savingList(this)'>Want To Read</button>
                                 ''')
 # Chay khi load trang
 def wishCheckPost(request):
@@ -157,10 +157,10 @@ def wishCheckPost(request):
     check = FavList.objects.filter(user_id = 1, book_id = book_id)
     if check: 
         return HttpResponse(f'''
-                            <button hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist{book_id}' hx-swap = 'innerHTML'>Saved</button>
+                            <button class="btn-wishlist" hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist{book_id}' hx-swap = 'innerHTML'>Saved</button>
                             ''')
     return HttpResponse(f'''
-                                <button hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist{book_id}' hx-swap = 'innerHTML' onclick='savingList(this)'>Want To Read</button>
+                                <button class="btn-wishlist" hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist{book_id}' hx-swap = 'innerHTML' onclick='savingList(this)'>Want To Read</button>
                                 ''')
 
 def topicListPost(request):
@@ -371,7 +371,6 @@ def searchAdvance(request):
         else:
             books = Book.objects.all()
                 
-    
     # Phân trang
     page_obj = pagePaginator(request, books)
 

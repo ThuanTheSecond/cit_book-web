@@ -25,7 +25,7 @@
                 
                 <div class="wish">
                     <div id='wishlist{{detail.book_id}}' hx-post = "/wishCheck_post/" hx-vals = '{"book_id": {{detail.book_id}}}' hx-trigger="load" hx-target='#wishlist{{detail.book_id}}' hx-swap = 'innerHTML'>
-                        <button hx-post = "/wishList_post/" hx-vals = '{"book_id": {{detail.book_id}}}' hx-trigger="click delay:0.25s" onclick='savingList(this)'></button>
+                        <button class="btn-wishlist" hx-post = "/wishList_post/" hx-vals = '{"book_id": {{detail.book_id}}}' hx-trigger="click delay:0.25s" onclick='savingList(this)'></button>
                     </div>
                 </div>
 
