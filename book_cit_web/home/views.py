@@ -124,8 +124,8 @@ def clearRatingPost(request):
     return HttpResponse(f'''
                         <input type="radio" name="rating" id="{val}" hx-vals='{hx_vals_data}' hx-post ="/rating_post/" hx-trigger="click delay:0.25s" hx-target="#clear-rating" hx-swap="outerHTML">
                         ''')
-# @login_required
 
+@login_required(login_url="/accounts/login/")
 # chay khi click vao button
 def wishListPost(request):
     book_id = request.POST.get('book_id')
@@ -141,12 +141,12 @@ def wishListPost(request):
         fav.save()
         # tra ve button saved
         return HttpResponse(f'''
-                            <button hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist{book_id}' hx-swap = 'innerHTML'>Saved</button>
+                            <button hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist{book_id}' hx-swap = 'innerHTML'><span style="color: green;">✓ </span>Đã Lưu</button>
                             ''')
     else:
         check.delete()
         return HttpResponse(f'''
-                                <button hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist{book_id}' hx-swap = 'innerHTML' onclick='savingList(this)'>Want To Read</button>
+                                <button hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist{book_id}' hx-swap = 'innerHTML' onclick='savingList(this)'>Xem Sau</button>
                                 ''')
 # Chay khi load trang
 def wishCheckPost(request):
@@ -157,10 +157,10 @@ def wishCheckPost(request):
     check = FavList.objects.filter(user_id = 1, book_id = book_id)
     if check: 
         return HttpResponse(f'''
-                            <button hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist{book_id}' hx-swap = 'innerHTML'>Saved</button>
+                            <button hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist{book_id}' hx-swap = 'innerHTML'><span style="color: green;">✓ </span>Đã Lưu</button>
                             ''')
     return HttpResponse(f'''
-                                <button hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist{book_id}' hx-swap = 'innerHTML' onclick='savingList(this)'>Want To Read</button>
+                                <button hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist{book_id}' hx-swap = 'innerHTML' onclick='savingList(this)'>Xem Sau</button>
                                 ''')
 
 def topicListPost(request):
@@ -179,6 +179,7 @@ def searchSlug(request):
     return redirect('search',search_type = search_type ,query = query, ftype = 5)
                    
 # Các view để trả về trang HTML theo url.
+
 def index(request):
     bookList = {}
     books_query = Book.objects.order_by('book_view')
@@ -298,7 +299,6 @@ def topicFilter(request,tid, type = 1):
         'page_obj': page_obj,
         'countRates': countRates,
         'averRates': averRates,
-        
     }
     # Cần thêm một html để hiển thị filter theo thể loại
     return render(request, 'filterBook.html', context)
