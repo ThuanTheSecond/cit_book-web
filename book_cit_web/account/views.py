@@ -7,15 +7,20 @@ from .forms import customUserCreationForm, loginForm
 
 # Create your views here.
 def loginView(request):
+    
     if request.user.is_authenticated:
         logout(request)       
+        
     form = loginForm(request.POST or None)
+    next_url = request.POST.get('next', 'index')
+    if next_url == '':
+        next_url = 'index'
     if request.method == 'POST':
         if form.is_valid():
             user = form.login(request.POST)
             if user:
                 login(request, user)
-                return redirect('index') # Redirect to a success page.
+                return redirect(next_url) # Redirect to a success page.
     return render(request, 'login.html', {'form': form })
 
 def logoutView(request):

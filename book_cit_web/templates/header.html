@@ -10,9 +10,17 @@
             </ul>
             
             <ul class="header-links pull-right">
-                <li class="active"><a href="{% url 'index' %}">Home</a></li>
-                <li><a href="{% url 'login' %}"><i class="fa fa-user-o"></i> Login</a></li>
-
+                
+                {% if user.is_authenticated %}
+                  <li style="color: white">Xin chào {{user.username}}</li>
+                  <li class="active"><a href="{% url 'index' %}">Home</a></li>
+                  <li><a href="{% url 'logout' %}"><i class="fa fa-user-o"></i> Đăng xuất</a></li>
+                {% else %}
+                  <li style="color: white">Xin chào</li>
+                  <li class="active"><a href="{% url 'index' %}">Home</a></li>
+                  <li><a href="{% url 'login' %}"><i class="fa fa-user-o"></i> Đăng nhập</a></li>  
+                {% endif %}
+                  
             </ul>
         </div>
     </div>

@@ -28,6 +28,30 @@ class HTTPResponseHXRedirect(HttpResponseRedirect):
         self['HX-Redirect']=self['Location']
     status_code = 200
 
+
+from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.conf import settings
+from django.contrib.auth.decorators import login_required as django_login_required
+from django.http import HttpResponse
+from functools import wraps
+
+from django.shortcuts import resolve_url
+
+
+def login_required(function=None, login_url=None, redirect_field_name=REDIRECT_FIELD_NAME):
+    @wraps(function)
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_authenticated and request.htmx:
+            return HTTPResponseHXRedirect(redirect_to='http://127.0.0.1:8000/account/login')
+        return django_login_required(
+            function=function,
+            login_url=login_url,
+            redirect_field_name=redirect_field_name
+        )(request, *args, **kwargs)
+    return wrapper
+
+
+
 # Thêm mới record vào ContentBook
 def createBookContent():
     from home.models import ContentBook, Book, Book_Topic
@@ -126,7 +150,7 @@ def getRecommend_content(book_id):
     
 def filterBasedType(books, type):
     if type == 1:
-        books = books.order_by('book_view')
+        books = books.order_by('-book_view')
     if type == 2:
         from django.db.models import IntegerField
         from django.db.models.functions import Cast,  Substr, Length
@@ -134,14 +158,18 @@ def filterBasedType(books, type):
                 year = Cast(Substr('book_publish', Length('book_publish') - 3),output_field=IntegerField())
         ).order_by("-year")
     if type == 3:
-        from django.db.models import Count, Avg
+        from django.db.models import Avg, Count, Value
+        from django.db.models.functions import Coalesce
         books = books.annotate(
+            rateavg = Coalesce(Avg('rating__rating'),Value(0.0)),
             ratecount = Count('rating')
-        ).order_by('-ratecount')
+        ).order_by('-ratecount', '-rateavg')
     if type == 4:
-        from django.db.models import Avg
+        from django.db.models import Avg, Count, Value
+        from django.db.models.functions import Coalesce
         books = books.annotate(
-        ratecount = Avg('rating__rating')
-    ).order_by('ratecount')
+            rateavg = Coalesce(Avg('rating__rating'),Value(0.0)),
+            ratecount = Count('rating')
+        ).order_by('-rateavg', '-ratecount')
     return books
     
