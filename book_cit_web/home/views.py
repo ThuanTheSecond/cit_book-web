@@ -115,7 +115,7 @@ def ratingPost(request):
                                })
     val = "rate-" + rate
     return HttpResponse(f'''
-                        <input type="button" onclick="hidebutton(this)" name="clear" id="clear-rating" hx-post ='/clear_rating_post/' hx-trigger="click delay:0.25s" hx-target='#{val}' hx-swap = "outerHTML" value="Clear My Rating" hx-vals ='{hx_vals_data}'>
+                        <input type="button" onclick="hidebutton(this)" name="clear" id="clear-rating" hx-post ='/clear_rating_post/' hx-trigger="click delay:0.25s" hx-target='#{val}' hx-swap = "outerHTML" value="Xóa đánh giá" hx-vals ='{hx_vals_data}'>
                         ''')
 
 def ratingCheckPost(request):
@@ -135,7 +135,7 @@ def ratingCheckPost(request):
                                })
     val = "rate-" + rate
     return HttpResponse(f'''
-                        <input type="button" onclick="hidebutton(this)" name="clear" id="clear-rating" hx-post ='/clear_rating_post/' hx-trigger="click delay:0.25s" hx-target='#{val}' hx-swap = "outerHTML" value="Clear My Rating" hx-vals ='{hx_vals_data}'>
+                        <input type="button" onclick="hidebutton(this)" name="clear" id="clear-rating" hx-post ='/clear_rating_post/' hx-trigger="click delay:0.25s" hx-target='#{val}' hx-swap = "outerHTML" value="Xóa đánh giá" hx-vals ='{hx_vals_data}'>
                         ''')
 
 def clearRatingPost(request):
@@ -186,7 +186,14 @@ def wishCheckPost(request):
     hx_data = json.dumps({
         'book_id': book_id,
     })
-    check = FavList.objects.filter(user_id = 1, book_id = book_id)
+    
+    
+    if not request.user.is_authenticated:
+        return HttpResponse(f'''
+                                <button class="btn-wishlist" hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist{book_id}' hx-swap = 'innerHTML' onclick='savingList(this)'>Xem Sau</button>
+                                ''')
+    
+    check = FavList.objects.filter(user_id = request.user.id, book_id = book_id)
     if check: 
         return HttpResponse(f'''
                             <button class="btn-wishlist" hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist{book_id}' hx-swap = 'innerHTML'><span style="color: green;">✓ </span>Đã Lưu</button>
@@ -234,7 +241,7 @@ def bookDetail(request, id):
     Rate = None
     rating = None
     if request.user.is_authenticated:
-        user_id = request.user # user_id = request.user.id
+        user_id = request.user.id
         Rate = Rating.objects.filter(user_id = user_id, book_id = id).first()
     if Rate:
         rating = Rate.rating

@@ -158,14 +158,14 @@ def filterBasedType(books, type):
                 year = Cast(Substr('book_publish', Length('book_publish') - 3),output_field=IntegerField())
         ).order_by("-year")
     if type == 3:
-        from django.db.models import Count, Avg
+        from django.db.models import Count
         books = books.annotate(
             ratecount = Count('rating')
         ).order_by('-ratecount')
     if type == 4:
         from django.db.models import Avg
         books = books.annotate(
-        ratecount = Avg('rating__rating')
-    ).order_by('ratecount')
+        rateavg = Avg('rating__rating')
+    ).order_by('rateavg')
     return books
     

@@ -13,6 +13,8 @@ def loginView(request):
         
     form = loginForm(request.POST or None)
     next_url = request.POST.get('next', 'index')
+    if next_url == '':
+        next_url = 'index'
     if request.method == 'POST':
         if form.is_valid():
             user = form.login(request.POST)

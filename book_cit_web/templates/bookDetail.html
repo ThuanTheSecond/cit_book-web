@@ -36,16 +36,20 @@
                                 {% for i in "12345" %} 
                                     {% if i == rating %}
                                         <label for="rate-{{i}}" style="--i: {{i}}"><i class="fa fa-star" title="{{i}} star"></i></label>
-                                        <input class="star" type="radio" name="rating" id="rate-{{i}}" hx-vals='{"rate": {{i}}, "book_id": {{detail.book_id}}}' hx-post ="/rating_post/" hx-trigger="click delay:0.25s" hx-target="#clear-rating" hx-swap="outerHTML" checked>
+                                        <input type="radio" name="rating" id="rate-{{i}}" hx-vals='{"rate": {{i}}, "book_id": {{detail.book_id}}}' hx-post ="/rating_post/" hx-trigger="click delay:0.25s" hx-target="#clear-rating" hx-swap="outerHTML" checked>
                                     {% else %}
                                         <label for="rate-{{i}}" style="--i: {{i}}"><i class="fa fa-star" title="{{i}} star"></i></label>
-                                        <input type="radio" name="rating" id="rate-{{i}}" hx-vals='{"rate": {{i}}, "book_id": {{detail.book_id}}}' hx-post ="/rating_post/" hx-trigger="click delay:0.25s" hx-target="#clear-rating" hx-swap="outerHTML">
+                                        <input class="star" type="radio" name="rating" id="rate-{{i}}" hx-vals='{"rate": {{i}}, "book_id": {{detail.book_id}}}' hx-post ="/rating_post/" hx-trigger="click delay:0.25s" hx-target="#clear-rating" hx-swap="outerHTML">
                                     {% endif %}
                                 {% endfor %}    
                             </span></p>
                         </div>
                         <div class="clear_rating">
-                            <input style="display: none;" type="button"  name="clear" id="clear-rating" >
+                            {% if rating != 'None' %}
+                                <input type="button" onclick="hidebutton(this)" name="clear" id="clear-rating" hx-post ='/clear_rating_post/' hx-trigger="click delay:0.25s" hx-target='#rate-{{rating}}' hx-swap = "outerHTML" value="Xóa đánh giá" hx-vals ='{"rate": {{rating}}, "book_id": {{detail.book_id}}}'>
+                            {% else %}
+                                <input style="display: none;" type="button"  name="clear" id="clear-rating" >
+                            {% endif %}
                         </div>
                     </form>
                 </div>
@@ -101,7 +105,7 @@
 document.body.addEventListener('htmx:configRequest', function(evt) {
     // Kiểm tra xem yêu cầu có đến từ nút wishList hay không
     let target = evt.target;
-    if (target && target.classList.contains('clear_rating')) {
+    if (target && target.classList.contains('star')) {
         let hxVals = JSON.parse(target.getAttribute('hx-vals'));
         hxVals["current_url"] = window.location.href;
         target.setAttribute('hx-vals', JSON.stringify(hxVals));
