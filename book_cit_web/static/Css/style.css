@@ -11,27 +11,17 @@ Table OF Contents
 ------ Inputs
 ------ Sections
 ------ Breadcrumb
-2 > HEADER
+2 > HEADER & NAVBAR
 ------ Top header
 ------ Logo
 ------ Search
 ------ Cart
-3 > NAVIGATION
------- Main nav
------- Responsive Nav
-4 > CONTAINER
-5 > HOT DEAL
-6 > PRODUCT
------- Product
------- Widget product
------- Product slick
-7 > STORE PAGE
------- Aside
------- Store
-8 > PRODUCT DETAILS PAGE
------- Product view
------- Product details
------- Product tab
+3 > CONTAINER
+4 > BOOK DETAIL
+5 > SEARCH PAGE
+6 > PAGINATION
+7 > LOGIN PAGE
+8 > REGISTER PAGE
 9 > CHECKOUT PAGE
 10 > NEWSLETTER
 11 > FOOTER
@@ -396,7 +386,7 @@ textarea.input {
 }
 
 /*=========================================================
-	02 -> HEADER
+	02 -> HEADER & NAVBAR
 ===========================================================*/
 
 /*----------------------------*\
@@ -707,7 +697,7 @@ textarea.input {
 }
 
 /*=========================================================
-	04 -> CONTAINER
+	03 -> CONTAINER
 ===========================================================*/
 .body {
   background-color: #e0dcc6;
@@ -760,7 +750,7 @@ textarea.input {
 }
 
 /*=========================================================
-	05 -> BOOK DETAIL
+	04 -> BOOK DETAIL
 ===========================================================*/
 .body .container {
   width: 70%;
@@ -796,13 +786,13 @@ textarea.input {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.wishlist {
+.wish {
   padding-top: 20px;
   padding-bottom: 20px;
   text-align: center;
 }
 
-#wishlist {
+.wishlistStyle {
   padding: 3px 3px;
   padding-left: 10px;
   padding-right: 10px;
@@ -810,11 +800,6 @@ textarea.input {
   border: 1px solid #b0b0b0;
   border-radius: 5px;
   font-size: 18px;
-  text-align: center;
-}
-
-#wishlist button {
-  border: none;
   display: inline-block;
   vertical-align: middle;
 }
@@ -935,7 +920,7 @@ textarea.input {
 }
 
 /*=========================================================
-	06 -> SEARCH PAGE
+	05 -> SEARCH PAGE
 ===========================================================*/
 .search-result .container-fluid {
   width: 70%;
@@ -1025,14 +1010,30 @@ h3 {
   align-content: center;
 }
 
+.pagination {
+  display: flex;
+  justify-content: center;
+}
+
 .pagination .page-link {
   border: none;
+  border-radius: 0;
   font-family: 'Lato', sans-serif;
   font-size: 15px;
+  color: #0d5586;
 
   &:hover {
     color: #fff;
     background-color: #095885;
+  }
+}
+
+.page-item.active .page-link {
+  background-color: #ededed;
+  color: #000;
+
+  &:hover {
+    color: #000;
   }
 }
 
@@ -1057,15 +1058,15 @@ h3 {
 }
 
 /* Màn hình có chiều rộng từ 601px đến 1300px */
-/* @media (min-width: 48.1rem) and (max-width: 79rem) {
+@media (min-width: 48.1rem) and (max-width: 79rem) {
   .search-result .container-fluid {
-      width: 100%; /* Giảm kích thước hình ảnh xuống trên các màn hình vừa 
+      width: 100%; /* Giảm kích thước hình ảnh xuống trên các màn hình vừa */
   }
 
   .left-content .book-image {
-    width: 100%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ 
+    width: 100%; /* Giữ hình ảnh phóng to ra chiều rộng tối đa trên màn hình nhỏ */
   }
-} */
+}
 
 
 /* Màn hình có chiều rộng lớn hơn 1300px */
@@ -1074,6 +1075,11 @@ h3 {
       width: 70%; /* Giảm kích thước hình ảnh xuống trên các màn hình lớn */
   }
 }
+
+/*=========================================================
+	06 -> SEARCH ADVANCE
+===========================================================*/
+
 
 /*=========================================================
 	07 -> LOGIN PAGE
@@ -1399,14 +1405,14 @@ h3 {
 }
 
 /* Màn hình có chiều rộng từ 601px đến 900px */
-@media (min-width: 48.1rem) and (max-width: 80rem) {
+@media (min-width: 48.1rem) and (max-width: 78rem) {
   #footer .container-fluid {
       width: 100%; /* Giảm kích thước hình ảnh xuống trên các màn hình vừa */
   }
 }
 
 /* Màn hình có chiều rộng lớn hơn 900px */
-@media (min-width: 80rem) {
+@media (min-width: 79rem) {
   #footer .container-fluid {
       width: 70%; /* Giảm kích thước hình ảnh xuống trên các màn hình lớn */
   }
