@@ -28,6 +28,30 @@ class HTTPResponseHXRedirect(HttpResponseRedirect):
         self['HX-Redirect']=self['Location']
     status_code = 200
 
+
+from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.conf import settings
+from django.contrib.auth.decorators import login_required as django_login_required
+from django.http import HttpResponse
+from functools import wraps
+
+from django.shortcuts import resolve_url
+
+
+def login_required(function=None, login_url=None, redirect_field_name=REDIRECT_FIELD_NAME):
+    @wraps(function)
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_authenticated and request.htmx:
+            return HTTPResponseHXRedirect(redirect_to='http://127.0.0.1:8000/account/login')
+        return django_login_required(
+            function=function,
+            login_url=login_url,
+            redirect_field_name=redirect_field_name
+        )(request, *args, **kwargs)
+    return wrapper
+
+
+
 # Thêm mới record vào ContentBook
 def createBookContent():
     from home.models import ContentBook, Book, Book_Topic

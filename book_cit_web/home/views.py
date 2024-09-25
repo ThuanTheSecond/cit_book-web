@@ -2,7 +2,7 @@ from django.shortcuts import render
 from .models import Book, Rating, Book_Topic, Topic, FavList, ContentBook
 from django.http import HttpResponse, JsonResponse
 from .forms import searchForm, SearchFormset
-from .utils import normalize_vietnamese, pagePaginator, HTTPResponseHXRedirect
+from .utils import normalize_vietnamese, pagePaginator, HTTPResponseHXRedirect, login_required
 from django.shortcuts import redirect
 import json
 from django.contrib.auth.decorators import login_required
@@ -11,6 +11,7 @@ import re
 from functools import reduce
 from operator import and_
 from django.template.loader import render_to_string
+from django.urls import reverse
 
 
 # Logic xử lí
@@ -94,17 +95,41 @@ def categoryPost(request):
         context+= f'<li><a href="/category/filter/id={topic.topic_id - 3000}">{ topic.topic_name }</a></li>'
     return HttpResponse(context)
 
-# @login_required
 def ratingPost(request):
-    # insert rating vao database va hien thi nut clear rating
+    # kiem tra nguoi dung da dang nhap chua khi nhan vao rating
+    if not request.user.is_authenticated:
+        login_url = reverse('login')  # URL của trang login
+        current_url = request.POST.get('current_url', '/')
+        return JsonResponse({"redirect": True, "url": f"{login_url}?next={current_url}"}, status=200)
+    
     rate = request.POST.get('rate')
     book_id = request.POST.get('book_id')
     # ----------- Thêm hoặc cập nhật rating----------
-    # rating, created = Rating.objects.update_or_create(
-    #     user_id = request.user.id,
-    #     book_id = book_id,
-    #     defaults={'rating' : rate}
-    # )
+    rating, created = Rating.objects.update_or_create(
+        user_id = request.user.id,
+        book_id = book_id,
+        defaults={'rating' : rate}
+    )
+    hx_vals_data = json.dumps({"rate": int(rate),
+                               "book_id": int(book_id),
+                               })
+    val = "rate-" + rate
+    return HttpResponse(f'''
+                        <input type="button" onclick="hidebutton(this)" name="clear" id="clear-rating" hx-post ='/clear_rating_post/' hx-trigger="click delay:0.25s" hx-target='#{val}' hx-swap = "outerHTML" value="Clear My Rating" hx-vals ='{hx_vals_data}'>
+                        ''')
+
+def ratingCheckPost(request):
+    if not request.user.is_authenticated:
+        return HttpResponse('')
+    
+    rate = request.POST.get('rate')
+    book_id = request.POST.get('book_id')
+    # ----------- Thêm hoặc cập nhật rating----------
+    rating, created = Rating.objects.update_or_create(
+        user_id = request.user.id,
+        book_id = book_id,
+        defaults={'rating' : rate}
+    )
     hx_vals_data = json.dumps({"rate": int(rate),
                                "book_id": int(book_id),
                                })
@@ -118,26 +143,33 @@ def clearRatingPost(request):
     book_id = request.POST.get('book_id')
     
     # delete record rating
-    # Rating.objects.filter(user_id = request.user.id, book_id = book_id).delete()
+    Rating.objects.filter(user_id = request.user.id, book_id = book_id).delete()
     val = "rate-" + rate
     hx_vals_data = json.dumps({"rate": int(rate), "book_id": int(book_id)})
     return HttpResponse(f'''
                         <input type="radio" name="rating" id="{val}" hx-vals='{hx_vals_data}' hx-post ="/rating_post/" hx-trigger="click delay:0.25s" hx-target="#clear-rating" hx-swap="outerHTML">
                         ''')
 
-@login_required(login_url="/accounts/login/")
+
 # chay khi click vao button
 def wishListPost(request):
+    if not request.user.is_authenticated:
+        login_url = reverse('login')  # URL của trang login
+        current_url = request.POST.get('current_url', '/')
+        current_url = current_url.replace('http://127.0.0.1:8000', '')
+        print(f"{login_url}?next={current_url}")
+        return JsonResponse({"redirect": True, "url": f"{login_url}?next={current_url}"}, status=200)
+    user = request.user
     book_id = request.POST.get('book_id')
     hx_data = json.dumps({
         'book_id': book_id
     })
-    # user_id = request.user.id
-    check = FavList.objects.filter(user_id = 1, book_id = book_id)
+    
+    check = FavList.objects.filter(user_id = user.id, book_id = book_id)
     # khi nhan vao -> kiem tra -> ko insert
     if not check:
         # thuc hien lenh insert
-        fav = FavList(user_id = 1, book_id=book_id)
+        fav = FavList(user_id = user.id, book_id=book_id)
         fav.save()
         # tra ve button saved
         return HttpResponse(f'''
@@ -152,15 +184,15 @@ def wishListPost(request):
 def wishCheckPost(request):
     book_id = request.POST.get('book_id')
     hx_data = json.dumps({
-        'book_id': book_id
+        'book_id': book_id,
     })
     check = FavList.objects.filter(user_id = 1, book_id = book_id)
     if check: 
         return HttpResponse(f'''
-                            <button hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist{book_id}' hx-swap = 'innerHTML'><span style="color: green;">✓ </span>Đã Lưu</button>
+                            <button class="btn-wishlist" hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist{book_id}' hx-swap = 'innerHTML'><span style="color: green;">✓ </span>Đã Lưu</button>
                             ''')
     return HttpResponse(f'''
-                                <button hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist{book_id}' hx-swap = 'innerHTML' onclick='savingList(this)'>Xem Sau</button>
+                                <button class="btn-wishlist" hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist{book_id}' hx-swap = 'innerHTML' onclick='savingList(this)'>Xem Sau</button>
                                 ''')
 
 def topicListPost(request):
@@ -199,9 +231,11 @@ def bookDetail(request, id):
     topicList = Book_Topic.objects.prefetch_related('topic_id').filter(book_id = detail.book_id)
     # xử lý rating
     # truy xuất rating của cuốn sách, thêm checked vào radio của sao đã được rating, thêm nút clear rating
-    user_id = 1 # user_id = request.user.id
-    Rate = Rating.objects.filter(user_id = user_id, book_id = id).first()
+    Rate = None
     rating = None
+    if request.user.is_authenticated:
+        user_id = request.user # user_id = request.user.id
+        Rate = Rating.objects.filter(user_id = user_id, book_id = id).first()
     if Rate:
         rating = Rate.rating
     averRate = averRating(id)
