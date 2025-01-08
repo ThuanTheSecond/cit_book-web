@@ -229,7 +229,50 @@ def index(request):
         'bookList' : bookList,
     }
     return render(request, 'index.html', context)
+ 
+ 
+def myBook(request):
+    bookList = {}
+    if not request.user.is_authenticated:
+        return redirect('login')
+    from .models import FavList
+    userID = request.user.id
+    books = FavList.objects.filter(user_id=userID).select_related('book').order_by('-id')
+    bookList = [fav.book for fav in books]
     
+    countRates = {}
+    averRates = {}
+    for book in bookList:
+        book_id = book.book_id
+        countRates[book_id] = countRating(book_id=book_id)  # Lưu số lượng đánh giá của từng sách
+        averRates[book_id] = averRating(book_id=book_id)
+        
+    # pagnition
+    page_obj = pagePaginator(request, bookList) # Lấy đối tượng phân trang
+    page_numbers = []
+    
+    # Hiển thị trang đầu, cuối, và các trang gần trang hiện tại
+    for num in page_obj.paginator.page_range:
+        if (
+            num == 1 or 
+            num == page_obj.paginator.num_pages or 
+            abs(num - page_obj.number) <= 2  # Số trang gần trang hiện tại
+        ):
+            page_numbers.append(num)
+        elif (
+            abs(num - page_obj.number) == 3  # Thêm dấu "..." khi cần
+            and num not in page_numbers
+        ):
+            page_numbers.append('...')
+    
+    context = {
+        'page_obj' : page_obj,
+        'page_numbers': page_numbers,
+        'countRates': countRates,
+        'averRates': averRates,
+    }
+    return render(request, 'myBook.html', context)   
+
 def bookDetail(request, id):
     id += 3000
     
@@ -302,6 +345,20 @@ def search(request, search_type, query, ftype):
         averRates[book_id] = averRating(book_id=book_id)
     # pagnition
     page_obj = pagePaginator(request, books)
+    page_numbers = []
+    # Hiển thị trang đầu, cuối, và các trang gần trang hiện tại
+    for num in page_obj.paginator.page_range:
+        if (
+            num == 1 or 
+            num == page_obj.paginator.num_pages or 
+            abs(num - page_obj.number) <= 2  # Số trang gần trang hiện tại
+        ):
+            page_numbers.append(num)
+        elif (
+            abs(num - page_obj.number) == 3  # Thêm dấu "..." khi cần
+            and num not in page_numbers
+        ):
+            page_numbers.append('...')
     context = {
         'formSearch': form,
         'query': pquery,
@@ -309,6 +366,7 @@ def search(request, search_type, query, ftype):
         'page_obj' : page_obj,
         'countRates': countRates,
         'averRates': averRates,
+        'page_numbers': page_numbers,
     }
     return render(request, 'searchBook.html', context)
 
@@ -333,13 +391,27 @@ def topicFilter(request,tid, type = 1):
         countRates[book_id] = countRating(book_id=book_id)  # Lưu số lượng đánh giá của từng sách
         averRates[book_id] = averRating(book_id=book_id)
     page_obj = pagePaginator(request, books)
-    
+    page_numbers = []
+    # Hiển thị trang đầu, cuối, và các trang gần trang hiện tại
+    for num in page_obj.paginator.page_range:
+        if (
+            num == 1 or 
+            num == page_obj.paginator.num_pages or 
+            abs(num - page_obj.number) <= 2  # Số trang gần trang hiện tại
+        ):
+            page_numbers.append(num)
+        elif (
+            abs(num - page_obj.number) == 3  # Thêm dấu "..." khi cần
+            and num not in page_numbers
+        ):
+            page_numbers.append('...')
     context = {
         'tid': tid,
         'topicName': topicName,
         'page_obj': page_obj,
         'countRates': countRates,
         'averRates': averRates,
+        'page_numbers': page_numbers,
     }
     # Cần thêm một html để hiển thị filter theo thể loại
     return render(request, 'filterBook.html', context)
@@ -422,13 +494,26 @@ def searchAdvance(request):
                 
     # Phân trang
     page_obj = pagePaginator(request, books)
-
+    page_numbers = []
+    # Hiển thị trang đầu, cuối, và các trang gần trang hiện tại
+    for num in page_obj.paginator.page_range:
+        if (
+            num == 1 or 
+            num == page_obj.paginator.num_pages or 
+            abs(num - page_obj.number) <= 2  # Số trang gần trang hiện tại
+        ):
+            page_numbers.append(num)
+        elif (
+            abs(num - page_obj.number) == 3  # Thêm dấu "..." khi cần
+            and num not in page_numbers
+        ):
+            page_numbers.append('...')
     # Xử lý yêu cầu HTMX
     if request.headers.get('HX-Request'):
-        html = render_to_string('advanceBooks.html', {'page_obj': page_obj})
+        html = render_to_string('advanceBooks.html', {'page_obj': page_obj, 'page_numbers': page_numbers})
         return HttpResponse(html)
 
-    return render(request, 'searchAdvance.html', {'formset': formset, 'page_obj': page_obj})
+    return render(request, 'searchAdvance.html', {'formset': formset, 'page_obj': page_obj, 'page_numbers': page_numbers})
 
 
 def test(request):
@@ -465,9 +550,24 @@ def categoryFilter(request,cid,type = 1):
         
     # phan trang
     page_obj = pagePaginator(request, books)
+    page_numbers = []
+    # Hiển thị trang đầu, cuối, và các trang gần trang hiện tại
+    for num in page_obj.paginator.page_range:
+        if (
+            num == 1 or 
+            num == page_obj.paginator.num_pages or 
+            abs(num - page_obj.number) <= 2  # Số trang gần trang hiện tại
+        ):
+            page_numbers.append(num)
+        elif (
+            abs(num - page_obj.number) == 3  # Thêm dấu "..." khi cần
+            and num not in page_numbers
+        ):
+            page_numbers.append('...')
     context = {
         'cid': cid,
         'page_obj': page_obj,
+        'page_numbers': page_numbers,
         'countRates': countRates,
         'averRates': averRates,
     }

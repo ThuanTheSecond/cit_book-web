@@ -15,16 +15,25 @@ class customUserCreationForm(UserCreationForm):
         password1 = self.cleaned_data['password1']
         password2 = self.cleaned_data['password2']
         if password1 and password2 and password1 != password2:
-            raise forms.ValidationError("Mật khẩu không khớp")
+            # raise forms.ValidationError("Mật khẩu không khớp")
+            self.add_error(None, "Mật khẩu không khớp")
         return password2
     
     def clean_email(self):
         email = self.cleaned_data['email']
         user = User.objects.filter(email = email).first()
         if user:
-            raise ValidationError("Email đã bị trùng")
-        
+            # raise ValidationError("Email đã bị trùng")
+             self.add_error(None, "Email đã bị trùng")
         return email
+    
+    def clean_username(self):
+        username = self.cleaned_data['username']
+        user = User.objects.filter(username = username).first()
+        if user:
+            # raise ValidationError("Email đã bị trùng")
+             self.add_error(None, "Username đã bị trùng")
+        return username
     
     def save(self, commit = True):  
         user = User.objects.create_user( 

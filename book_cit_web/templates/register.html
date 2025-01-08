@@ -44,8 +44,7 @@
                 <ul class="header-links pull-left">
                     <li><a href="/">CIT LIBRARY</li>
                     {% comment %} <li><a href="#"><i class="fa fa-phone"></i> +91 911111113664</a></li> {% endcomment %}
-                    <li><a href="#"><i class="fa fa-envelope-o"></i> Khang1@gmail.com</a></li>
-                    <li><a href="#"><i class="fa fa-map-marker"></i> Ninh Kieu, Can Tho</a></li>
+                   
                 </ul>
                 
                 <ul class="header-links pull-right">
@@ -64,19 +63,33 @@
     <div class="container-fluid">
         <div class="register-overall row justify-content-center align-items-center" style="height:auto">
             <div class="left-register col-md-5">
-                <h3 class="card-title text-left">Sign Up</h3><br>
-                <p class="card-description text-left">Get your CIT Library card and see suggested books from the website</p>
+                <h3 class="card-title text-left">Tạo tài khoản</h3><br>
+                {% comment %} <p class="card-description text-left">Get your CIT Library card and see suggested books from the website</p> {% endcomment %}
             </div>
 
             <div class="right-register col-md-4">
                 <div class="card">
                     <article class="card-body">
-                        <h4 class="card-title text-center mb-4">Create Account</h4>
+                        <h4 class="card-title text-center mb-4">Đăng kí</h4>
                         <br>
                         <form class="register-form" action="{% url 'register' %}" method="POST">
                             <div class="form-group">
 
                                 {% csrf_token %} 
+                                {% comment %} thong bao loi {% endcomment %}
+                                <div class="error_msg">
+                                    {% if form.non_field_errors %}
+                                    <div class="form-errors">
+                                        {% for error in form.non_field_errors %}
+                                        <strong><li>{% render_field error %}</li></strong>
+
+                                        {% endfor %}
+                                        </ul>
+                                        {% endif %}
+
+                                    </div>
+				                    <ul>
+                                </div>
 
                                 <span>Email:</span>
                                 <div class="input-group mb-3">
@@ -99,11 +112,11 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <button type="submit" class="register-btn btn btn-primary btn-block"> Sign Up  </button>
+                                    <button type="submit" class="register-btn btn btn-primary btn-block"> Đăng kí  </button>
                                 </div>
                                 <br>
                                 <div class="other">
-                                    <p>Already have an account? <a class="link-login" href="{% url 'login' %}">Log in</a></p>
+                                    <p>Đã có tài khoản? <a class="link-login" href="{% url 'login' %}">Đăng nhập ngay</a></p>
                                 </div>
                             </div>
                         </form>
@@ -182,9 +195,7 @@
                         <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
                         Copyright &copy;
                         <script>document.write(new Date().getFullYear());</script> All rights reserved | This website template
-                        is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by our team{% comment %} <a href="https://colorlib.com"
-                        target="_blank">TDRCE Team</a> and website back-end is made with <i class="fa fa-heart-o"
-                        aria-hidden="true"></i> by Trupti Langalia. {% endcomment %}
+                        is made with <i class="fa fa-heart-o" aria-hidden="true"></i> 
                     </span>
                 </div>
             </div>
