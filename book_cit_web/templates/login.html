@@ -42,13 +42,12 @@
                 <ul class="header-links pull-left">
                     <li><a href="/">CIT LIBRARY</li>
                     {% comment %} <li><a href="#"><i class="fa fa-phone"></i> +91 911111113664</a></li> {% endcomment %}
-                    <li><a href="#"><i class="fa fa-envelope-o"></i> Khang1@gmail.com</a></li>
-                    <li><a href="#"><i class="fa fa-map-marker"></i> Ninh Kieu, Can Tho</a></li>
+            
                 </ul>
                 
                 <ul class="header-links pull-right">
                     <li class="active"><a href="{% url 'index' %}">Home</a></li>
-                    <li><a href="{% url 'login' %}"><i class="fa fa-user-o"></i> Login</a></li>
+                    <li><a href="{% url 'login' %}"><i class="fa fa-user-o"></i> Đăng nhập</a></li>
     
                 </ul>
             </div>
@@ -62,8 +61,8 @@
     <div class="container-fluid">
         <div class="login-overall row justify-content-center align-items-center" style="height:auto">
             <div class="left-login col-md-5">
-                <h3 class="card-title text-left">Login</h3><br>
-                <p class="card-description text-left">Login to use your CIT Library card to see suggested books from the website</p>
+                <h3 class="card-title text-left">Đăng nhập</h3><br>
+                {% comment %} <p class="card-description text-left">Login to use your CIT Library card to see suggested books from the website</p> {% endcomment %}
             </div>
 
             <div class="right-login col-md-4">
@@ -75,15 +74,19 @@
                                 {% csrf_token %} 
                                 <div class="error_msg">
                                     {% if form.non_field_errors %}
-				                    <ul class='form-errors'>
-				                    {% for error in form.non_field_errors %}
-					                    <li>{% render_field error %}</li>
-				                    {% endfor %}
-				                    </ul>
-			                        {% endif %}
+                                    <div class="form-errors">
+                                        {% for error in form.non_field_errors %}
+                                        <strong><li>{% render_field error %}</li></strong>
+
+                                        {% endfor %}
+                                        </ul>
+                                        {% endif %}
+
+                                    </div>
+				                    <ul>
                                 </div>
                                 
-                                <h6>Please enter your email and password to access your CIT Library account.</h6><br>
+                                <h6>Hãy nhập vào email/username và mật khẩu để đăng nhập.</h6><br>
                                 <span>Email or  Username:</span>
                                 <div class="input-group mb-3">
                                     {% render_field form.username class="form-control" placeholder="Nhập vào Email hoặc username" %}
@@ -120,9 +123,7 @@
                     <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
                     Copyright &copy;
                     <script>document.write(new Date().getFullYear());</script> All rights reserved | This website template
-                    is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by our team{% comment %} <a href="https://colorlib.com"
-                    target="_blank">TDRCE Team</a> and website back-end is made with <i class="fa fa-heart-o"
-                    aria-hidden="true"></i> by Trupti Langalia. {% endcomment %}
+                    is made with <i class="fa fa-heart-o" aria-hidden="true"></i>
                 </span>
             </div>
         </div>

@@ -10,6 +10,7 @@ urlpatterns = [
     path('searchAdvance/', views.searchAdvance, name='searchAdvance'),  
     path('categoryFilter/<str:cid>/<int:type>', views.categoryFilter, name='categoryFilter'), 
     path('topicFilter/<str:tid>/<int:type>', views.topicFilter, name='topicFilter'), 
+    path('mybook/', views.myBook, name='myBook'),
     path('test', views.test, name='test'),  
 ]
 
