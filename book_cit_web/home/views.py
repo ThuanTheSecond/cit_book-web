@@ -222,9 +222,9 @@ def searchSlug(request):
 def index(request):
     bookList = {}
     books_query = Book.objects.order_by('book_view')
-    bookList['popular'] = books_query[:10]  
-    bookList['topVn'] = books_query.filter(book_lang = 'Vietnamese')[0:10]
-    bookList['topFl'] = books_query.filter(book_lang = 'Foreign')[0:10]
+    bookList['popular'] = books_query
+    bookList['topVn'] = books_query.filter(book_lang = 'Vietnamese')
+    bookList['topFl'] = books_query.filter(book_lang = 'Foreign')
     context = {
         'bookList' : bookList,
     }
