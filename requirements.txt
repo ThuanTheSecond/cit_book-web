@@ -1,6 +1,6 @@
 import_ipynb==0.1.4
 numpy==2.0.0
-pandas==2.2.2
+pandas==2.2.3
 scikit_learn==1.5.0
 asgiref==3.8.1
 Django==5.0.6
@@ -8,3 +8,5 @@ psycopg2==2.9.9
 sqlparse==0.5.0
 tzdata==2024.1
 whitenoise==6.7.0
+dj-database-url==2.1.0
+gunicorn==21.2.0

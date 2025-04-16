@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,12 +22,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-20p@sd!v6gq#yx3n*&0^j3y4z1_!n$*ej33cr69eeuwiw=m2_m'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-20p@sd!v6gq#yx3n*&0^j3y4z1_!n$*ej33cr69eeuwiw=m2_m')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['book-cit-web.fly.dev', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -88,14 +89,15 @@ AUTHENTICATION_BACKENDS = (
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+# Cấu hình Database - kết nối tới PostgreSQL trên fly.io qua proxy cổng 15432
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'book_cit_web',
+        'NAME': 'postgres',
         'USER': 'postgres',
-        'PASSWORD': '1001',
+        'PASSWORD': '98L940Ccpe9mpqr',  # Mật khẩu từ connection string của fly.io
         'HOST': 'localhost',
-        'PORT': '5432',
+        'PORT': '15432',
     }
 }
 
