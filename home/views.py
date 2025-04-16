@@ -39,7 +39,7 @@ def averRating(book_id):
 def countRating(book_id):
     result = Rating.objects.filter(book_id=book_id).values('user_id').distinct().count()
     if result:
-        return str(result) + " người đánh giá"
+        return f"{result} đánh giá"
     return "Chưa có đánh giá"
 
 
@@ -308,7 +308,7 @@ def bookDetail(request, id):
     averRate = "{:.1f}".format(averRate)
     
     # Count number of ratings
-    countRate = detail.rating_set.count()
+    countRate = countRating(book_id=detail.book_id)
 
     # Get similar books
     bookList = Book.objects.all()
@@ -617,12 +617,28 @@ def profile(request):
     history_list = BookViewHistory.objects.filter(
         user=request.user
     ).select_related('book').order_by('-viewed_at')[:12]  # Show last 12 viewed books
+    
+    # Get user's wishlist books
+    wishlist_books = [toread.book for toread in ToRead.objects.filter(
+        user=request.user
+    ).select_related('book').order_by('-created_at')]
+    
+    # Lấy đánh giá và lượt xem cho sách yêu thích
+    countRates = {}
+    averRates = {}
+    for book in wishlist_books:
+        book_id = book.book_id
+        countRates[book_id] = countRating(book_id=book_id)
+        averRates[book_id] = averRating(book_id=book_id)
 
     context = {
         'books_viewed': books_viewed,
         'books_rated': books_rated,
         'books_saved': books_saved,
         'history_list': history_list,
+        'wishlist_books': wishlist_books,
+        'countRates': countRates,
+        'averRates': averRates,
     }
     return render(request, 'profile.html', context)
 
