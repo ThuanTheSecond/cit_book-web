@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% load filters %}
+
+
+
+{% block bonusContent %}
+<div class="body">
+    <div class="overall container-fluid justify-content-center">
+        <h3>Search Books</h3>
+        <div class="filter">
+            <span>Lọc theo: </span>
+                <span><a href="{% url 'search' ftype=5 query=query search_type=search_type %}">Liên quan nhất</a> | </span>
+                <span><a href="{% url 'search' ftype=1 query=query search_type=search_type %}">Lượt xem</a> | </span>
+                <span><a href="{% url 'search' ftype=2 query=query search_type=search_type %}">Xuất bản gần đây</a> | </span>
+                <span><a href="{% url 'search' ftype=3 query=query search_type=search_type %}">Đánh giá nhiều</a> | </span>
+                <span><a href="{% url 'search' ftype=4 query=query search_type=search_type %}">Đánh giá tốt nhất</a></span> 
+        </div>
+    </div>
+</div>
+{% endblock bonusContent %}
+    
+
+{% block content %}
+<div class="search-result">
+    {% if page_obj %}
+    <div class="search-book-content container-fluid justify-content-center">
+        <ul id="book-form">
+            {% comment %} thông tin sách {% endcomment %}
+            {% for book in page_obj %}
+                {% comment %} chỉnh sửa câu lệnh dưới để hiển thị từng cuốn sách {% endcomment %}
+                {% comment %} Cần chỉnh sửa lại wishlist post {% endcomment %}
+                <div class="book-found">
+                    <li>
+                        <div class="row">
+                            <div class="left-content col-md-2 justify-content-center">
+                                <a href="/book/detail/id={{book.book_id|add:'-3000'}}"><img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}"></a>
+                            </div>
+
+                            <div class="middle-content col-md-7">
+                                <a class="book-name" href="/book/detail/id={{book.book_id|add:'-3000'}}">{{ book.book_title }}</a> 
+                                <p class="book-author">by {{book.book_author}}</p>
+                                <p class="book-published">Xuất Bản: {{ book.book_publish }}</p>
+                                
+                                <div class="aveRating">
+                                    <span class="product-rating">{{ averRates|get_item:book.book_id }}</span><span>/5 <span class="fa fa-star aveRating-start"></span> ({{ countRates|get_item:book.book_id }} - {{ book.book_view }} lượt xem)</span>
+                                </div>
+                            </div>
+
+                            <div class="right-content col-md-3">
+                                <div id='wishlist{{book.book_id}}' hx-post = "/wishCheck_post/"  hx-vals = '{"book_id": {{book.book_id}}}' hx-trigger="load" hx-target="#wishlist{{book.book_id}}">
+                                    <button hx-post = "/wishList_post/" hx-vals = '{"book_id": {{book.book_id}}}' hx-trigger="click delay:0.25s">...</button>
+                                </div>
+                            </div>
+                    </li><br>
+                </div>
+            {% endfor %}
+        </ul>
+    </div> 
+
+    {% comment %} Đây là khi khong tim thay sach {% endcomment %}
+    {% elif not page_obj%}
+    {% comment %} Chỉnh sửa thông báo khi không tìm thấy sách {% endcomment %}
+            <div style="color:red">
+                Can not found book with your search key
+            </div>
+    {% endif %}
+</div>
+{% endblock content %}
+    
+
+{% block navBot %}
+    {% include 'pagePagnition.html' %}
+{% endblock navBot %}
+
+{% block scripts %}
+<script src="https://unpkg.com/htmx.org@2.0.2/dist/htmx.js" integrity="sha384-yZq+5izaUBKcRgFbxgkRYwpHhHHCpp5nseXp0MEQ1A4MTWVMnqkmcuFez8x5qfxr"crossorigin="anonymous"></script>
+{% endblock scripts %}

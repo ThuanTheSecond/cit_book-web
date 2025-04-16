@@ -1,0 +1,56 @@
+<div id="pagination">
+    <nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+        {% comment %} hx-post {% endcomment %}
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" hx-get="?page=1" hx-target="#book-list" hx-swap="outerHTML" aria-label="First">
+            <span aria-hidden="true">&laquo;&laquo;</span>
+            </a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" hx-get="?page={{ page_obj.previous_page_number }}" hx-target="#book-list" hx-swap="outerHTML" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">&laquo;&laquo;</span>
+        </li>
+        <li class="page-item disabled">
+            <span class="page-link">&laquo;</span>
+        </li>
+        {% endif %}
+    
+        {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item"><a class="page-link" hx-get="?page={{ num }}" hx-target="#book-list" hx-swap="outerHTML">{{ num }}</a></li>
+        {% endif %}
+        {% endfor %}
+    
+        {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" hx-get="?page={{ page_obj.next_page_number }}" hx-target="#book-list" hx-swap="outerHTML" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" hx-get="?page={{ page_obj.paginator.num_pages }}" hx-target="#book-list" hx-swap="outerHTML" aria-label="Last">
+            <span aria-hidden="true">&raquo;&raquo;</span>
+            </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">&raquo;</span>
+        </li>
+        <li class="page-item disabled">
+            <span class="page-link">&raquo;&raquo;</span>
+        </li>
+        {% endif %}
+    </ul>
+    </nav>
+
+</div>
+
