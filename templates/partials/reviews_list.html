@@ -1,0 +1,33 @@
+{% if reviews %}
+    {% for review in reviews %}
+        <div class="review-item">
+            <div class="review-header">
+                <div class="review-user">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="review-user-info">
+                        <h6 class="username">{{ review.user.username }}</h6>
+                        <p class="review-date">{{ review.created_at|date:"d/m/Y H:i" }}</p>
+                    </div>
+                </div>
+                <div class="review-rating">
+                    {% for i in "12345"|make_list %}
+                        {% if forloop.counter <= review.rating %}
+                            <i class="fas fa-star text-warning"></i>
+                        {% else %}
+                            <i class="far fa-star text-warning"></i>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            <p class="review-content">{{ review.comment }}</p>
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="empty-reviews">
+        <i class="far fa-comment-dots"></i>
+        <h4>Chưa có đánh giá nào</h4>
+        <p>Hãy là người đầu tiên đánh giá cuốn sách này</p>
+    </div>
+{% endif %} 

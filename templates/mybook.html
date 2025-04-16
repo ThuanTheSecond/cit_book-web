@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% load filters %}
+
+{% block pack %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+{% endblock pack %}
+
+{% block content %}
+<div class="search-result">
+    {% if page_obj %}
+    <div class="search-book-content container-fluid justify-content-center">
+        <ul id="book-form">
+            {% comment %} thông tin sách {% endcomment %}
+            {% for book in page_obj %}
+                
+                <div class="book-found">
+                    <li>
+                        <div class="row">
+                            <div class="left-content col-md-2 justify-content-center">
+                                <a href="/book/detail/id={{book.book_id|add:'-3000'}}"><img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}"></a>
+                            </div>
+
+                            <div class="middle-content col-md-7">
+                                <a class="book-name" href="/book/detail/id={{book.book_id|add:'-3000'}}">{{ book.book_title }}</a> 
+                                <p class="book-author">by {{book.book_author}}</p>
+                                <p class="book-published">Xuất bản: {{ book.book_publish }}</p>
+                                
+                                <div class="aveRating">
+                                    <span class="product-rating">{{ averRates|get_item:book.book_id }}</span><span>/5 <span class="fa fa-star aveRating-start"></span> ({{ countRates|get_item:book.book_id }} - {{ book.book_view }} lượt xem)</span>
+                                </div>
+                            </div>
+
+                            <div class="right-content col-md-3">
+                                <div id='wishlist{{book.book_id}}' hx-post = "/wishCheck_post/"  hx-vals = '{"book_id": {{book.book_id}}}' hx-trigger="load" hx-target="#wishlist{{book.book_id}}">
+                                    <button hx-post = "/wishList_post/" hx-vals = '{"book_id": {{book.book_id}}}' hx-trigger="click delay:0.25s">...</button>
+                                </div>
+                            </div>
+                    </li><br>
+                </div>
+            {% endfor %}
+        </ul>
+    </div> 
+
+    {% elif not page_obj %}
+    <div class="empty-state text-center py-5">
+        <div class="empty-state-container">
+            <i class="fas fa-book-open mb-4" style="font-size: 4rem; color: #6c757d;"></i>
+            <h3 class="mb-3" style="color: #343a40;">Không tìm thấy sách</h3>
+            <p class="text-muted mb-4" style="max-width: 500px; margin: 0 auto;">
+                Rất tiếc, chúng tôi không thể tìm thấy cuốn sách nào phù hợp với từ khóa tìm kiếm của bạn.
+                Vui lòng thử lại với từ khóa khác.
+            </p>
+            <a href="/" class="btn btn-primary">
+                <i class="fas fa-home"></i> Quay lại trang chủ
+            </a>
+        </div>
+    </div>
+
+    <style>
+        .empty-state {
+            min-height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .empty-state-container {
+            background: white;
+            padding: 3rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+            max-width: 600px;
+            width: 90%;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+        }
+        .fas.fa-home {
+            margin-right: 8px;
+        }
+    </style>
+    {% endif %}
+</div>
+{% endblock content %}
+    
+{% block navBot %} 
+    {% include 'pagePagnition.html' %}
+{% endblock navBot %}
+

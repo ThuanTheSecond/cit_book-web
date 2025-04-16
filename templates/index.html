@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% load filters %}
+
+
+{% block pack %}
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick.css"/>
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick-theme.css"/>
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick.min.js"></script>
+  <link rel="stylesheet" href="{% static 'Css/customSlick.css' %}">
+{% endblock pack %}
+ 
+
+
+{% block content %}
+<div class="body">
+  <div class="container-fluid justify-content-center">
+    {% comment %} book-slider la phan se slide {% endcomment %}
+    {% comment %} Chinh sua tren file customSlick.css và customSlick.js {% endcomment %}
+    <h5 ><a id="container-header" href="/categoryFilter/Trending/1">Trending Books</a></h5>
+    <div class="book-slider">
+      {% for book in bookList.popular %}
+      <div class="book-item">
+          <a href="/book/detail/id={{ book.book_id|subtract:3000 }}"><img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}"></a>
+          <h5 class="mt-2">{{ book.book_title }}</h5>
+      </div>
+      {% endfor %}
+    </div>
+    <h5 ><a id="container-header" href="/categoryFilter/Ngoại Văn/1">Ngoại Văn</a></h5>
+    <div class="book-slider">
+      {% for book in bookList.topFl %}
+      <div class="book-item">
+          <a href="/book/detail/id={{ book.book_id|subtract:3000 }}"><img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}"></a>
+          <h5 class="mt-2">{{ book.book_title }}</h5>
+      </div>
+      {% endfor %}
+    </div>
+    <h5 ><a id="container-header" href="/categoryFilter/Tiếng Việt/1">Sách Tiếng Việt</a></h5>
+    <div class="book-slider">
+      {% for book in bookList.topVn %}
+      <div class="book-item">
+          <a href="/book/detail/id={{ book.book_id|subtract:3000 }}"><img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}"></a>
+          <h5 class="mt-2">{{ book.book_title }}</h5>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>   
+
+{% endblock content %}
+
+{% block scripts %}
+<script src="{% static 'Js/customSlick.js' %}"></script>
+<script src="https://unpkg.com/htmx.org@2.0.2/dist/htmx.js" integrity="sha384-yZq+5izaUBKcRgFbxgkRYwpHhHHCpp5nseXp0MEQ1A4MTWVMnqkmcuFez8x5qfxr" crossorigin="anonymous"></script>
+{% endblock %}
