@@ -43,3 +43,4 @@ ENV/
 .DS_Store
 Thumbs.db
 EOL
+"book_cit_web_backup.sql" 
