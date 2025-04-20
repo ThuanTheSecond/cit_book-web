@@ -12,6 +12,8 @@
   <!-- Google font -->
   <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
   <!--Bootstrap-->
   <link type="text/css" rel="stylesheet" href="{% static 'Css/bootstrap.min.css' %}" />
@@ -41,13 +43,15 @@
       padding: 0;
     }
     
+    /* Xóa phần CSS ẩn header */
+    
     .login-page {
       min-height: calc(100vh - 180px);
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 40px 0;
-      margin-top: 90px;
+      margin-top: 90px; /* Để có khoảng cách phía trên cho header */
     }
     
     .login-container {
@@ -55,7 +59,7 @@
       border-radius: 12px;
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
       overflow: hidden;
-      max-width: 1000px;
+      max-width: 900px;
       width: 100%;
       margin: 0 auto;
     }
@@ -68,7 +72,7 @@
     .login-image {
       flex: 1;
       min-width: 300px;
-      background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('{% static "img/library-bg.jpg" %}');
+      background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('https://www.voicesofruralindia.org/wp-content/uploads/2020/11/ylswjsy7stw-1536x901.jpg');
       background-size: cover;
       background-position: center;
       position: relative;
@@ -86,10 +90,25 @@
     }
     
     .login-image h2 {
+      font-family: 'Playfair Display', serif;
       font-weight: 700;
-      font-size: 32px;
+      font-size: 48px;
       margin-bottom: 20px;
-      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+      color: #fff;
+      letter-spacing: 1px;
+      position: relative;
+      display: inline-block;
+    }
+    
+    .login-image h2::after {
+      content: '';
+      display: block;
+      width: 80%;
+      height: 2px;
+      background-color: #fff;
+      margin: 10px auto 0;
+      box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
     }
     
     .login-image p {
@@ -102,35 +121,78 @@
     .login-form-container {
       flex: 1;
       min-width: 320px;
-      padding: 50px;
+      padding: 30px;
+      background: linear-gradient(145deg, #ffffff, #f8f9fa);
+      border-radius: 0 12px 12px 0;
+      box-shadow: inset 1px 1px 5px rgba(0,0,0,0.05);
+      animation: fadeIn 0.8s ease forwards;
     }
     
     .login-title {
       text-align: center;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
     }
     
     .login-title h3 {
-      font-size: 28px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 24px;
       color: #333;
-      font-weight: 500;
-      margin-bottom: 10px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      position: relative;
+      display: inline-block;
+    }
+    
+    .login-title h3::after {
+      content: '';
+      width: 40px;
+      height: 3px;
+      background: linear-gradient(90deg, #007bff, #00c6ff);
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 3px;
+    }
+    
+    .welcome-text {
+      font-family: 'Poppins', sans-serif;
+      color: #6c757d;
+      font-size: 14px;
+      margin-bottom: 25px;
+      text-align: center;
+      font-weight: 300;
     }
     
     .form-group {
-      margin-bottom: 25px;
+      margin-bottom: 16px;
     }
     
     .form-group label {
       display: block;
+      font-family: 'Poppins', sans-serif;
       font-weight: 500;
       margin-bottom: 8px;
-      color: #444;
-      font-size: 15px;
+      color: #495057;
+      font-size: 14px;
+      transition: all 0.3s ease;
     }
     
     .input-group {
       position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .input-group:focus-within {
+      box-shadow: 0 5px 15px rgba(0,123,255,0.15);
+      transform: translateY(-2px);
+    }
+    
+    .input-group:hover {
+      box-shadow: 0 3px 12px rgba(0,0,0,0.08);
     }
     
     .input-group-text {
@@ -142,57 +204,141 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: transparent;
+      background: linear-gradient(180deg, #f8f9fa, #e9ecef);
       border: none;
-      color: #666;
-      font-size: 18px;
+      color: #007bff;
+      font-size: 16px;
       z-index: 10;
+      border-right: 1px solid rgba(0,0,0,0.05);
     }
     
     .form-control {
-      height: 50px;
+      height: 46px;
       border-radius: 8px;
-      padding-left: 50px;
-      font-size: 16px;
-      border: 1px solid #ddd;
-      background-color: #f9f9f9;
+      padding-left: 60px;
+      font-size: 14px;
+      font-family: 'Poppins', sans-serif;
+      border: 1px solid #e1e5eb;
+      background-color: #fff;
       transition: all 0.3s ease;
+      font-weight: 400;
+      color: #495057;
     }
     
     .form-control:focus {
-      box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+      box-shadow: none;
       border-color: #007bff;
       background-color: #fff;
     }
     
+    .form-control::placeholder {
+      color: #adb5bd;
+      font-weight: 300;
+    }
+    
+    .auth-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .remember-me {
+      display: flex;
+      align-items: center;
+    }
+    
+    .remember-me input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin-right: 8px;
+      accent-color: #007bff;
+      cursor: pointer;
+    }
+    
+    .remember-me label {
+      margin-bottom: 0;
+      font-size: 14px;
+      color: #495057;
+      cursor: pointer;
+    }
+    
+    .forgot-password {
+      color: #007bff;
+      font-size: 14px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .forgot-password::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 1px;
+      bottom: -2px;
+      left: 0;
+      background-color: #007bff;
+      transition: width 0.3s ease;
+    }
+    
+    .forgot-password:hover {
+      color: #0056b3;
+    }
+    
+    .forgot-password:hover::after {
+      width: 100%;
+    }
+    
     .btn-login {
-      height: 50px;
+      height: 46px;
       border-radius: 8px;
-      background: #007bff;
+      background: linear-gradient(135deg, #007bff, #0056b3);
       border: none;
       color: white;
-      font-size: 16px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 15px;
       font-weight: 500;
       letter-spacing: 0.5px;
       text-transform: uppercase;
       transition: all 0.3s ease;
       width: 100%;
       cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,123,255,0.2);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn-login:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: all 0.6s ease;
+    }
+    
+    .btn-login:hover:before {
+      left: 100%;
     }
     
     .btn-login:hover {
-      background: #0069d9;
+      background: linear-gradient(135deg, #0056b3, #003d80);
       transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0, 105, 217, 0.4);
+      box-shadow: 0 8px 20px rgba(0,105,217,0.3);
     }
     
     .btn-google {
-      height: 50px;
+      height: 46px;
       border-radius: 8px;
       background: #fff;
-      border: 1px solid #ddd;
+      border: 1px solid #e1e5eb;
       color: #333;
-      font-size: 16px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 15px;
       font-weight: 500;
       transition: all 0.3s ease;
       display: flex;
@@ -201,6 +347,7 @@
       cursor: pointer;
       width: 100%;
       text-decoration: none;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     }
     
     .btn-google i {
@@ -210,51 +357,67 @@
     }
     
     .btn-google:hover {
-      background: #f8f8f8;
-      border-color: #ccc;
+      background: #f8f9fa;
+      border-color: #ced4da;
       transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
     }
     
     .separator {
       display: flex;
       align-items: center;
       text-align: center;
-      margin: 25px 0;
+      margin: 16px 0;
     }
     
     .separator::before,
     .separator::after {
       content: '';
       flex: 1;
-      border-bottom: 1px solid #ddd;
+      border-bottom: 1px solid #e1e5eb;
     }
     
     .separator span {
       padding: 0 15px;
-      color: #999;
+      color: #6c757d;
       font-size: 14px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 400;
     }
     
     .login-footer {
       text-align: center;
-      margin-top: 25px;
+      margin-top: 16px;
     }
     
     .login-footer p {
       margin-bottom: 0;
-      color: #666;
-      font-size: 15px;
+      color: #6c757d;
+      font-size: 14px;
+      font-family: 'Poppins', sans-serif;
     }
     
     .login-footer a {
       color: #007bff;
       text-decoration: none;
       font-weight: 500;
+      position: relative;
+      padding-bottom: 2px;
     }
     
-    .login-footer a:hover {
-      text-decoration: underline;
+    .login-footer a::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 1px;
+      bottom: 0;
+      left: 0;
+      background-color: #007bff;
+      transition: width 0.3s ease;
+    }
+    
+    .login-footer a:hover::after {
+      width: 100%;
     }
     
     .error-msg {
@@ -270,22 +433,10 @@
       font-weight: 500;
     }
     
-    .welcome-text {
-      color: #007bff;
-      font-size: 16px;
-      margin-bottom: 40px;
-      text-align: center;
-      font-weight: 300;
-    }
-    
     /* Animation */
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .login-form-container {
-      animation: fadeIn 0.8s ease forwards;
     }
     
     /* Footer styling */
@@ -298,22 +449,6 @@
     .copyright {
       color: #aaa;
       font-size: 14px;
-    }
-    
-    /* Header styling */
-    #top-header {
-      background-color: #222;
-      color: #fff;
-      padding: 27px 0;
-    }
-    
-    .header-links a {
-      color: #fff;
-      transition: color 0.3s;
-    }
-    
-    .header-links a:hover {
-      color: #007bff;
     }
     
     @media (max-width: 768px) {
@@ -336,6 +471,7 @@
 </head>
 
 <body id="login">
+    <!-- Chỉ giữ lại header -->
     {% include 'header.html' %}
 
     <div class="login-page">
@@ -382,6 +518,14 @@
                                     <span class="input-group-text"><i class="fa fa-lock"></i></span>
                                     {% render_field form.password class="form-control" placeholder="Nhập mật khẩu" id="id_password" %}
                                 </div>
+                            </div>
+                            
+                            <div class="form-group auth-options">
+                                <div class="remember-me">
+                                    <input type="checkbox" id="remember-me">
+                                    <label for="remember-me">Ghi nhớ đăng nhập</label>
+                                </div>
+                                <a href="#" class="forgot-password">Quên mật khẩu?</a>
                             </div>
                             
                             <div class="form-group">
