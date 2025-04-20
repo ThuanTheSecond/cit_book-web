@@ -33,6 +33,23 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" />
   
+  <!-- Background Styles -->
+  <style>
+    body {
+      /* Bạn có thể thay đổi background của trang web tại đây */
+      background-color: #f8f5eb; /* Màu nền dạng đơn giản */
+      
+      /* Hoặc bạn có thể sử dụng gradient */
+      /* background: linear-gradient(to bottom, #f8f9fa, #e9ecef); */
+      
+      /* Hoặc sử dụng hình ảnh làm nền */
+      /* background-image: url('{% static "img/background.jpg" %}'); */
+      /* background-size: cover; */
+      /* background-attachment: fixed; */
+      /* background-position: center; */
+    }
+  </style>
+  
   <meta name="csrf-token" content="{{ csrf_token }}">
   <!-- Add bonus component for head -->
   {% block pack %}

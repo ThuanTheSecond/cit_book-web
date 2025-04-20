@@ -41,6 +41,36 @@
       font-family: 'Roboto', sans-serif;
       margin: 0;
       padding: 0;
+      animation: fadeInPage 0.4s ease-in;
+    }
+    
+    @keyframes fadeInPage {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .page-transition-link {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+    }
+    
+    .page-transition-link::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 123, 255, 0.1);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+      z-index: -1;
+    }
+    
+    .page-transition-link:hover::before {
+      transform: scaleX(1);
     }
     
     /* Xóa phần CSS ẩn header */
@@ -395,6 +425,10 @@
       color: #6c757d;
       font-size: 14px;
       font-family: 'Poppins', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
     }
     
     .login-footer a {
@@ -544,7 +578,7 @@
                             </div>
                             
                             <div class="login-footer">
-                                <p>Chưa có tài khoản? <a href="{% url 'register' %}">Đăng ký ngay</a></p>
+                                <p>Chưa có tài khoản? <a href="{% url 'register' %}" class="page-transition-link" id="to-register">Đăng ký ngay</a></p>
                             </div>
                         </form>
                     </div>
@@ -577,6 +611,20 @@
             input.addEventListener('blur', function() {
                 this.parentElement.classList.remove('input-focused');
             });
+        });
+        
+        // Page transition animation
+        document.getElementById('to-register').addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Fade out current page
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 0.3s ease';
+            
+            // Navigate to register page after animation completes
+            setTimeout(function() {
+                window.location.href = e.target.href;
+            }, 300);
         });
     </script>
 </body>
