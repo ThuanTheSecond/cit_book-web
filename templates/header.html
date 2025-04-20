@@ -3,7 +3,12 @@
     <div id="top-header">
         <div class="container">
             <ul class="header-links pull-left">
-                <li><a href="/"><i class="fa fa-book"></i>CIT LIBRARY</a></li>
+                <li>
+                    <a class="school-logo" href="/">
+                        <img src="/static/img/imgBook/logoCIT.jpg" alt="error" href="/" class="logo-img">
+                        CIT LIBRARY
+                    </a>
+                </li>
                 {% comment %} <li><a href="#"><i class="fa fa-phone"></i> +91 911111113664</a></li> {% endcomment %}
             </ul>
             
@@ -22,15 +27,87 @@
     </div>
 </header>
 
-<script>
-// Thêm hiệu ứng khi cuộn trang
-window.addEventListener('scroll', function() {
-    const header = document.getElementById('top-header');
-    if (window.scrollY > 50) {
-        header.classList.add('header-scrolled');
-    } else {
-        header.classList.remove('header-scrolled');
+<style>
+    /* Header fixed khi scroll */
+    #top-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        z-index: 9999;
+        background-color: #2874f0;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
-});
+    
+    /* Style cho container */
+    #top-header .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        height: 50px;
+    }
+    
+    /* Logo style */
+    .school-logo {
+        display: flex !important;
+        align-items: center !important;
+        color: #FFFFFF !important;
+        text-decoration: none;
+        font-size: 22px;
+        font-family: 'Roboto Slab', serif;
+        font-weight: 500;
+        transition: opacity 0.3s;
+    }
+    
+    .school-logo:hover {
+        opacity: 0.9;
+    }
+    
+    .logo-img {
+        height: 40px;
+        width: 40px;
+        border-radius: 50%;
+        margin-right: 10px;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Style cho header-links */
+    .header-links {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: flex;
+        align-items: center;
+    }
+    
+    .header-links li {
+        display: inline-block;
+        margin: 0 10px;
+    }
+    
+    .header-links li a {
+        color: #fff;
+        text-decoration: none;
+        font-size: 14px;
+        transition: opacity 0.3s;
+        line-height: 40px;
+        display: block;
+    }
+    
+    .header-links li a:hover {
+        opacity: 0.8;
+    }
+    
+    .header-links i {
+        margin-right: 5px;
+        font-size: 16px;
+    }
+</style>
+
+<script>
+// Xóa script thêm padding cho body vì đã xử lý qua CSS trong navbar
 </script>
 
