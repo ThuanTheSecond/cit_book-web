@@ -3,26 +3,36 @@
     <div id="top-header">
         <div class="container">
             <ul class="header-links pull-left">
-                <li><a href="/">CIT LIBRARY</li>
+                <li><a href="/"><i class="fa fa-book"></i>CIT LIBRARY</a></li>
                 {% comment %} <li><a href="#"><i class="fa fa-phone"></i> +91 911111113664</a></li> {% endcomment %}
             </ul>
             
             <ul class="header-links pull-right">
-                
                 {% if user.is_authenticated %}
-                  <li><a href="{% url 'profile' %}" style="color: white">Xin chào {{user.username}}</a></li>
-                  <li class="active"><a href="{% url 'index' %}">Home</a></li>
-                  <li><a href="{% url 'logout' %}"><i class="fa fa-user-o"></i> Đăng xuất</a></li>
+                  <li><a href="{% url 'profile' %}"><i class="fa fa-user"></i>Xin chào {{user.username}}</a></li>
+                  <li class="active"><a href="{% url 'index' %}"><i class="fa fa-home"></i>Home</a></li>
+                  <li><a href="{% url 'logout' %}"><i class="fa fa-sign-out"></i>Đăng xuất</a></li>
                 {% else %}
-                  <li style="color: white">Xin chào Guest   </li>
-                  <li class="active"><a href="{% url 'index' %}">Home</a></li>
-                  <li><a href="{% url 'login' %}"><i class="fa fa-user-o"></i> Đăng nhập</a></li>  
+                  <li><a href="#"><i class="fa fa-user-o"></i>Xin chào Guest</a></li>
+                  <li class="active"><a href="{% url 'index' %}"><i class="fa fa-home"></i>Home</a></li>
+                  <li><a href="{% url 'login' %}"><i class="fa fa-sign-in"></i>Đăng nhập</a></li>  
                 {% endif %}
-                  
             </ul>
         </div>
     </div>
 </header>
+
+<script>
+// Thêm hiệu ứng khi cuộn trang
+window.addEventListener('scroll', function() {
+    const header = document.getElementById('top-header');
+    if (window.scrollY > 50) {
+        header.classList.add('header-scrolled');
+    } else {
+        header.classList.remove('header-scrolled');
+    }
+});
+</script>
 
 <!--
      <header class="site-header">

@@ -89,15 +89,15 @@ AUTHENTICATION_BACKENDS = (
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-# Cấu hình Database - kết nối tới PostgreSQL trên fly.io qua proxy cổng 15432
+# Cấu hình Database - kết nối với PostgreSQL local
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'postgres',
+        'NAME': 'book_cit_web',
         'USER': 'postgres',
-        'PASSWORD': '98L940Ccpe9mpqr',  # Mật khẩu từ connection string của fly.io
+        'PASSWORD': '1001',
         'HOST': 'localhost',
-        'PORT': '15432',
+        'PORT': '5432',
     }
 }
 
@@ -144,7 +144,7 @@ STATICFILES_DIRS = [
 ]
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR,'media\\')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 

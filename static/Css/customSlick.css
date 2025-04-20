@@ -1,3 +1,104 @@
+/* CSS cho header hiện đại */
+#top-header {
+  background: linear-gradient(135deg, #1e5799 0%, #207cca 51%, #2989d8 100%);
+  padding: 12px 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+#top-header:hover {
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+#top-header .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+.header-links {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+}
+
+.header-links.pull-left {
+  gap: 20px;
+}
+
+.header-links.pull-right {
+  gap: 15px;
+}
+
+.header-links li a {
+  color: white;
+  font-weight: 500;
+  text-decoration: none;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.header-links li a:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.header-links li.active a {
+  background-color: rgba(255, 255, 255, 0.2);
+  font-weight: 600;
+}
+
+.header-links li a i {
+  margin-right: 5px;
+  font-size: 16px;
+}
+
+/* Logo styling */
+.header-links.pull-left li a {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* Responsive header */
+@media (max-width: 768px) {
+  #top-header .container {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .header-links.pull-left, .header-links.pull-right {
+    justify-content: center;
+  }
+}
+
+/* Animation for header on scroll */
+@keyframes shrinkHeader {
+  from {
+    padding: 12px 0;
+  }
+  to {
+    padding: 8px 0;
+  }
+}
+
+.header-scrolled {
+  animation: shrinkHeader 0.3s forwards;
+  background: linear-gradient(135deg, #155293 0%, #1a6cb1 51%, #2378c0 100%);
+}
+
 .book-slider img {
     width: 140px;
     height: 200px;
@@ -123,4 +224,52 @@
             align-items: center;
             text-align: center;
         }
+}
+
+/* Style cho tiêu đề danh mục sách */
+#container-header {
+  padding-left: 12px;
+  color: #095885;
+  font-size: 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  position: relative;
+  display: inline-block;
+  transition: all 0.3s ease;
+  border-left: 4px solid #095885;
+  padding-left: 15px;
+  margin-bottom: 15px;
+}
+
+#container-header:hover {
+  color: #333;
+  transform: translateX(5px);
+}
+
+#container-header::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: #333;
+  transition: width 0.3s ease;
+}
+
+#container-header:hover::after {
+  width: 100%;
+}
+
+/* Style cho container tiêu đề */
+.body h5 {
+  padding-top: 25px;
+  padding-bottom: 10px;
+  position: relative;
+  margin-left: 10px;
+}
+
+/* Thêm hiệu ứng cho danh mục */
+.book-slider {
+  margin-top: 15px;
 }

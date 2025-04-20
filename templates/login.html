@@ -1,7 +1,8 @@
 {% load static %}
 {% load widget_tweaks %}
 
-
+<!DOCTYPE html>
+<html lang="vi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +11,7 @@
 
   <!-- Google font -->
   <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 
   <!--Bootstrap-->
   <link type="text/css" rel="stylesheet" href="{% static 'Css/bootstrap.min.css' %}" />
@@ -31,112 +33,408 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" />
   
+  <style>
+    body {
+      background-color: #f5f5f5;
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .login-page {
+      min-height: calc(100vh - 180px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 0;
+      margin-top: 90px;
+    }
+    
+    .login-container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      max-width: 1000px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    
+    .login-row {
+      display: flex;
+      flex-wrap: wrap;
+    }
+    
+    .login-image {
+      flex: 1;
+      min-width: 300px;
+      background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('{% static "img/library-bg.jpg" %}');
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      color: white;
+      text-align: center;
+    }
+    
+    .login-image-content {
+      position: relative;
+      z-index: 2;
+    }
+    
+    .login-image h2 {
+      font-weight: 700;
+      font-size: 32px;
+      margin-bottom: 20px;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    }
+    
+    .login-image p {
+      font-size: 18px;
+      line-height: 1.6;
+      margin-bottom: 0;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+    
+    .login-form-container {
+      flex: 1;
+      min-width: 320px;
+      padding: 50px;
+    }
+    
+    .login-title {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .login-title h3 {
+      font-size: 28px;
+      color: #333;
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+    
+    .form-group {
+      margin-bottom: 25px;
+    }
+    
+    .form-group label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: #444;
+      font-size: 15px;
+    }
+    
+    .input-group {
+      position: relative;
+    }
+    
+    .input-group-text {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      color: #666;
+      font-size: 18px;
+      z-index: 10;
+    }
+    
+    .form-control {
+      height: 50px;
+      border-radius: 8px;
+      padding-left: 50px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      background-color: #f9f9f9;
+      transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+      box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+      border-color: #007bff;
+      background-color: #fff;
+    }
+    
+    .btn-login {
+      height: 50px;
+      border-radius: 8px;
+      background: #007bff;
+      border: none;
+      color: white;
+      font-size: 16px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      transition: all 0.3s ease;
+      width: 100%;
+      cursor: pointer;
+    }
+    
+    .btn-login:hover {
+      background: #0069d9;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 105, 217, 0.4);
+    }
+    
+    .btn-google {
+      height: 50px;
+      border-radius: 8px;
+      background: #fff;
+      border: 1px solid #ddd;
+      color: #333;
+      font-size: 16px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      width: 100%;
+      text-decoration: none;
+    }
+    
+    .btn-google i {
+      color: #db4437;
+      font-size: 18px;
+      margin-right: 10px;
+    }
+    
+    .btn-google:hover {
+      background: #f8f8f8;
+      border-color: #ccc;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .separator {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 25px 0;
+    }
+    
+    .separator::before,
+    .separator::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    .separator span {
+      padding: 0 15px;
+      color: #999;
+      font-size: 14px;
+    }
+    
+    .login-footer {
+      text-align: center;
+      margin-top: 25px;
+    }
+    
+    .login-footer p {
+      margin-bottom: 0;
+      color: #666;
+      font-size: 15px;
+    }
+    
+    .login-footer a {
+      color: #007bff;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    
+    .login-footer a:hover {
+      text-decoration: underline;
+    }
+    
+    .error-msg {
+      padding: 15px;
+      background: rgba(220, 53, 69, 0.1);
+      color: #dc3545;
+      border-radius: 8px;
+      margin-bottom: 25px;
+      font-size: 14px;
+    }
+    
+    .error-msg strong {
+      font-weight: 500;
+    }
+    
+    .welcome-text {
+      color: #007bff;
+      font-size: 16px;
+      margin-bottom: 40px;
+      text-align: center;
+      font-weight: 300;
+    }
+    
+    /* Animation */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .login-form-container {
+      animation: fadeIn 0.8s ease forwards;
+    }
+    
+    /* Footer styling */
+    #footer {
+      background-color: #222;
+      color: #fff;
+      padding: 20px 0;
+    }
+    
+    .copyright {
+      color: #aaa;
+      font-size: 14px;
+    }
+    
+    /* Header styling */
+    #top-header {
+      background-color: #222;
+      color: #fff;
+      padding: 27px 0;
+    }
+    
+    .header-links a {
+      color: #fff;
+      transition: color 0.3s;
+    }
+    
+    .header-links a:hover {
+      color: #007bff;
+    }
+    
+    @media (max-width: 768px) {
+      .login-form-container,
+      .login-image {
+        min-width: 100%;
+      }
+      
+      .login-image {
+        min-height: 200px;
+      }
+      
+      .login-form-container {
+        padding: 30px;
+      }
+    }
+  </style>
+  
   <meta name="csrf-token" content="{{ csrf_token }}">
 </head>
 
 <body id="login">
-    <header>
-        <!-- TOP HEADER -->
-        <div id="top-header">
-            <div class="container">
-                <ul class="header-links pull-left">
-                    <li><a href="/">CIT LIBRARY</li>
-                    {% comment %} <li><a href="#"><i class="fa fa-phone"></i> +91 911111113664</a></li> {% endcomment %}
-            
-                </ul>
-                
-                <ul class="header-links pull-right">
-                    <li class="active"><a href="{% url 'index' %}">Home</a></li>
-                    <li><a href="{% url 'login' %}"><i class="fa fa-user-o"></i> Đăng nhập</a></li>
-    
-                </ul>
-            </div>
-        </div>
-    </header>
+    {% include 'header.html' %}
 
-    <div class="empty-block">
-        <p></p>
-    </div>
-
-    <div class="container-fluid">
-        <div class="login-overall row justify-content-center align-items-center" style="height:auto">
-            <div class="left-login col-md-5">
-                <h3 class="card-title text-left">Đăng nhập</h3><br>
-                {% comment %} <p class="card-description text-left">Login to use your CIT Library card to see suggested books from the website</p> {% endcomment %}
-            </div>
-
-            <div class="right-login col-md-4">
-                <div class="card">
-                    <article class="card-body">
+    <div class="login-page">
+        <div class="container">
+            <div class="login-container">
+                <div class="login-row">
+                    <!-- Left side - Image with text -->
+                    <div class="login-image">
+                        <div class="login-image-content">
+                            <h2>CIT Library</h2>
+                            <p>Khám phá thế giới tri thức cùng hệ thống thư viện và gợi ý sách thông minh</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Right side - Login form -->
+                    <div class="login-form-container">
+                        <div class="login-title">
+                            <h3>Đăng nhập</h3>
+                            <p class="welcome-text">Chào mừng bạn trở lại với CIT Library</p>
+                        </div>
+                        
                         <form class="login-form" action="{% url 'login' %}" method="POST">
+                            {% csrf_token %}
+                            
+                            {% if form.non_field_errors %}
+                            <div class="error-msg">
+                                {% for error in form.non_field_errors %}
+                                <strong>{{ error }}</strong>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            
                             <div class="form-group">
-
-                                {% csrf_token %} 
-                                <div class="error_msg">
-                                    {% if form.non_field_errors %}
-                                    <div class="form-errors">
-                                        {% for error in form.non_field_errors %}
-                                        <strong><li>{% render_field error %}</li></strong>
-
-                                        {% endfor %}
-                                        </ul>
-                                        {% endif %}
-
-                                    </div>
-				                    <ul>
-                                </div>
-                                
-                                <h6>Hãy nhập vào email/username và mật khẩu để đăng nhập.</h6><br>
-                                <span>Email or  Username:</span>
-                                <div class="input-group mb-3">
-                                    {% render_field form.username class="form-control" placeholder="Nhập vào Email hoặc username" %}
-                                </div>
-
-                                <span>Password:</span>
-                                <div class="input-group mb-3">  
-                                    {% render_field form.password class="form-control" placeholder="Nhập vào mật khẩu" %}
-                                </div>
-                                
-                                <div class="form-group">
-                                    <input type="hidden" name="next" value="{{ request.GET.next }}">
-                                    <button type="submit" class="login-btn btn btn-primary btn-block"> Đăng nhập </button>
-                                </div>
-                                <br>
-                                <!-- Add Google Login Button -->
-                                <div class="form-group">
-                                    <a href="{% url 'social:begin' 'google-oauth2' %}?prompt=select_account" class="btn btn-danger btn-block">
-                                        <i class="fa fa-google"></i> Đăng nhập bằng Google
-                                    </a>
-                                </div>
-                                <div class="other">
-                                    <p>Chưa có tài khoản? <a class="link-register" href="{% url 'register' %}">Đăng kí ngay</a></p>
+                                <label for="id_username">Email hoặc Username</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fa fa-user"></i></span>
+                                    {% render_field form.username class="form-control" placeholder="Nhập email hoặc username" id="id_username" %}
                                 </div>
                             </div>
+                            
+                            <div class="form-group">
+                                <label for="id_password">Mật khẩu</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fa fa-lock"></i></span>
+                                    {% render_field form.password class="form-control" placeholder="Nhập mật khẩu" id="id_password" %}
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <input type="hidden" name="next" value="{{ request.GET.next }}">
+                                <button type="submit" class="btn-login">Đăng nhập</button>
+                            </div>
+                            
+                            <div class="separator">
+                                <span>hoặc</span>
+                            </div>
+                            
+                            <div class="form-group">
+                                <a href="{% url 'social:begin' 'google-oauth2' %}?prompt=select_account" class="btn-google">
+                                    <i class="fa fa-google"></i> Đăng nhập bằng Google
+                                </a>
+                            </div>
+                            
+                            <div class="login-footer">
+                                <p>Chưa có tài khoản? <a href="{% url 'register' %}">Đăng ký ngay</a></p>
+                            </div>
                         </form>
-                    </article>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<footer id="footer">
-    <div id="bottom-footer" class="section">
-        <div class="container-fluid justify-content-center">
-            <div class="bottom-footer">
-
-                <span class="copyright">
-                    <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                    Copyright &copy;
-                    <script>document.write(new Date().getFullYear());</script> All rights reserved | This website template
-                    is made with <i class="fa fa-heart-o" aria-hidden="true"></i>
-                </span>
+    <footer id="footer">
+        <div id="bottom-footer" class="section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <span class="copyright">
+                            Copyright &copy; <script>document.write(new Date().getFullYear());</script> CIT Library. All rights reserved
+                        </span>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</footer>
+    </footer>
 
+    <script>
+        // Add focus effect to input fields
+        const inputs = document.querySelectorAll('.form-control');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.classList.add('input-focused');
+            });
+            input.addEventListener('blur', function() {
+                this.parentElement.classList.remove('input-focused');
+            });
+        });
+    </script>
 </body>
-
 </html>
     
