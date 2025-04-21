@@ -1,0 +1,641 @@
+{% extends "admin/base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ title }} | CIT LIBRARY ADMIN{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" type="text/css" href="{% static 'admin/css/custom.css' %}">
+<style>
+  :root {
+    --primary: #3b82f6;
+    --secondary: #2563eb;
+    --accent: #dbeafe;
+    --primary-fg: #fff;
+    
+    --body-bg: #f8fafc;
+    --body-fg: #334155;
+    --body-quiet-color: #64748b;
+    --body-loud-color: #1e293b;
+    
+    --header-color: #fff;
+    --header-branding-color: var(--header-color);
+    --header-bg: var(--primary);
+    --header-link-color: #efefef;
+    
+    --breadcrumbs-fg: #64748b;
+    --breadcrumbs-link-fg: var(--primary);
+    --breadcrumbs-bg: #f8fafc;
+    
+    --link-fg: #3b82f6;
+    --link-hover-color: #2563eb;
+    --link-selected-fg: #1d4ed8;
+    
+    --hairline-color: #e2e8f0;
+    --border-color: #cbd5e0;
+    
+    --error-fg: #ef4444;
+    
+    --message-success-bg: #dcfce7;
+    --message-success-border: #bbf7d0;
+    --message-success-fg: #166534;
+    
+    --message-warning-bg: #fef9c3;
+    --message-warning-border: #fef08a;
+    --message-warning-fg: #854d0e;
+    
+    --message-error-bg: #fee2e2;
+    --message-error-border: #fecaca;
+    --message-error-fg: #b91c1c;
+    
+    --button-bg: var(--primary);
+    --button-fg: var(--primary-fg);
+    --button-hover-bg: var(--secondary);
+    --button-hover-fg: var(--primary-fg);
+    
+    --default-button-bg: #f8fafc;
+    --default-button-fg: #334155;
+    --default-button-hover-bg: #f1f5f9;
+    --default-button-hover-fg: #1e293b;
+    
+    --sidebar-width: 240px;
+  }
+
+  /* Rounded corners for various UI elements */
+  .module, 
+  .submit-row input[type="submit"], 
+  .button, 
+  input[type="submit"], 
+  input[type="button"], 
+  select, 
+  input[type="text"], 
+  input[type="password"], 
+  textarea {
+    border-radius: 8px !important;
+  }
+  
+  /* Add a slight shadow to modules */
+  .module {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  }
+  
+  /* Make form labels a bit more prominent */
+  label {
+    font-weight: 500;
+    color: #334155;
+  }
+  
+  /* Style Django's default header text */
+  #header {
+    padding: 16px 40px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+    position: relative;
+    background: linear-gradient(to right, #3b82f6, #60a5fa);
+    z-index: 20;
+  }
+  
+  #header #branding h1 {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+  }
+
+  #header #branding img {
+    transition: transform 0.3s;
+  }
+
+  #header #branding:hover img {
+    transform: scale(1.1);
+  }
+  
+  /* Style the user dropdown menu */
+  #user-tools {
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+  }
+  
+  #user-tools a {
+    border-bottom: none;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: all 0.2s;
+  }
+  
+  #user-tools a:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  /* Theme toggle */
+  .theme-toggle {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 18px;
+    margin-left: 10px;
+    padding: 5px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    transition: all 0.2s;
+  }
+
+  .theme-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+  
+  /* Main layout with sidebar */
+  #container {
+    display: flex;
+    position: relative;
+  }
+  
+  #sidebar {
+    width: var(--sidebar-width);
+    background-color: white;
+    border-right: 1px solid #e2e8f0;
+    height: calc(100vh - 60px);
+    position: fixed;
+    top: 60px;
+    left: 0;
+    z-index: 10;
+    box-shadow: 1px 0 5px rgba(0, 0, 0, 0.05);
+    overflow-y: auto;
+  }
+  
+  #content {
+    flex: 1;
+    padding: 25px;
+    margin-left: var(--sidebar-width);
+  }
+  
+  /* Sidebar navigation */
+  .sidebar-nav {
+    padding: 20px 0;
+  }
+  
+  .nav-header {
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 8px 25px;
+    margin-top: 15px;
+  }
+  
+  .sidebar-nav-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 25px;
+    color: #334155;
+    text-decoration: none;
+    transition: all 0.2s;
+    font-weight: 500;
+    position: relative;
+  }
+  
+  .sidebar-nav-item i {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+    font-size: 16px;
+    color: #3b82f6;
+  }
+  
+  .sidebar-nav-item:hover {
+    background-color: #f0f9ff;
+    color: #3b82f6;
+  }
+  
+  .sidebar-nav-item.active {
+    background-color: #dbeafe;
+    color: #2563eb;
+    border-right: 3px solid #3b82f6;
+  }
+  
+  .sidebar-nav-item.active i {
+    color: #2563eb;
+  }
+  
+  /* Search form in sidebar */
+  .sidebar-search {
+    padding: 15px 25px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  .sidebar-search form {
+    position: relative;
+  }
+  
+  .sidebar-search input {
+    width: 100%;
+    padding: 8px 15px 8px 35px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s;
+    background-color: #f8fafc;
+  }
+  
+  .sidebar-search input:focus {
+    border-color: #3b82f6;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    background-color: white;
+  }
+  
+  .sidebar-search button {
+    background: none;
+    border: none;
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    cursor: pointer;
+  }
+  
+  .sidebar-search button:hover {
+    color: #3b82f6;
+  }
+  
+  /* Collapsible sidebar for mobile */
+  .sidebar-toggle {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #3b82f6;
+    color: white;
+    box-shadow: 0 2px 10px rgba(59, 130, 246, 0.5);
+    z-index: 30;
+    border: none;
+    cursor: pointer;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+  }
+  
+  .sidebar-toggle:hover {
+    background: #2563eb;
+  }
+  
+  /* Style the sidebar module headers */
+  .module h2, .module caption {
+    background: var(--primary);
+    color: var(--header-color);
+    font-weight: 500;
+    padding: 12px 15px;
+  }
+  
+  /* Style buttons */
+  .button, input[type="submit"], input[type="button"] {
+    padding: 10px 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+  }
+  
+  .button:hover, 
+  input[type="submit"]:hover, 
+  input[type="button"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Style fieldsets */
+  fieldset.collapsed h2 {
+    background: #e2e8f0;
+    color: #334155;
+  }
+  
+  /* Style pagination */
+  .paginator a:link, .paginator a:visited {
+    background: var(--primary);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 4px;
+  }
+  
+  .paginator a:hover {
+    background: var(--secondary);
+  }
+  
+  /* Style the "Recent Actions" module */
+  .dashboard .module table td a {
+    color: var(--link-fg);
+  }
+  
+  /* Style object-tools (links at the top of change forms) */
+  .object-tools a {
+    background: var(--primary);
+    font-weight: 500;
+  }
+  
+  .object-tools a:hover {
+    background: var(--secondary);
+  }
+  
+  /* Style inline related items */
+  .inline-related h3 {
+    background: #f1f5f9;
+    color: #334155;
+    border-radius: 4px 4px 0 0;
+    padding: 8px 12px;
+    font-weight: 500;
+  }
+
+  /* Responsive design adjustments */
+  @media (max-width: 1024px) {
+    #header {
+      padding: 16px 20px;
+    }
+    
+    #content {
+      padding: 20px;
+    }
+    
+    :root {
+      --sidebar-width: 220px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    #header #user-tools {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      margin-top: 12px;
+    }
+    
+    #sidebar {
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+    
+    #sidebar.open {
+      transform: translateX(0);
+    }
+    
+    #content {
+      margin-left: 0;
+    }
+    
+    .sidebar-toggle {
+      display: flex;
+    }
+    
+    body.sidebar-open::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 5;
+    }
+  }
+
+  /* Dark mode styles */
+  body.dark-mode {
+    --primary: #3b82f6;
+    --secondary: #2563eb;
+    
+    --body-bg: #0f172a;
+    --body-fg: #e2e8f0;
+    --body-quiet-color: #94a3b8;
+    --body-loud-color: #f1f5f9;
+    
+    --breadcrumbs-bg: #1e293b;
+    --breadcrumbs-fg: #94a3b8;
+    
+    --hairline-color: #334155;
+    --border-color: #334155;
+    
+    background-color: var(--body-bg);
+    color: var(--body-fg);
+  }
+
+  body.dark-mode #content {
+    background-color: var(--body-bg);
+  }
+
+  body.dark-mode .module {
+    background-color: #1e293b;
+  }
+  
+  body.dark-mode #sidebar {
+    background-color: #1e293b;
+    border-right-color: #334155;
+  }
+  
+  body.dark-mode .sidebar-nav-item {
+    color: #e2e8f0;
+  }
+  
+  body.dark-mode .sidebar-nav-item:hover {
+    background-color: #334155;
+    color: #60a5fa;
+  }
+  
+  body.dark-mode .sidebar-nav-item.active {
+    background-color: #2d3748;
+    color: #60a5fa;
+  }
+  
+  body.dark-mode .sidebar-search {
+    border-bottom-color: #334155;
+  }
+
+  body.dark-mode .welcome-message,
+  body.dark-mode .stat-box,
+  body.dark-mode .app-box,
+  body.dark-mode .custom-breadcrumbs,
+  body.dark-mode #recent-actions-module {
+    background-color: #1e293b;
+    color: var(--body-fg);
+  }
+
+  body.dark-mode .module h2, 
+  body.dark-mode .welcome-message h2,
+  body.dark-mode .stat-box h3,
+  body.dark-mode label {
+    color: #f1f5f9;
+  }
+
+  body.dark-mode input[type="text"], 
+  body.dark-mode input[type="password"],
+  body.dark-mode select, 
+  body.dark-mode textarea {
+    background-color: #334155;
+    color: #f1f5f9;
+    border-color: #475569;
+  }
+
+  body.dark-mode a {
+    color: #60a5fa;
+  }
+
+  body.dark-mode .app-box .model {
+    border-color: #334155;
+  }
+
+  body.dark-mode .app-box .model a {
+    color: #f1f5f9;
+  }
+  
+  body.dark-mode .sidebar-search input {
+    background-color: #334155;
+    border-color: #475569;
+    color: #f1f5f9;
+  }
+  
+  body.dark-mode .sidebar-search input:focus {
+    background-color: #475569;
+    border-color: #60a5fa;
+  }
+
+  body.dark-mode fieldset {
+    background-color: #1e293b;
+  }
+</style>
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+        <img src="{% static 'images/logo.png' %}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'28\' height=\'28\' fill=\'white\'><text x=\'0\' y=\'20\' font-size=\'20\'>📚</text></svg>'; this.onerror=null;" alt="Logo" style="height: 28px; margin-right: 10px; vertical-align: middle;">
+        CIT LIBRARY ADMIN
+    </a>
+</h1>
+{% endblock %}
+
+{% block usertools %}
+<div id="user-tools">
+    {% if has_permission %}
+        {% block welcome-msg %}
+            <span><i class="fas fa-user-circle" style="margin-right: 5px;"></i> {% firstof user.get_short_name user.get_username %}</span>
+        {% endblock %}
+        <span class="separator" style="color: rgba(255,255,255,0.5); margin: 0 10px;">|</span>
+        {% block userlinks %}
+            {% if site_url %}
+                <a href="{{ site_url }}"><i class="fas fa-globe"></i> {% trans "View site" %}</a>
+            {% endif %}
+            {% if user.is_active and user.is_staff %}
+                {% url 'django-admindocs-docroot' as docsroot %}
+                {% if docsroot %}
+                    <a href="{{ docsroot }}"><i class="fas fa-book"></i> {% trans "Documentation" %}</a>
+                {% endif %}
+            {% endif %}
+            {% if user.has_usable_password %}
+                <a href="{% url 'admin:password_change' %}"><i class="fas fa-key"></i> {% trans "Change password" %}</a>
+            {% endif %}
+            <a href="{% url 'admin:logout' %}"><i class="fas fa-sign-out-alt"></i> {% trans "Log out" %}</a>
+        {% endblock %}
+    {% endif %}
+    <button id="theme-toggle" class="theme-toggle" title="Toggle Dark Mode">
+        <i class="fas fa-moon"></i>
+    </button>
+</div>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block bodyclass %}{{ block.super }} with-sidebar{% endblock %}
+
+{% block content_container %}
+<div id="sidebar">
+  <div class="sidebar-search">
+    <form action="{% url 'admin:index' %}" method="GET">
+      <button type="submit"><i class="fas fa-search"></i></button>
+      <input type="text" name="q" placeholder="Search..." aria-label="Search">
+    </form>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="{% url 'admin:index' %}" class="sidebar-nav-item {% if request.path == '/admin/' %}active{% endif %}">
+      <i class="fas fa-tachometer-alt"></i> Dashboard
+    </a>
+    
+    <div class="nav-header">Applications</div>
+    
+    {% if perms.auth %}
+    <a href="{% url 'admin:auth_user_changelist' %}" class="sidebar-nav-item {% if '/admin/auth/user/' in request.path %}active{% endif %}">
+      <i class="fas fa-users"></i> Users
+    </a>
+    {% endif %}
+    
+    <a href="{% url 'admin:app_list' app_label='home' %}" class="sidebar-nav-item {% if '/admin/home/' in request.path %}active{% endif %}">
+      <i class="fas fa-book"></i> Books
+    </a>
+    
+    <div class="nav-header">Management</div>
+    
+    <a href="{% url 'admin:index' %}" class="sidebar-nav-item">
+      <i class="fas fa-chart-line"></i> Statistics
+    </a>
+    
+    <a href="#" class="sidebar-nav-item">
+      <i class="fas fa-cog"></i> Settings
+    </a>
+  </nav>
+</div>
+<button class="sidebar-toggle" id="sidebar-toggle" title="Toggle Sidebar"><i class="fas fa-bars"></i></button>
+
+{{ block.super }}
+{% endblock %}
+
+{% block footer %}
+<script>
+    // Theme toggle functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        const icon = themeToggle.querySelector('i');
+        
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            body.classList.add('dark-mode');
+            icon.classList.remove('fa-moon');
+            icon.classList.add('fa-sun');
+        }
+        
+        // Toggle theme on button click
+        themeToggle.addEventListener('click', function() {
+            body.classList.toggle('dark-mode');
+            
+            if (body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                localStorage.setItem('theme', 'light');
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+        });
+        
+        // Sidebar toggle functionality
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebar = document.getElementById('sidebar');
+        
+        sidebarToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('open');
+            body.classList.toggle('sidebar-open');
+        });
+    });
+</script>
+{% endblock %} 
