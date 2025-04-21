@@ -1,3 +1,104 @@
+/* CSS cho header hiện đại */
+#top-header {
+  background: linear-gradient(135deg, #1e5799 0%, #207cca 51%, #2989d8 100%);
+  padding: 12px 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+#top-header:hover {
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+#top-header .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+.header-links {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+}
+
+.header-links.pull-left {
+  gap: 20px;
+}
+
+.header-links.pull-right {
+  gap: 15px;
+}
+
+.header-links li a {
+  color: white;
+  font-weight: 500;
+  text-decoration: none;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.header-links li a:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.header-links li.active a {
+  background-color: rgba(255, 255, 255, 0.2);
+  font-weight: 600;
+}
+
+.header-links li a i {
+  margin-right: 5px;
+  font-size: 16px;
+}
+
+/* Logo styling */
+.header-links.pull-left li a {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* Responsive header */
+@media (max-width: 768px) {
+  #top-header .container {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .header-links.pull-left, .header-links.pull-right {
+    justify-content: center;
+  }
+}
+
+/* Animation for header on scroll */
+@keyframes shrinkHeader {
+  from {
+    padding: 12px 0;
+  }
+  to {
+    padding: 8px 0;
+  }
+}
+
+.header-scrolled {
+  animation: shrinkHeader 0.3s forwards;
+  background: linear-gradient(135deg, #155293 0%, #1a6cb1 51%, #2378c0 100%);
+}
+
 .book-slider img {
     width: 140px;
     height: 200px;
@@ -57,47 +158,214 @@
 }
 
 .slick-prev {
-    padding-left: 50px;
+    padding-left: 30px;
 }
+
 
 .slick-prev:before, .slick-next:before {
     height: 30px !important;
     width: 30px !important;
     font-family: 'slick' !important;
-    font-size: 20px !important;
+    font-size: 30px !important;
     line-height: 1 !important;
     opacity: .75 !important;
-    color: rgb(184, 206, 212) !important;
+    color: rgb(152, 198, 211) !important;
     -webkit-font-smoothing: antialiased !important;
     -moz-osx-font-smoothing: grayscale;
 }
-
-.book-slider {
-    background-color: #f3ecd7;
-    display: flex;
-    gap: 20px;
-    padding-top: 20px;
-    padding-left: 30px;
-    padding-right: 30px;
-    margin-left: -12px;
-    margin-right: -12px;
-    border: 1px solid #e6e0cb;
-    border-right: 0;
-    border-left: 0;
+.slick-prev:hover::before, .slick-next:hover::before{
+        height: 30px !important;
+        width: 30px !important;
+        font-family: 'slick' !important;
+        font-size: 30px !important;
+        line-height: 1 !important;
+        opacity: .75 !important;
+        color: hsl(202,96%,37%) !important;
+        -webkit-font-smoothing: antialiased !important;
+        -moz-osx-font-smoothing: grayscale;
 }
 
+.book-slider {
+    background-color: #f8f9fa;
+    display: flex;
+    padding: 30px 40px;
+    margin: 15px -12px 30px -12px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    position: relative;
+    border: none;
+}
+
+/* Thiết kế mới cho book-item */
 .book-item {
-    padding-right: 30px;
-    padding-left: 30px;
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 0 25px; /* Tăng margin giữa các sách */
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    height: 280px; /* Giảm chiều cao vì đã bỏ nút Chi tiết */
     display: flex;
     flex-direction: column;
-    align-items: center;
-    text-align: center;
+    position: relative;
+    overflow: hidden;
+    text-align: left;
+    align-items: flex-start;
+    width: calc(100% - 50px); /* Điều chỉnh lại chiều rộng tương ứng với margin */
+    cursor: pointer; /* Thêm pointer khi hover để biểu thị có thể click */
+}
+
+.book-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+}
+
+.book-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 6px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+    margin-bottom: 10px;
+}
+
+.book-image:hover {
+    transform: scale(1.05);
 }
 
 .book-item h5 {
-    padding-top: 0;
-    margin-top: 10px;
-    font-size: 0.8rem;
+    font-size: 14px;
+    font-weight: 500;
     color: #333;
+    margin: 10px 0;
+    line-height: 1.4;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    height: 60px;
+    padding-top: 0;
+    text-align: left;
+}
+
+/* Nút điều hướng */
+.slick-prev, 
+.slick-next {
+    width: 40px !important;
+    height: 40px !important;
+    background: white !important;
+    border-radius: 50% !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
+    z-index: 5 !important;
+    transition: all 0.3s ease !important;
+    padding: 0 !important;
+}
+
+.slick-prev {
+    left: 10px !important;
+}
+
+.slick-next {
+    right: 10px !important;
+}
+
+.slick-prev:before, 
+.slick-next:before {
+    font-family: 'slick' !important;
+    font-size: 20px !important;
+    line-height: 1 !important;
+    color: #3498db !important;
+    opacity: 1 !important;
+}
+
+.slick-prev:hover, 
+.slick-next:hover {
+    background: #f0f0f0 !important;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15) !important;
+}
+
+.slick-prev:hover:before, 
+.slick-next:hover:before {
+    color: #2c3e50 !important;
+}
+
+/* Style cho tiêu đề danh mục sách */
+#container-header {
+    padding-left: 15px;
+    color: #2c3e50;
+    font-size: 22px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    position: relative;
+    display: inline-block;
+    transition: all 0.3s ease;
+    border-left: 4px solid #3498db;
+    margin-bottom: 20px;
+    margin-top: 15px;
+}
+
+#container-header:hover {
+    color: #3498db;
+    transform: translateX(5px);
+}
+
+#container-header::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: #3498db;
+    transition: width 0.3s ease;
+}
+
+#container-header:hover::after {
+    width: 100%;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .book-item {
+        height: 300px;
+    }
+    
+    .book-image {
+        height: 160px;
+    }
+    
+    .book-item h5 {
+        font-size: 13px;
+        -webkit-line-clamp: 2;
+        height: 40px;
+    }
+}
+
+/* Style cho container tiêu đề */
+.body h5 {
+  padding-top: 25px;
+  padding-bottom: 10px;
+  position: relative;
+  margin-left: 10px;
+}
+
+/* Thêm hiệu ứng cho danh mục */
+.book-slider {
+  margin-top: 15px;
+}
+
+.book-item .btn {
+    margin-top: auto;
+    transition: all 0.3s ease;
+    text-align: center;
+    text-decoration: none;
+    color: white;
+    font-weight: 500;
+    display: block;
+}
+
+.book-item .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
 }

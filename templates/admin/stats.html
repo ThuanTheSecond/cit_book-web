@@ -1,0 +1,1118 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrahead %}{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="{% static 'admin/css/charts.css' %}">
+<script src="{% static 'admin/js/chart.min.js' %}"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+{% endblock %}
+
+{% block extrastyle %}{{ block.super }}
+<style type="text/css">
+  .stats-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+  
+  .chart-box {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s;
+    position: relative;
+    margin-bottom: 20px;
+  }
+  
+  .chart-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  }
+  
+  .chart-box h3 {
+    font-size: 18px;
+    color: #334155;
+    margin-bottom: 15px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+  }
+  
+  .chart-box h3 i {
+    margin-right: 10px;
+    color: #3b82f6;
+    font-size: 20px;
+  }
+  
+  .chart-full {
+    flex: 0 0 100%;
+  }
+  
+  .chart-half {
+    flex: 1 0 calc(50% - 10px);
+    min-width: 300px;
+  }
+  
+  .time-filter {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .time-filter button {
+    padding: 8px 16px;
+    background: #f1f5f9;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  
+  .time-filter button:hover {
+    background: #e2e8f0;
+  }
+  
+  .time-filter button.active {
+    background: #3b82f6;
+    color: white;
+  }
+  
+  table.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+  
+  table.data-table th {
+    background-color: #f8fafc;
+    text-align: left;
+    padding: 12px 15px;
+    font-weight: 600;
+    color: #334155;
+    border-bottom: 2px solid #e2e8f0;
+  }
+  
+  table.data-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #475569;
+  }
+  
+  table.data-table tr:hover td {
+    background-color: #f8fafc;
+  }
+  
+  .info-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+  
+  .info-card-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #334155;
+  }
+  
+  .info-card-description {
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  
+  /* Dark mode styles */
+  body.dark-mode .chart-box,
+  body.dark-mode .info-card {
+    background-color: #1e293b;
+  }
+  
+  body.dark-mode .chart-box h3,
+  body.dark-mode .info-card-title {
+    color: #e2e8f0;
+  }
+  
+  body.dark-mode .info-card-description {
+    color: #94a3b8;
+  }
+  
+  body.dark-mode table.data-table th {
+    background-color: #334155;
+    color: #e2e8f0;
+    border-bottom-color: #475569;
+  }
+  
+  body.dark-mode table.data-table td {
+    border-bottom-color: #334155;
+    color: #cbd5e1;
+  }
+  
+  body.dark-mode table.data-table tr:hover td {
+    background-color: #1e293b;
+  }
+  
+  body.dark-mode .time-filter button {
+    background: #334155;
+    color: #e2e8f0;
+  }
+  
+  body.dark-mode .time-filter button:hover {
+    background: #475569;
+  }
+  
+  body.dark-mode .time-filter button.active {
+    background: #3b82f6;
+  }
+  
+  .admin-stats {
+    margin-top: 20px;
+    padding: 0 15px;
+  }
+  
+  .stats-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .stats-title {
+    font-size: 1.5rem;
+    margin: 0;
+  }
+  
+  .time-filters {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .time-filter-btn {
+    padding: 8px 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .time-filter-btn:hover {
+    border-color: #3b82f6;
+  }
+  
+  .time-filter-btn.active {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+  }
+  
+  .charts-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .chart-container {
+    position: relative;
+    width: 100%;
+    height: 300px;
+  }
+  
+  @media (max-width: 768px) {
+    .charts-container {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  .time-chart-container {
+    grid-column: 1 / -1;
+  }
+  
+  /* Trạng thái loading cho charts */
+  .chart-box.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.7);
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+  }
+  
+  .chart-box.loading::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #3b82f6;
+    animation: spin 1s linear infinite;
+    z-index: 3;
+  }
+  
+  @keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+  
+  /* Dark mode styles */
+  body.dark-mode .chart-box {
+    background: #1e1e2d;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+  
+  body.dark-mode .time-filter-btn {
+    background: #1e1e2d;
+    border-color: #2d2d3f;
+    color: #e4e6ef;
+  }
+  
+  body.dark-mode .chart-box.loading::after {
+    background-color: rgba(30, 30, 45, 0.7);
+  }
+  
+  body.dark-mode .chart-box.loading::before {
+    border: 3px solid #2d2d3f;
+    border-top: 3px solid #3b82f6;
+  }
+  
+  /* Summary Cards */
+  .summary-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+  
+  .summary-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s;
+  }
+  
+  .summary-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .summary-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    flex-shrink: 0;
+  }
+  
+  .summary-icon i {
+    font-size: 22px;
+    color: white;
+  }
+  
+  .book-icon {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  }
+  
+  .user-icon {
+    background: linear-gradient(135deg, #10b981, #047857);
+  }
+  
+  .views-icon {
+    background: linear-gradient(135deg, #f59e0b, #b45309);
+  }
+  
+  .downloads-icon {
+    background: linear-gradient(135deg, #8b5cf6, #5b21b6);
+  }
+  
+  .summary-content {
+    flex-grow: 1;
+  }
+  
+  .summary-label {
+    color: #64748b;
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
+  
+  .summary-value {
+    font-size: 22px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 5px;
+  }
+  
+  .summary-change {
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .summary-change i {
+    margin-right: 4px;
+    font-size: 11px;
+  }
+  
+  .summary-change.positive {
+    color: #10b981;
+  }
+  
+  .summary-change.negative {
+    color: #ef4444;
+  }
+  
+  @media (max-width: 1024px) {
+    .summary-cards {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 640px) {
+    .summary-cards {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  /* Dark mode styles for summary cards */
+  body.dark-mode .summary-card {
+    background: #1e1e2d;
+  }
+  
+  body.dark-mode .summary-label {
+    color: #94a3b8;
+  }
+  
+  body.dark-mode .summary-value {
+    color: #e2e8f0;
+  }
+
+  /* Most read books section styles */
+  .most-read-books-section {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    margin: 20px 15px;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 20px;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+
+  .most-read-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+  }
+
+  .most-read-table th {
+    background-color: #f8fafc;
+    padding: 12px 15px;
+    text-align: left;
+    font-weight: 600;
+    color: #334155;
+    border-bottom: 2px solid #e2e8f0;
+  }
+
+  .most-read-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #475569;
+  }
+
+  .most-read-table tr:hover td {
+    background-color: #f8fafc;
+  }
+
+  .most-read-table .loading-text {
+    text-align: center;
+    padding: 30px 0;
+    color: #94a3b8;
+  }
+
+  .action-btn {
+    display: inline-block;
+    padding: 6px 12px;
+    background: #3b82f6;
+    color: white;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .action-btn:hover {
+    background: #2563eb;
+    transform: translateY(-2px);
+  }
+
+  /* Dark mode for most read books section */
+  body.dark-mode .most-read-books-section {
+    background: #1e1e2d;
+  }
+
+  body.dark-mode .section-title {
+    color: #e2e8f0;
+  }
+
+  body.dark-mode .most-read-table th {
+    background-color: #334155;
+    color: #e2e8f0;
+    border-bottom-color: #475569;
+  }
+
+  body.dark-mode .most-read-table td {
+    border-bottom-color: #334155;
+    color: #cbd5e1;
+  }
+
+  body.dark-mode .most-read-table tr:hover td {
+    background-color: #1e293b;
+  }
+
+  body.dark-mode .most-read-table .loading-text {
+    color: #94a3b8;
+  }
+</style>
+{% endblock %}
+
+{% block nav-global %}
+{% if has_permission %}
+<div class="task-bar">
+  <div class="task-bar-actions">
+    <a href="{% url 'admin:app_list' app_label='home' %}book/add/" class="task-button">
+      <i class="fas fa-book-medical"></i> Thêm sách
+    </a>
+    <a href="{% url 'admin:app_list' app_label='home' %}topic/add/" class="task-button">
+      <i class="fas fa-bookmark"></i> Thêm chủ đề
+    </a>
+    <a href="{% url 'admin:auth_user_add' %}" class="task-button">
+      <i class="fas fa-user-plus"></i> Thêm người dùng
+    </a>
+    <a href="{% url 'admin:app_list' app_label='home' %}book/" class="task-button">
+      <i class="fas fa-list"></i> Tất cả sách
+    </a>
+    <a href="{% url 'admin:auth_user_changelist' %}" class="task-button">
+      <i class="fas fa-users-cog"></i> Quản lý người dùng
+    </a>
+    <a href="{% url 'admin:index' %}stats/" class="task-button">
+      <i class="fas fa-chart-line"></i> Thống kê
+    </a>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+{% block breadcrumbs %}
+<div class="custom-breadcrumbs">
+  <a href="{% url 'admin:index' %}"><i class="fas fa-home"></i> Home</a>
+  <span class="separator">/</span>
+  <span>Thống kê lưu lượng</span>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="admin-stats">
+  <div class="stats-header">
+    <h1 class="stats-title">Thống kê hoạt động</h1>
+    <div class="time-filters">
+      <button class="time-filter-btn active" data-days="7">7 ngày</button>
+      <button class="time-filter-btn" data-days="30">30 ngày</button>
+      <button class="time-filter-btn" data-days="90">90 ngày</button>
+      <button class="time-filter-btn" data-days="365">365 ngày</button>
+    </div>
+  </div>
+  
+  <div class="summary-cards">
+    <div class="summary-card">
+      <div class="summary-icon book-icon">
+        <i class="fas fa-book"></i>
+      </div>
+      <div class="summary-content">
+        <div class="summary-label">Tổng số sách</div>
+        <div class="summary-value" id="total-books">--</div>
+        <div class="summary-change positive">
+          <i class="fas fa-arrow-up"></i>
+          <span id="books-change">--</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="summary-card">
+      <div class="summary-icon user-icon">
+        <i class="fas fa-users"></i>
+      </div>
+      <div class="summary-content">
+        <div class="summary-label">Người dùng</div>
+        <div class="summary-value" id="total-users">--</div>
+        <div class="summary-change positive">
+          <i class="fas fa-arrow-up"></i>
+          <span id="users-change">--</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="summary-card">
+      <div class="summary-icon views-icon">
+        <i class="fas fa-eye"></i>
+      </div>
+      <div class="summary-content">
+        <div class="summary-label">Lượt đọc</div>
+        <div class="summary-value" id="total-views">--</div>
+        <div class="summary-change positive">
+          <i class="fas fa-arrow-up"></i>
+          <span id="views-change">--</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="summary-card">
+      <div class="summary-icon downloads-icon">
+        <i class="fas fa-download"></i>
+      </div>
+      <div class="summary-content">
+        <div class="summary-label">Tải xuống</div>
+        <div class="summary-value" id="total-downloads">--</div>
+        <div class="summary-change positive">
+          <i class="fas fa-arrow-up"></i>
+          <span id="downloads-change">--</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="charts-container">
+    <div class="chart-box">
+      <div class="chart-header">
+        <h2 class="chart-title">Sách mới đăng ký</h2>
+      </div>
+      <div class="chart-container">
+        <canvas id="new-books-chart"></canvas>
+      </div>
+    </div>
+    
+    <div class="chart-box">
+      <div class="chart-header">
+        <h2 class="chart-title">Người dùng mới</h2>
+      </div>
+      <div class="chart-container">
+        <canvas id="new-users-chart"></canvas>
+      </div>
+    </div>
+    
+    <div class="chart-box">
+      <div class="chart-header">
+        <h2 class="chart-title">Lượt đọc sách</h2>
+      </div>
+      <div class="chart-container">
+        <canvas id="book-views-chart"></canvas>
+      </div>
+    </div>
+    
+    <div class="chart-box">
+      <div class="chart-header">
+        <h2 class="chart-title">Thể loại phổ biến</h2>
+      </div>
+      <div class="chart-container">
+        <canvas id="popular-genres-chart"></canvas>
+      </div>
+    </div>
+    
+    <div class="chart-box time-chart-container">
+      <div class="chart-header">
+        <h2 class="chart-title">Hoạt động theo thời gian</h2>
+      </div>
+      <div class="chart-container">
+        <canvas id="activity-timeline-chart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="most-read-books-section">
+  <h2 class="section-title">Top 10 sách được đọc nhiều nhất</h2>
+  <div class="table-responsive">
+    <table class="most-read-table">
+      <thead>
+        <tr>
+          <th>STT</th>
+          <th>Tên sách</th>
+          <th>Tác giả</th>
+          <th>Lượt đọc</th>
+          <th>Hành động</th>
+        </tr>
+      </thead>
+      <tbody id="most-read-books-table">
+        <tr>
+          <td colspan="5" class="loading-text">Đang tải dữ liệu...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Kiểm soát việc gọi API
+    let isLoading = false;
+    let lastLoadTime = 0;
+    const minLoadInterval = 5000; // 5 giây
+    let activeDays = 7; // Mặc định là 7 ngày
+    
+    // Tạo các biến chart để lưu trữ instances
+    let newBooksChart, newUsersChart, bookViewsChart, popularGenresChart, activityTimelineChart;
+    
+    // Hàm hiển thị trạng thái loading
+    function setLoadingState(isLoading) {
+      const chartBoxes = document.querySelectorAll('.chart-box');
+      chartBoxes.forEach(box => {
+        if (isLoading) {
+          box.classList.add('loading');
+        } else {
+          box.classList.remove('loading');
+        }
+      });
+    }
+    
+    // Hàm chính để tải dữ liệu thống kê
+    async function loadStats(days) {
+      // Kiểm tra nếu đang loading hoặc chưa đủ thời gian để gọi API lại
+      const currentTime = Date.now();
+      if (isLoading || (currentTime - lastLoadTime < minLoadInterval)) {
+        console.log('Đang loading hoặc chưa đủ thời gian, bỏ qua request');
+        return false;
+      }
+      
+      // Cập nhật trạng thái và thời gian
+      isLoading = true;
+      lastLoadTime = currentTime;
+      setLoadingState(true);
+      
+      try {
+        // Tải dữ liệu sách mới
+        await loadNewBooksChart(days);
+        
+        // Tải dữ liệu người dùng mới
+        await loadNewUsersChart(days);
+        
+        // Tải dữ liệu lượt đọc sách
+        await loadBookViewsChart(days);
+        
+        // Tải dữ liệu thể loại phổ biến
+        await loadPopularGenresChart(days);
+        
+        // Tải dữ liệu hoạt động theo thời gian
+        await loadActivityTimelineChart(days);
+        
+        console.log('Đã tải tất cả dữ liệu thành công');
+        return true;
+      } catch (error) {
+        console.error('Lỗi khi tải dữ liệu:', error);
+        return false;
+      } finally {
+        // Luôn cập nhật trạng thái khi hoàn thành
+        isLoading = false;
+        setLoadingState(false);
+      }
+    }
+    
+    // Hàm tải dữ liệu sách mới
+    async function loadNewBooksChart(days) {
+      try {
+        const response = await fetch(`/admin/api/stats/new-books/?days=${days}`);
+        if (!response.ok) throw new Error('Lỗi khi tải dữ liệu sách mới');
+        
+        const data = await response.json();
+        const ctx = document.getElementById('new-books-chart').getContext('2d');
+        
+        // Hủy chart cũ nếu đã tồn tại
+        if (newBooksChart) newBooksChart.destroy();
+        
+        // Tạo chart mới
+        newBooksChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: data.labels,
+            datasets: [{
+              label: 'Sách mới',
+              data: data.values,
+              backgroundColor: 'rgba(59, 130, 246, 0.7)',
+              borderColor: 'rgba(59, 130, 246, 1)',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  precision: 0
+                }
+              }
+            }
+          }
+        });
+        
+        return true;
+      } catch (error) {
+        console.error('Lỗi khi tải dữ liệu sách mới:', error);
+        return false;
+      }
+    }
+    
+    // Hàm tải dữ liệu người dùng mới
+    async function loadNewUsersChart(days) {
+      try {
+        const response = await fetch(`/admin/api/stats/new-users/?days=${days}`);
+        if (!response.ok) throw new Error('Lỗi khi tải dữ liệu người dùng mới');
+        
+        const data = await response.json();
+        const ctx = document.getElementById('new-users-chart').getContext('2d');
+        
+        // Hủy chart cũ nếu đã tồn tại
+        if (newUsersChart) newUsersChart.destroy();
+        
+        // Tạo chart mới
+        newUsersChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: data.labels,
+            datasets: [{
+              label: 'Người dùng mới',
+              data: data.values,
+              backgroundColor: 'rgba(16, 185, 129, 0.7)',
+              borderColor: 'rgba(16, 185, 129, 1)',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  precision: 0
+                }
+              }
+            }
+          }
+        });
+        
+        return true;
+      } catch (error) {
+        console.error('Lỗi khi tải dữ liệu người dùng mới:', error);
+        return false;
+      }
+    }
+    
+    // Hàm tải dữ liệu lượt đọc sách
+    async function loadBookViewsChart(days) {
+      try {
+        const response = await fetch(`/admin/api/stats/book-views/?days=${days}`);
+        if (!response.ok) throw new Error('Lỗi khi tải dữ liệu lượt đọc sách');
+        
+        const data = await response.json();
+        const ctx = document.getElementById('book-views-chart').getContext('2d');
+        
+        // Hủy chart cũ nếu đã tồn tại
+        if (bookViewsChart) bookViewsChart.destroy();
+        
+        // Tạo chart mới
+        bookViewsChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: data.labels,
+            datasets: [{
+              label: 'Lượt đọc',
+              data: data.values,
+              backgroundColor: 'rgba(245, 158, 11, 0.2)',
+              borderColor: 'rgba(245, 158, 11, 1)',
+              borderWidth: 2,
+              tension: 0.1,
+              fill: true
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+        
+        return true;
+      } catch (error) {
+        console.error('Lỗi khi tải dữ liệu lượt đọc sách:', error);
+        return false;
+      }
+    }
+    
+    // Hàm tải dữ liệu thể loại phổ biến
+    async function loadPopularGenresChart(days) {
+      try {
+        const response = await fetch(`/admin/api/stats/popular-genres/?days=${days}`);
+        if (!response.ok) throw new Error('Lỗi khi tải dữ liệu thể loại phổ biến');
+        
+        const data = await response.json();
+        const ctx = document.getElementById('popular-genres-chart').getContext('2d');
+        
+        // Hủy chart cũ nếu đã tồn tại
+        if (popularGenresChart) popularGenresChart.destroy();
+        
+        // Tạo chart mới
+        popularGenresChart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: data.labels,
+            datasets: [{
+              data: data.values,
+              backgroundColor: [
+                'rgba(59, 130, 246, 0.7)',
+                'rgba(16, 185, 129, 0.7)',
+                'rgba(245, 158, 11, 0.7)',
+                'rgba(239, 68, 68, 0.7)',
+                'rgba(139, 92, 246, 0.7)',
+                'rgba(236, 72, 153, 0.7)',
+                'rgba(75, 85, 99, 0.7)'
+              ],
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'right'
+              }
+            }
+          }
+        });
+        
+        return true;
+      } catch (error) {
+        console.error('Lỗi khi tải dữ liệu thể loại phổ biến:', error);
+        return false;
+      }
+    }
+    
+    // Hàm tải dữ liệu hoạt động theo thời gian
+    async function loadActivityTimelineChart(days) {
+      try {
+        const response = await fetch(`/admin/api/stats/activity-timeline/?days=${days}`);
+        if (!response.ok) throw new Error('Lỗi khi tải dữ liệu hoạt động theo thời gian');
+        
+        const data = await response.json();
+        const ctx = document.getElementById('activity-timeline-chart').getContext('2d');
+        
+        // Hủy chart cũ nếu đã tồn tại
+        if (activityTimelineChart) activityTimelineChart.destroy();
+        
+        // Tạo chart mới
+        activityTimelineChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: data.labels,
+            datasets: [
+              {
+                label: 'Đăng nhập',
+                data: data.logins,
+                borderColor: 'rgba(59, 130, 246, 1)',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                borderWidth: 2,
+                tension: 0.3,
+                fill: true
+              },
+              {
+                label: 'Xem sách',
+                data: data.views,
+                borderColor: 'rgba(16, 185, 129, 1)',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                borderWidth: 2,
+                tension: 0.3,
+                fill: true
+              },
+              {
+                label: 'Tải xuống',
+                data: data.downloads,
+                borderColor: 'rgba(245, 158, 11, 1)',
+                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                borderWidth: 2,
+                tension: 0.3,
+                fill: true
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+        
+        return true;
+      } catch (error) {
+        console.error('Lỗi khi tải dữ liệu hoạt động theo thời gian:', error);
+        return false;
+      }
+    }
+    
+    // Xử lý sự kiện khi người dùng thay đổi khoảng thời gian
+    document.querySelectorAll('.time-filter-btn').forEach(button => {
+      button.addEventListener('click', function() {
+        // Kiểm tra nếu button này đã active hoặc đang loading
+        if (this.classList.contains('active') || isLoading) {
+          return;
+        }
+        
+        // Cập nhật UI
+        document.querySelector('.time-filter-btn.active').classList.remove('active');
+        this.classList.add('active');
+        
+        // Lấy số ngày và tải dữ liệu
+        const days = parseInt(this.dataset.days);
+        activeDays = days;
+        loadStats(days);
+      });
+    });
+    
+    // Tải dữ liệu ban đầu
+    loadStats(activeDays);
+    
+    // Tải dữ liệu tổng quan
+    async function loadSummaryStats() {
+      try {
+        const response = await fetch('/admin/api/stats/summary/');
+        if (!response.ok) throw new Error('Lỗi khi tải dữ liệu tổng quan');
+        
+        const data = await response.json();
+        
+        // Cập nhật các thẻ summary
+        updateSummaryCard('total-books', data.books.total, 'books-change', data.books.change);
+        updateSummaryCard('total-users', data.users.total, 'users-change', data.users.change);
+        updateSummaryCard('total-views', data.views.total, 'views-change', data.views.change);
+        updateSummaryCard('total-downloads', data.downloads.total, 'downloads-change', data.downloads.change);
+        
+        return true;
+      } catch (error) {
+        console.error('Lỗi khi tải dữ liệu tổng quan:', error);
+        return false;
+      }
+    }
+    
+    // Hàm cập nhật thẻ tổng quan
+    function updateSummaryCard(valueId, value, changeId, change) {
+      const valueElement = document.getElementById(valueId);
+      const changeElement = document.getElementById(changeId);
+      
+      // Định dạng số
+      valueElement.textContent = formatNumber(value);
+      
+      // Định dạng phần trăm thay đổi
+      if (change >= 0) {
+        changeElement.parentElement.classList.remove('negative');
+        changeElement.parentElement.classList.add('positive');
+        changeElement.parentElement.querySelector('i').className = 'fas fa-arrow-up';
+        changeElement.textContent = `+${change}%`;
+      } else {
+        changeElement.parentElement.classList.remove('positive');
+        changeElement.parentElement.classList.add('negative');
+        changeElement.parentElement.querySelector('i').className = 'fas fa-arrow-down';
+        changeElement.textContent = `${change}%`;
+      }
+    }
+    
+    // Hàm định dạng số
+    function formatNumber(num) {
+      if (num >= 1000000) {
+        return (num / 1000000).toFixed(1) + 'M';
+      } else if (num >= 1000) {
+        return (num / 1000).toFixed(1) + 'K';
+      }
+      return num.toString();
+    }
+    
+    // Tải dữ liệu top 10 sách được đọc nhiều nhất
+    async function loadMostReadBooks() {
+      try {
+        const response = await fetch('/admin/api/stats/most-read-books/');
+        if (!response.ok) throw new Error('Lỗi khi tải dữ liệu sách đọc nhiều');
+        
+        const data = await response.json();
+        const tableBody = document.getElementById('most-read-books-table');
+        
+        // Xóa thông báo loading
+        tableBody.innerHTML = '';
+        
+        // Thêm dữ liệu vào bảng
+        data.labels.forEach((title, index) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${title}</td>
+            <td>${data.authors[index]}</td>
+            <td>${data.values[index].toLocaleString()}</td>
+            <td>
+              <a href="/book/detail/id=${data.book_ids[index]}" class="action-btn" target="_blank">
+                <i class="fas fa-eye"></i> Xem
+              </a>
+            </td>
+          `;
+          tableBody.appendChild(row);
+        });
+        
+        return true;
+      } catch (error) {
+        console.error('Lỗi khi tải dữ liệu sách đọc nhiều:', error);
+        return false;
+      }
+    }
+    
+    // Tải dữ liệu tổng quan
+    loadSummaryStats();
+    
+    // Tải dữ liệu top 10 sách được đọc nhiều nhất
+    loadMostReadBooks();
+  });
+</script>
+{% endblock %} 

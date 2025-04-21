@@ -1,6 +1,9 @@
 {% extends "admin/base_site.html" %}
 {% load i18n static %}
 
+{% block extrahead %}{{ block.super }}
+{% endblock %}
+
 {% block extrastyle %}{{ block.super }}
 <style type="text/css">
 body {
@@ -108,6 +111,57 @@ body {
   font-size: 13px;
   color: #64748b;
   margin-top: auto;
+}
+
+/* Chart container */
+.chart-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.chart-box {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s;
+  position: relative;
+}
+
+.chart-box:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.chart-box h3 {
+  font-size: 16px;
+  color: #334155;
+  margin-bottom: 15px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+.chart-box h3 i {
+  margin-right: 8px;
+  color: #3b82f6;
+  font-size: 18px;
+}
+
+.chart-box canvas {
+  width: 100%;
+  height: 250px;
+}
+
+.chart-full {
+  flex: 0 0 100%;
+}
+
+.chart-half {
+  flex: 1 0 calc(50% - 10px);
+  min-width: 300px;
 }
 
 /* Quick actions */
@@ -374,6 +428,10 @@ body {
   .actions-grid {
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   }
+  
+  .chart-half {
+    flex: 0 0 100%;
+  }
 }
 
 /* Hide Django's default breadcrumbs */
@@ -485,35 +543,11 @@ div.breadcrumbs {
 
   <div class="welcome-message">
     <h2>{% trans "Welcome to CIT LIBRARY Admin" %}</h2>
-    <p>{% trans "Manage your library resources, users, and more from this dashboard. Use the modules below to navigate to different sections and perform various administrative tasks." %}</p>
+    <p>{% trans "Manage your library resources, users, and more from this dashboard. The administration provides a comprehensive overview of library statistics and tools to manage content." %}</p>
   </div>
   
-  <div class="quick-actions">
-    <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
-    <div class="actions-grid">
-      <a href="{% url 'admin:auth_user_add' %}" class="action-btn">
-        <i class="fas fa-user-plus"></i>
-        <span>Add User</span>
-      </a>
-      <a href="{% url 'admin:home_book_add' %}" class="action-btn">
-        <i class="fas fa-book-medical"></i>
-        <span>Add Book</span>
-      </a>
-      <a href="{% url 'admin:home_topic_add' %}" class="action-btn">
-        <i class="fas fa-tags"></i>
-        <span>Add Topic</span>
-      </a>
-      <a href="{% url 'admin:auth_user_changelist' %}" class="action-btn">
-        <i class="fas fa-users"></i>
-        <span>Manage Users</span>
-      </a>
-      <a href="{% url 'admin:index' %}" class="action-btn">
-        <i class="fas fa-cog"></i>
-        <span>Settings</span>
-      </a>
-    </div>
-  </div>
-  
+  <!-- Quick Actions section removed as it's been moved to the taskbar -->
+
   <div class="stats-container">
     <div class="stat-box">
       <h3><i class="fas fa-users"></i> Users</h3>
@@ -537,6 +571,26 @@ div.breadcrumbs {
       <h3><i class="fas fa-clock"></i> New Today</h3>
       <div class="stat-number">{{ new_today|default:"0" }}</div>
       <div class="stat-caption">Activities today</div>
+    </div>
+  </div>
+  
+  <div class="chart-container">
+    <div class="chart-box chart-full">
+      <h3><i class="fas fa-bookmark"></i> Top Topics</h3>
+      <div id="topicChart" style="height: 300px; width: 100%; margin-top: 20px;">
+        {% for topic, count in books_by_topic.items %}
+          <div class="topic-bar" style="display: flex; margin-bottom: 10px; align-items: center;">
+            <div style="width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 14px;">
+              {{ topic|default:'Unknown'|truncatechars:30 }}
+            </div>
+            <div style="flex-grow: 1; height: 25px; background: linear-gradient(to right, #3b82f6 {{ count }}%, transparent {{ count }}%);">
+              <div style="background-color: #3b82f6; width: {{ count }}%; height: 100%; max-width: 100%; position: relative;">
+                <span style="position: absolute; right: -25px; color: #334155; font-weight: 600;">{{ count }}</span>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
     </div>
   </div>
 
@@ -588,6 +642,10 @@ div.breadcrumbs {
     </div>
   {% endif %}
 </div>
+
+<script>
+  // No complex chart logic required
+</script>
 {% endblock %}
 
 {% block sidebar %}

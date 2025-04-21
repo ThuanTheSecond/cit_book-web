@@ -52,6 +52,7 @@ class Rating(models.Model):
     rating = models.PositiveSmallIntegerField(
         validators= [MinValueValidator(1), MaxValueValidator(5)]
     )
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
 
 class Comment(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
@@ -113,6 +114,18 @@ class BookReview(models.Model):
 
     def __str__(self):
         return f'{self.user.username} - {self.book.book_title} - {self.rating}★'
+
+class AuthorViewHistory(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.CharField(max_length=150)
+    viewed_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ['-viewed_at']
+        unique_together = ['user', 'author']
+
+    def __str__(self):
+        return f"{self.user.username} viewed author {self.author}"
 
     
         

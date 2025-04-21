@@ -263,7 +263,7 @@
           </div>
         </div>
         
-        <input type="hidden" name="next" value="{{ next }}">
+        <input type="hidden" name="next" value="{% if next %}{{ next }}{% else %}{{ app_path }}?login=success{% endif %}">
         <button type="submit" class="login-button">LOG IN</button>
       </form>
       
