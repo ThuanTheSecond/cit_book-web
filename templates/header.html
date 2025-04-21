@@ -108,6 +108,9 @@
 </style>
 
 <script>
-// Xóa script thêm padding cho body vì đã xử lý qua CSS trong navbar
+// Thêm padding-top cho body để tránh bị che khi fixed header
+document.addEventListener('DOMContentLoaded', function() {
+    document.body.style.paddingTop = '50px';
+});
 </script>
 

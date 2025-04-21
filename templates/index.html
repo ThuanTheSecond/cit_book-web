@@ -70,8 +70,8 @@
     <h5 ><a id="container-header" href="/categoryFilter/Trending/1">Trending Books</a></h5>
     <div class="book-slider">
       {% for book in bookList.popular %}
-      <div class="book-item">
-          <a href="/book/detail/id={{ book.book_id|subtract:3000 }}"><img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}"></a>
+      <div class="book-item" onclick="window.location.href='/book/detail/id={{ book.book_id|subtract:3000 }}'">
+          <img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}">
           <h5 class="mt-2">{{ book.book_title }}</h5>
       </div>
       {% endfor %}
@@ -79,8 +79,8 @@
     <h5 ><a id="container-header" href="/categoryFilter/Ngoại Văn/1">Ngoại Văn</a></h5>
     <div class="book-slider">
       {% for book in bookList.topFl %}
-      <div class="book-item">
-          <a href="/book/detail/id={{ book.book_id|subtract:3000 }}"><img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}"></a>
+      <div class="book-item" onclick="window.location.href='/book/detail/id={{ book.book_id|subtract:3000 }}'">
+          <img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}">
           <h5 class="mt-2">{{ book.book_title }}</h5>
       </div>
       {% endfor %}
@@ -88,8 +88,8 @@
     <h5 ><a id="container-header" href="/categoryFilter/Tiếng Việt/1">Sách Tiếng Việt</a></h5>
     <div class="book-slider">
       {% for book in bookList.topVn %}
-      <div class="book-item">
-          <a href="/book/detail/id={{ book.book_id|subtract:3000 }}"><img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}"></a>
+      <div class="book-item" onclick="window.location.href='/book/detail/id={{ book.book_id|subtract:3000 }}'">
+          <img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}">
           <h5 class="mt-2">{{ book.book_title }}</h5>
       </div>
       {% endfor %}
