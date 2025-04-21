@@ -42,5 +42,10 @@ ENV/
 # OS specific
 .DS_Store
 Thumbs.db
+
+# Database backups
+database_backups/
+*.sql
+*.dump
 EOL
 "book_cit_web_backup.sql" 
