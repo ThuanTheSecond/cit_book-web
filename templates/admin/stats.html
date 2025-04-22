@@ -10,6 +10,54 @@
 
 {% block extrastyle %}{{ block.super }}
 <style type="text/css">
+  /* Override base content margin for stats page */
+  body.dashboard #content {
+    margin-left: 0 !important;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  /* Center admin-stats */
+  .admin-stats {
+    max-width: 1600px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+    margin-left: 120px; /* Điều chỉnh để cân bằng với sidebar */
+  }
+
+  /* Responsive adjustment */
+  @media (max-width: 1200px) {
+    .admin-stats {
+      margin-left: 60px; /* Giảm margin khi màn hình nhỏ hơn */
+    }
+  }
+
+  @media (max-width: 768px) {
+    .admin-stats {
+      margin-left: 20px; /* Giảm margin cho màn hình mobile */
+    }
+  }
+
+  /* Keep other existing styles */
+  .chart-container {
+    min-height: 400px !important;
+  }
+
+  .stats-main-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+    margin-top: 30px;
+    align-items: start;
+  }
+
+  .chart-box {
+    margin-bottom: 30px;
+  }
+
   .stats-container {
     display: flex;
     flex-wrap: wrap;
@@ -169,11 +217,6 @@
   
   body.dark-mode .time-filter button.active {
     background: #3b82f6;
-  }
-  
-  .admin-stats {
-    margin-top: 20px;
-    padding: 0 15px;
   }
   
   .stats-header {
@@ -542,144 +585,142 @@
 {% endblock %}
 
 {% block content %}
-<div class="admin-stats">
-  <div class="stats-header">
-    <h1 class="stats-title">Thống kê hoạt động</h1>
-    <div class="time-filters">
-      <button class="time-filter-btn active" data-days="7">7 ngày</button>
-      <button class="time-filter-btn" data-days="30">30 ngày</button>
-      <button class="time-filter-btn" data-days="90">90 ngày</button>
-      <button class="time-filter-btn" data-days="365">365 ngày</button>
-    </div>
-  </div>
-  
-  <div class="summary-cards">
-    <div class="summary-card">
-      <div class="summary-icon book-icon">
-        <i class="fas fa-book"></i>
-      </div>
-      <div class="summary-content">
-        <div class="summary-label">Tổng số sách</div>
-        <div class="summary-value" id="total-books">--</div>
-        <div class="summary-change positive">
-          <i class="fas fa-arrow-up"></i>
-          <span id="books-change">--</span>
-        </div>
+<!-- Content -->
+<div id="content" class="colM">
+  <div class="admin-stats">
+    <div class="stats-header">
+      <h1 class="stats-title">Thống kê hoạt động</h1>
+      <div class="time-filters">
+        <button class="time-filter-btn active" data-days="7">7 ngày</button>
+        <button class="time-filter-btn" data-days="30">30 ngày</button>
+        <button class="time-filter-btn" data-days="90">90 ngày</button>
+        <button class="time-filter-btn" data-days="365">365 ngày</button>
       </div>
     </div>
-    
-    <div class="summary-card">
-      <div class="summary-icon user-icon">
-        <i class="fas fa-users"></i>
-      </div>
-      <div class="summary-content">
-        <div class="summary-label">Người dùng</div>
-        <div class="summary-value" id="total-users">--</div>
-        <div class="summary-change positive">
-          <i class="fas fa-arrow-up"></i>
-          <span id="users-change">--</span>
-        </div>
-      </div>
-    </div>
-    
-    <div class="summary-card">
-      <div class="summary-icon views-icon">
-        <i class="fas fa-eye"></i>
-      </div>
-      <div class="summary-content">
-        <div class="summary-label">Lượt đọc</div>
-        <div class="summary-value" id="total-views">--</div>
-        <div class="summary-change positive">
-          <i class="fas fa-arrow-up"></i>
-          <span id="views-change">--</span>
-        </div>
-      </div>
-    </div>
-    
-    <div class="summary-card">
-      <div class="summary-icon downloads-icon">
-        <i class="fas fa-download"></i>
-      </div>
-      <div class="summary-content">
-        <div class="summary-label">Tải xuống</div>
-        <div class="summary-value" id="total-downloads">--</div>
-        <div class="summary-change positive">
-          <i class="fas fa-arrow-up"></i>
-          <span id="downloads-change">--</span>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <div class="charts-container">
-    <div class="chart-box">
-      <div class="chart-header">
-        <h2 class="chart-title">Sách mới đăng ký</h2>
-      </div>
-      <div class="chart-container">
-        <canvas id="new-books-chart"></canvas>
-      </div>
-    </div>
-    
-    <div class="chart-box">
-      <div class="chart-header">
-        <h2 class="chart-title">Người dùng mới</h2>
-      </div>
-      <div class="chart-container">
-        <canvas id="new-users-chart"></canvas>
-      </div>
-    </div>
-    
-    <div class="chart-box">
-      <div class="chart-header">
-        <h2 class="chart-title">Lượt đọc sách</h2>
-      </div>
-      <div class="chart-container">
-        <canvas id="book-views-chart"></canvas>
-      </div>
-    </div>
-    
-    <div class="chart-box">
-      <div class="chart-header">
-        <h2 class="chart-title">Thể loại phổ biến</h2>
-      </div>
-      <div class="chart-container">
-        <canvas id="popular-genres-chart"></canvas>
-      </div>
-    </div>
-    
-    <div class="chart-box time-chart-container">
-      <div class="chart-header">
-        <h2 class="chart-title">Hoạt động theo thời gian</h2>
-      </div>
-      <div class="chart-container">
-        <canvas id="activity-timeline-chart"></canvas>
-      </div>
-    </div>
-  </div>
-</div>
 
-<div class="most-read-books-section">
-  <h2 class="section-title">Top 10 sách được đọc nhiều nhất</h2>
-  <div class="table-responsive">
-    <table class="most-read-table">
-      <thead>
-        <tr>
-          <th>STT</th>
-          <th>Tên sách</th>
-          <th>Tác giả</th>
-          <th>Lượt đọc</th>
-          <th>Hành động</th>
-        </tr>
-      </thead>
-      <tbody id="most-read-books-table">
-        <tr>
-          <td colspan="5" class="loading-text">Đang tải dữ liệu...</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="summary-cards">
+      <!-- Summary Cards -->
+      <div class="summary-card">
+        <div class="summary-icon book-icon"><i class="fas fa-book"></i></div>
+        <div class="summary-content">
+          <div class="summary-label">Tổng số sách</div>
+          <div class="summary-value" id="total-books">{{ summary_stats.books.total|default:"--" }}</div>
+          <div class="summary-change positive"><i class="fas fa-arrow-up"></i> <span id="books-change">{{ summary_stats.books.change|default:"--" }}%</span></div>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-icon user-icon"><i class="fas fa-users"></i></div>
+        <div class="summary-content">
+          <div class="summary-label">Người dùng</div>
+          <div class="summary-value" id="total-users">{{ summary_stats.users.total|default:"--" }}</div>
+          <div class="summary-change positive"><i class="fas fa-arrow-up"></i> <span id="users-change">{{ summary_stats.users.change|default:"--" }}%</span></div>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-icon views-icon"><i class="fas fa-eye"></i></div>
+        <div class="summary-content">
+          <div class="summary-label">Lượt đọc</div>
+          <div class="summary-value" id="total-views">{{ summary_stats.views.total|default:"--" }}</div>
+          <div class="summary-change positive"><i class="fas fa-arrow-up"></i> <span id="views-change">{{ summary_stats.views.change|default:"--" }}%</span></div>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-icon downloads-icon"><i class="fas fa-download"></i></div>
+        <div class="summary-content">
+          <div class="summary-label">Tải xuống</div>
+          <div class="summary-value" id="total-downloads">{{ summary_stats.downloads.total|default:"--" }}</div>
+          <div class="summary-change positive"><i class="fas fa-arrow-up"></i> <span id="downloads-change">{{ summary_stats.downloads.change|default:"--" }}%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Grid Layout -->
+    <div class="stats-main-grid" style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-top: 30px;">
+
+      <!-- Left Column: New Books, Book Views, Timeline -->
+      <div class="stats-grid-left" style="display: flex; flex-direction: column; gap: 20px;">
+        <div class="chart-box">
+          <div class="chart-header"><h2 class="chart-title">Sách mới đăng ký</h2></div>
+          <div class="chart-container" style="height: 280px;"><canvas id="new-books-chart"></canvas></div>
+        </div>
+         <div class="chart-box">
+            <div class="chart-header"><h2 class="chart-title">Lượt đọc sách</h2></div>
+            <div class="chart-container" style="height: 280px;"><canvas id="book-views-chart"></canvas></div>
+          </div>
+        <div class="chart-box time-chart-container" style="flex-grow: 1;">
+          <div class="chart-header"><h2 class="chart-title">Hoạt động theo thời gian</h2></div>
+          <div class="chart-container" style="height: 300px;"><canvas id="activity-timeline-chart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Right Column: Popular Genres, Top Books, New Users -->
+      <div class="stats-grid-right" style="display: flex; flex-direction: column; gap: 20px;">
+         <!-- Popular Genres Chart -->
+         <div class="chart-box">
+            <div class="chart-header"><h2 class="chart-title">Thể loại phổ biến</h2></div>
+            <div class="chart-container" style="height: 300px;"><canvas id="popular-genres-chart"></canvas></div>
+          </div>
+          
+          <!-- Top 10 Books Table (Moved Up) -->
+          <div class="most-read-books-section" style="flex-grow: 1; margin: 0; display: flex; flex-direction: column;">
+            <h2 class="section-title">Top 10 sách được đọc nhiều nhất</h2>
+            <div class="table-responsive" style="flex-grow: 1; max-height: 300px; overflow-y: auto;"> <!-- Adjusted max-height -->
+              <table class="most-read-table">
+                <thead>
+                  <tr>
+                    <th>STT</th>
+                    <th>Tên sách</th>
+                    <th>Tác giả</th>
+                    <th>Lượt đọc</th>
+                    <th>Hành động</th>
+                  </tr>
+                </thead>
+                <tbody id="most-read-books-table">
+                  <tr><td colspan="5" class="loading-text">Đang tải dữ liệu...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- New Users Chart (Moved Down) -->
+          <div class="chart-box">
+            <div class="chart-header"><h2 class="chart-title">Người dùng mới</h2></div>
+            <div class="chart-container" style="height: 300px;"><canvas id="new-users-chart"></canvas></div>
+          </div>
+      </div>
+
+    </div>
   </div>
+
+  <br class="clear">
 </div>
+<!-- END Content -->
+
+<style>
+  /* Styles for the table remain the same */
+  .most-read-books-section { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); }
+  .most-read-table { width: 100%; border-collapse: collapse; border-spacing: 0; }
+  .most-read-table th { background-color: #f8fafc; padding: 12px 15px; text-align: left; font-weight: 600; color: #334155; border-bottom: 2px solid #e2e8f0; position: sticky; top: 0; z-index: 10; }
+  .most-read-table td { padding: 10px 15px; border-bottom: 1px solid #f1f5f9; color: #475569; font-size: 14px; }
+  .most-read-table tr:hover td { background-color: #f8fafc; }
+  body.dark-mode .most-read-books-section { background: #1e293b; }
+  body.dark-mode .most-read-table th { background-color: #334155; color: #e2e8f0; border-bottom-color: #475569; }
+  body.dark-mode .most-read-table td { border-bottom-color: #334155; color: #cbd5e1; }
+  body.dark-mode .most-read-table tr:hover td { background-color: #1e293b; }
+
+  /* Responsive adjustments */
+  @media (max-width: 1024px) {
+    .stats-main-grid {
+      grid-template-columns: 1fr; /* Stack columns */
+    }
+    .stats-grid-right {
+       margin-top: 20px; /* Add space when stacked */
+    }
+    .most-read-books-section .table-responsive {
+      max-height: 400px; /* Adjust height for stacked view */
+    }
+  }
+</style>
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
