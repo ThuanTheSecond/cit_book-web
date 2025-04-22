@@ -14,7 +14,7 @@ class Topic(models.Model):
     topic_slug= models.SlugField()
     is_active = models.BooleanField(default= True)
     
-    class META:
+    class Meta:
         verbose_name_plural = "Topics"
     def __str__(self):
         return f'{self.topic_name}'
@@ -34,6 +34,8 @@ class Book(models.Model):
     book_view = models.PositiveIntegerField(default=0)
     book_lang = models.CharField(max_length=10, choices=Language.choices, default=Language.FL)
     bookImage = models.ImageField(upload_to='imgBooks\\', default='imgBooks\\nothumb.jpg')
+    isbn_10 = models.CharField(max_length=10, blank=True)
+    isbn_13 = models.CharField(max_length=13, blank=True)
     is_active = models.BooleanField(default= True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -59,15 +61,37 @@ class Comment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
 
-class FavList(models.Model):
-    book = models.ForeignKey(Book, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    is_active = models.BooleanField(default=True)
+
 
 class ContentBook(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     content = models.CharField(max_length= 300)
+
+class AmazonUser(models.Model):
+    id = models.AutoField(primary_key=True)
+    amazon_user_id = models.CharField(max_length=50, unique=True)
+
+    class Meta:
+        db_table = 'amazon_users'
+
+    def __str__(self):
+        return self.amazon_user_id
+
+class AmazonRating(models.Model):
+    id = models.AutoField(primary_key=True)
+    amazon_user = models.ForeignKey(AmazonUser, on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    rating = models.FloatField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)]
+    )
+    timestamp = models.DateTimeField()
+
+    class Meta:
+        db_table = 'amazon_ratings'
+        unique_together = ('amazon_user', 'book')
+
+    def __str__(self):
+        return f'{self.amazon_user} rated {self.book} with {self.rating}'
 
 # Dùng để thêm extension Unaccent của postgresql
 class Unaccent(Transform):

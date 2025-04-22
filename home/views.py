@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from .models import Book, Rating, Book_Topic, Topic, ToRead, ContentBook, BookViewHistory, BookReview
+from .models import Book, Rating, Book_Topic, Topic, ToReads, ContentBook, BookViewHistory, BookReview
 from django.http import HttpResponse, JsonResponse
 from .forms import searchForm, SearchFormset
 from .utils import normalize_vietnamese, pagePaginator, HTTPResponseHXRedirect, login_required
@@ -166,9 +166,9 @@ def wishListPost(request):
         'book_id': book_id
     })
     
-    check = ToRead.objects.filter(user_id = user.id, book_id = book_id)
+    check = ToReads.objects.filter(user_id = user.id, book_id = book_id)
     if not check:
-        fav = ToRead(user_id = user.id, book_id=book_id)
+        fav = ToReads(user_id = user.id, book_id=book_id)
         fav.save()
         return HttpResponse(f'''
                             <button class="wishlistStyle" hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist{book_id}' hx-swap = 'innerHTML'><span style="color: green;">✓ </span>Đã Lưu</button>
@@ -192,7 +192,7 @@ def wishCheckPost(request):
                                 <button class="btn-wishlist wishlistStyle" hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist{book_id}' hx-swap = 'innerHTML' onclick='savingList(this)'>Xem Sau</button>
                                 ''')
     
-    check = ToRead.objects.filter(user_id = request.user.id, book_id = book_id)
+    check = ToReads.objects.filter(user_id = request.user.id, book_id = book_id)
     if check: 
         return HttpResponse(f'''
                             <button class="btn-wishlist wishlistStyle" hx-post = "/wishList_post/" hx-vals ='{hx_data}' hx-trigger="click delay:0.25s" hx-target='#wishlist{book_id}' hx-swap = 'innerHTML'><span style="color: green;">✓ </span>Đã Lưu</button>
@@ -234,9 +234,9 @@ def myBook(request):
     bookList = {}
     if not request.user.is_authenticated:
         return redirect('login')
-    from .models import ToRead
+    from .models import ToReads
     userID = request.user.id
-    books = ToRead.objects.filter(user_id=userID).select_related('book').order_by('-id')
+    books = ToReads.objects.filter(user_id=userID).select_related('book').order_by('-id')
     bookList = [fav.book for fav in books]
     
     countRates = {}
@@ -611,7 +611,7 @@ def profile(request):
     # Get user's statistics
     books_viewed = BookViewHistory.objects.filter(user=request.user).count()
     books_rated = Rating.objects.filter(user=request.user).count()
-    books_saved = ToRead.objects.filter(user=request.user).count()
+    books_saved = ToReads.objects.filter(user=request.user).count()
 
     # Get user's view history
     history_list = BookViewHistory.objects.filter(
@@ -619,7 +619,7 @@ def profile(request):
     ).select_related('book').order_by('-viewed_at')[:12]  # Show last 12 viewed books
     
     # Get user's wishlist books
-    wishlist_books = [toread.book for toread in ToRead.objects.filter(
+    wishlist_books = [toreads.book for toreads in ToReads.objects.filter(
         user=request.user
     ).select_related('book').order_by('-created_at')]
     

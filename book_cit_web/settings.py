@@ -91,11 +91,11 @@ AUTHENTICATION_BACKENDS = (
 
 # Cấu hình Database - kết nối với PostgreSQL local
 DATABASES = {
-    'default': {
+     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'book_cit_web',
-        'USER': 'postgres',
-        'PASSWORD': '1001',
+        'NAME': 'CIT_Book2',
+        'USER': 'Mangaka',
+        'PASSWORD': 'kazuma',
         'HOST': 'localhost',
         'PORT': '5432',
     }

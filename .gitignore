@@ -49,3 +49,6 @@ database_backups/
 *.dump
 EOL
 "book_cit_web_backup.sql" 
+
+# venv
+bookWorld/

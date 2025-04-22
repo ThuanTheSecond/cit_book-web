@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Book, Topic, Book_Topic, Rating, ToRead, BookViewHistory, AuthorViewHistory
+from .models import Book, Topic, Book_Topic, Rating, ToReads, BookViewHistory, AuthorViewHistory, FavList
 from django.db.models import Count
 from django.utils import timezone
 from django.urls import path
@@ -22,6 +22,18 @@ class BookAdmin(admin.ModelAdmin):
     search_fields = ('book_title', 'book_author')
     list_filter = ('book_lang', 'created_at')
 
+    def delete_model(self, request, obj):
+        # Xóa tất cả FavList entries liên quan
+        FavList.objects.filter(book=obj).delete()
+        # Sau đó xóa sách
+        obj.delete()
+
+    def delete_queryset(self, request, queryset):
+        # Xử lý xóa nhiều sách cùng lúc
+        for obj in queryset:
+            FavList.objects.filter(book=obj).delete()
+        queryset.delete()
+
 @admin.register(Book_Topic)
 class Book_TopicAdmin(admin.ModelAdmin):
     list_display = ('book_id', 'topic_id')
@@ -33,7 +45,7 @@ class RatingAdmin(admin.ModelAdmin):
     list_filter = ('rating', 'created_at')
     search_fields = ('user__username', 'book__book_title')
 
-@admin.register(ToRead)
+@admin.register(ToReads)
 class ToReadAdmin(admin.ModelAdmin):
     list_display = ('user', 'book', 'created_at')
     list_filter = ('created_at',)
@@ -99,7 +111,7 @@ admin_site.register(Book, BookAdmin)
 admin_site.register(Topic, TopicAdmin)
 admin_site.register(Book_Topic, Book_TopicAdmin)
 admin_site.register(Rating, RatingAdmin)
-admin_site.register(ToRead, ToReadAdmin)
+admin_site.register(ToReads, ToReadAdmin)
 admin_site.register(BookViewHistory, BookViewHistoryAdmin)
 admin_site.register(AuthorViewHistory, AuthorViewHistoryAdmin)
 
