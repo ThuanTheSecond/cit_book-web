@@ -42,80 +42,39 @@
 .footer-section {
     background: #1a237e;
     color: #fff;
-    padding: 70px 0 20px;
-    font-family: 'Roboto', sans-serif;
+    padding: 40px 0 20px;
 }
 
 .footer-content {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 30px;
-    margin-bottom: 30px;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
 }
 
 .footer-col {
     padding: 0 15px;
-}
-
-.footer-logo {
     margin-bottom: 20px;
 }
 
-.ctu-logo {
+.footer-logo img {
     max-width: 200px;
     height: auto;
-}
-
-.footer-about {
-    color: #b3e5fc;
-    line-height: 1.6;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .footer-col h4 {
     font-size: 18px;
-    color: #fff;
-    margin-bottom: 20px;
-    font-weight: 500;
-    position: relative;
-    padding-bottom: 10px;
+    margin-bottom: 15px;
 }
 
-.footer-col h4::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    height: 2px;
-    width: 50px;
-    background: #2196f3;
-}
-
-.footer-links {
+.footer-contact {
     list-style: none;
     padding: 0;
 }
 
-.footer-links li {
-    margin-bottom: 15px;
-}
-
-.footer-links a {
-    color: #b3e5fc;
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-.footer-links a:hover {
-    color: #fff;
-    padding-left: 8px;
-}
-
 .footer-contact li {
-    display: flex;
-    align-items: flex-start;
-    margin-bottom: 15px;
-    color: #b3e5fc;
+    margin-bottom: 10px;
 }
 
 .footer-contact i {
@@ -123,37 +82,10 @@
     color: #2196f3;
 }
 
-.social-links {
-    display: flex;
-    gap: 15px;
-}
-
-.social-links a {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 40px;
-    width: 40px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 50%;
-    color: #fff;
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-.social-links a:hover {
-    background: #2196f3;
-    transform: translateY(-3px);
-}
-
-.footer-divider {
-    border-color: rgba(255,255,255,0.1);
-    margin: 20px 0;
-}
-
 .footer-bottom {
     text-align: center;
     padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.1);
 }
 
 .copyright {
@@ -162,13 +94,14 @@
 }
 
 @media (max-width: 768px) {
-    .footer-content {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 20px;
+    .footer-col {
+        flex: 0 0 100%;
+        text-align: center;
     }
     
-    .footer-col {
-        padding: 0 10px;
+    .footer-contact {
+        display: inline-block;
+        text-align: left;
     }
 }
 </style>

@@ -272,7 +272,6 @@ def myBook(request):
     }
     return render(request, 'myBook.html', context)   
 
-
 def bookDetail(request, id):
     detail = get_object_or_404(Book, book_id=id+3000)
     
@@ -293,6 +292,9 @@ def bookDetail(request, id):
         user_has_reviewed = BookReview.objects.filter(user=request.user, book=detail).exists()
     else:
         user_has_reviewed = False
+        # Increment view count even for anonymous users
+        detail.book_view += 1
+        detail.save()
 
     # Get user's rating if exists
     rating = 'None'

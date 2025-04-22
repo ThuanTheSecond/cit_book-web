@@ -1,0 +1,56 @@
+{% load filters %}
+
+<div class="search-suggestions">
+    {% if books %}
+        <div class="search-suggestions-header">
+            <i class="fas fa-search"></i> Gợi ý sách
+        </div>
+        {% for book in books|slice:":3" %}
+            <div class="suggestion-item" data-url="/book/detail/id={{book.book_id|add:'-3000'}}">
+                <div class="suggestion-image">
+                    <img src="{{ book.bookImage.url }}" alt="{{ book.book_title }}">
+                </div>
+                <div class="suggestion-info">
+                    <div class="suggestion-title">{{ book.book_title|truncatechars:40 }}</div>
+                    <div class="suggestion-author"><i class="fas fa-pen-fancy"></i> {{ book.book_author|truncatechars:25 }}</div>
+                    <div class="suggestion-rating">
+                        <span class="rating-value">{{ averRates|get_item:book.book_id }}</span>
+                        <i class="fas fa-star"></i>
+                        <span class="rating-count">({{ countRates|get_item:book.book_id }} đánh giá)</span>
+                    </div>
+                </div>
+                <div class="view-hint">
+                    <i class="fas fa-eye"></i>
+                </div>
+            </div>
+        {% endfor %}
+        {% if books|length > 3 %}
+            <div class="more-results">
+                <a href="/searchSlug?search_type={{ search_type }}&query={{ query }}">
+                    Xem tất cả {{ books|length }} kết quả <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="no-suggestions">
+            <i class="fas fa-search-minus"></i>
+            <p>Không tìm thấy sách phù hợp</p>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Thêm animation cho mỗi gợi ý sách
+    const suggestionItems = document.querySelectorAll('.suggestion-item');
+    suggestionItems.forEach((item, index) => {
+        // Thêm delay để tạo hiệu ứng xuất hiện lần lượt
+        item.style.animationDelay = (index * 0.1) + 's';
+        
+        // Xử lý sự kiện click
+        item.addEventListener('click', function() {
+            window.location.href = this.getAttribute('data-url');
+        });
+    });
+});
+</script> 

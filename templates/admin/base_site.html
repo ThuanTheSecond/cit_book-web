@@ -159,31 +159,28 @@
   
   /* Task Bar styles */
   .task-bar {
-    background: rgba(59, 130, 246, 0.15);
+    background: rgba(255, 255, 255, 0.1);
     padding: 10px 40px;
-    display: flex !important;
+    display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     position: fixed;
     top: 60px;
     left: 0;
-    right: 0;
     width: 100%;
-    z-index: 1000;
-    border-bottom: 1px solid rgba(59, 130, 246, 0.3);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    z-index: 15;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(5px);
   }
   
   .task-bar-actions {
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
+    gap: 15px;
   }
   
   .task-button {
-    background: rgba(59, 130, 246, 0.8);
-    color: white !important;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
     border: none;
     border-radius: 6px;
     padding: 8px 15px;
@@ -193,15 +190,12 @@
     cursor: pointer;
     transition: all 0.2s;
     font-size: 13px;
-    text-decoration: none !important;
-    font-weight: 500;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
   }
   
   .task-button:hover {
-    background: rgba(59, 130, 246, 1);
+    background: rgba(255, 255, 255, 0.25);
     transform: translateY(-2px);
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
   }
   
   .task-button i {
@@ -852,22 +846,22 @@
 {% if has_permission %}
 <div class="task-bar">
   <div class="task-bar-actions">
-    <a href="/admin/home/book/add/" class="task-button">
+    <a href="{% url 'admin:home_book_add' %}" class="task-button">
       <i class="fas fa-book-medical"></i> Thêm sách
     </a>
-    <a href="/admin/home/topic/add/" class="task-button">
+    <a href="{% url 'admin:home_topic_add' %}" class="task-button">
       <i class="fas fa-bookmark"></i> Thêm chủ đề
     </a>
-    <a href="/admin/auth/user/add/" class="task-button">
+    <a href="{% url 'admin:auth_user_add' %}" class="task-button">
       <i class="fas fa-user-plus"></i> Thêm người dùng
     </a>
-    <a href="/admin/home/book/" class="task-button">
+    <a href="{% url 'admin:home_book_changelist' %}" class="task-button">
       <i class="fas fa-list"></i> Tất cả sách
     </a>
-    <a href="/admin/auth/user/" class="task-button">
+    <a href="{% url 'admin:auth_user_changelist' %}" class="task-button">
       <i class="fas fa-users-cog"></i> Quản lý người dùng
     </a>
-    <a href="/admin/stats/" class="task-button">
+    <a href="{% url 'admin:index' %}stats/" class="task-button">
       <i class="fas fa-chart-line"></i> Thống kê
     </a>
   </div>

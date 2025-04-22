@@ -657,6 +657,215 @@
             gap: 0.5rem;
         }
     }
+
+    /* Phần CSS cho sách tương tự */
+    .suggestBook {
+        padding: 40px 0;
+        background-color: #f8f8f8;
+        border-radius: 15px;
+        margin: 30px 0;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .similar-books-title {
+        position: relative;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 30px;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .similar-books-title .title-icon {
+        color: #3498db;
+        font-size: 1.4rem;
+        animation: pulse 2s infinite;
+    }
+
+    .similar-books-title::after {
+        content: '';
+        position: absolute;
+        width: 80px;
+        height: 3px;
+        background: linear-gradient(to right, #3498db, #2ecc71);
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 3px;
+    }
+
+    .similar-books-slider {
+        padding: 15px 40px;
+    }
+
+    .similar-book-item {
+        padding: 15px;
+    }
+
+    .book-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .book-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .book-cover {
+        position: relative;
+        overflow: hidden;
+        height: 240px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f0f0f0;
+    }
+
+    .book-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: all 0.5s ease;
+    }
+
+    .book-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(52, 152, 219, 0.85);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+
+    .book-card:hover .book-overlay {
+        opacity: 1;
+    }
+
+    .book-card:hover .book-cover img {
+        transform: scale(1.1);
+    }
+
+    .view-details {
+        color: white;
+        font-weight: 600;
+        padding: 8px 16px;
+        border: 2px solid white;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    .book-card:hover .view-details {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    .view-details:hover {
+        background: white;
+        color: #3498db;
+    }
+
+    .book-info {
+        padding: 15px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .book-info .book-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 5px;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .book-info .book-author {
+        font-size: 0.85rem;
+        color: #7f8c8d;
+        margin-bottom: 5px;
+        font-style: italic;
+    }
+
+    /* Custom arrows for the slider */
+    .similar-books-slider .slick-prev,
+    .similar-books-slider .slick-next {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #3498db;
+        z-index: 1;
+        transition: all 0.3s ease;
+    }
+
+    .similar-books-slider .slick-prev:before,
+    .similar-books-slider .slick-next:before {
+        font-size: 18px;
+        opacity: 1;
+    }
+
+    .similar-books-slider .slick-prev:hover,
+    .similar-books-slider .slick-next:hover {
+        background: #2980b9;
+        transform: scale(1.1);
+    }
+
+    .similar-books-slider .slick-prev {
+        left: 5px;
+    }
+
+    .similar-books-slider .slick-next {
+        right: 5px;
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.1);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .similar-books-slider {
+            padding: 15px 30px;
+        }
+        
+        .book-cover {
+            height: 200px;
+        }
+        
+        .similar-books-title {
+            font-size: 1.3rem;
+        }
+    }
   </style>
 {% endblock pack %}
 
@@ -744,12 +953,28 @@
     </div>
     <div class="suggestBook">
         <div class="container-fluid justify-content-center">
-            <h5><a id="container-header" href="#">Sách tương tự</a></h5>
-            <div class="book-slider">
+            <h5 class="similar-books-title">
+                <span class="title-icon"><i class="fas fa-book-reader"></i></span>
+                <span>Sách tương tự</span>
+            </h5>
+            
+            <div class="book-slider similar-books-slider">
                 {% for book in bookList reversed %}
-                <div class="book-item">
-                    <a href="/book/detail/id={{ book.book_id|subtract:3000 }}"><img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}"></a>
-                    <h5 class="mt-2">{{ book.book_title }}</h5>
+                <div class="similar-book-item">
+                    <div class="book-card">
+                        <div class="book-cover">
+                            <a href="/book/detail/id={{ book.book_id|subtract:3000 }}">
+                                <img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}">
+                                <div class="book-overlay">
+                                    <span class="view-details">Xem chi tiết</span>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="book-info">
+                            <h5 class="book-title">{{ book.book_title }}</h5>
+                            <p class="book-author">{{ book.book_author }}</p>
+                        </div>
+                    </div>
                 </div>
                 {% endfor %}
             </div>
@@ -925,6 +1150,44 @@ document.body.addEventListener('htmx:configRequest', function(evt) {
 });
 </script>
 
+<script>
+// Cấu hình slider cho sách tương tự
+$(document).ready(function(){
+    $('.similar-books-slider').slick({
+        dots: true,
+        infinite: true,
+        speed: 500,
+        slidesToShow: 4,
+        slidesToScroll: 1,
+        autoplay: true,
+        autoplaySpeed: 3000,
+        pauseOnHover: true,
+        responsive: [
+            {
+                breakpoint: 1024,
+                settings: {
+                    slidesToShow: 3,
+                    slidesToScroll: 1
+                }
+            },
+            {
+                breakpoint: 768,
+                settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: 1
+                }
+            },
+            {
+                breakpoint: 480,
+                settings: {
+                    slidesToShow: 1,
+                    slidesToScroll: 1
+                }
+            }
+        ]
+    });
+});
+</script>
 
 {% endblock scripts %}
     
