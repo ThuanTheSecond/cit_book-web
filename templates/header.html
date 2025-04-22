@@ -14,13 +14,13 @@
             
             <ul class="header-links pull-right">
                 {% if user.is_authenticated %}
-                  <li><a href="{% url 'profile' %}"><i class="fa fa-user"></i>Xin chào {{user.username}}</a></li>
-                  <li class="active"><a href="{% url 'index' %}"><i class="fa fa-home"></i>Home</a></li>
-                  <li><a href="{% url 'logout' %}"><i class="fa fa-sign-out"></i>Đăng xuất</a></li>
+                  <li><a href="{% url 'profile' %}"><i class="fas fa-user"></i>Xin chào {{user.username}}</a></li>
+                  <li class="active"><a href="{% url 'index' %}"><i class="fas fa-home"></i>Home</a></li>
+                  <li><a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i>Đăng xuất</a></li>
                 {% else %}
-                  <li><a href="#"><i class="fa fa-user-o"></i>Xin chào Guest</a></li>
-                  <li class="active"><a href="{% url 'index' %}"><i class="fa fa-home"></i>Home</a></li>
-                  <li><a href="{% url 'login' %}"><i class="fa fa-sign-in"></i>Đăng nhập</a></li>  
+                  <li><a href="#"><i class="far fa-user"></i>Xin chào Guest</a></li>
+                  <li class="active"><a href="{% url 'index' %}"><i class="fas fa-home"></i>Home</a></li>
+                  <li><a href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i>Đăng nhập</a></li>  
                 {% endif %}
             </ul>
         </div>

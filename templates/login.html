@@ -27,6 +27,8 @@
 
   <!-- Font Awesome Icon -->
   <link rel="stylesheet" href="{% static 'Css/font-awesome.min.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="{% static 'Css/customSlick.css' %}">
 
   <!-- Custom stlylesheet -->
   <link type="text/css" rel="stylesheet" href="{% static 'Css/style.css' %}" />
@@ -73,7 +75,7 @@
       transform: scaleX(1);
     }
     
-    /* Xóa phần CSS ẩn header */
+    /* The padding-top will be handled by header.html script */
     
     .login-page {
       min-height: calc(100vh - 180px);
@@ -81,7 +83,6 @@
       align-items: center;
       justify-content: center;
       padding: 40px 0;
-      margin-top: 90px; /* Để có khoảng cách phía trên cho header */
     }
     
     .login-container {
@@ -564,7 +565,7 @@
                             
                             <div class="form-group">
                                 <input type="hidden" name="next" value="{{ request.GET.next }}">
-                                <button type="submit" class="btn-login">Đăng nhập</button>
+                                <button type="submit" class="btn-login"><i class="fas fa-sign-in-alt"></i> Đăng nhập</button>
                             </div>
                             
                             <div class="separator">
@@ -573,7 +574,7 @@
                             
                             <div class="form-group">
                                 <a href="{% url 'social:begin' 'google-oauth2' %}?prompt=select_account" class="btn-google">
-                                    <i class="fa fa-google"></i> Đăng nhập bằng Google
+                                    <i class="fab fa-google"></i> Đăng nhập bằng Google
                                 </a>
                             </div>
                             

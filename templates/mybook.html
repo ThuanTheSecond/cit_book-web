@@ -5,16 +5,218 @@
 
 {% block pack %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link rel="stylesheet" href="{% static 'Css/customSlick.css' %}">
+<style>
+    /* Background styling consistent with index page */
+    body {
+      background: linear-gradient(to bottom, #f0f5fa, #e5eef7);
+      background-attachment: fixed;
+      font-family: 'Roboto', sans-serif;
+      /* Header padding is handled by header.html script */
+    }
+    
+    .search-result {
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      margin: 20px auto;
+      max-width: 1200px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    /* Overlay pattern for texture */
+    .search-result:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('{% static "img/pattern.png" %}');
+      background-size: 200px;
+      opacity: 0.02;
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    /* Book styling */
+    .book-found {
+      position: relative;
+      margin-bottom: 20px;
+      padding: 15px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
+      border: 1px solid rgba(25, 118, 210, 0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .book-found:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(25, 118, 210, 0.12);
+      border-color: rgba(25, 118, 210, 0.2);
+    }
+    
+    /* Book image styling */
+    .left-content img.book-image {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .left-content img.book-image:hover {
+      transform: scale(1.05);
+    }
+    
+    /* Book information styling */
+    .book-name {
+      color: #1a237e;
+      font-size: 1.2rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      display: block;
+      margin-bottom: 5px;
+    }
+    
+    .book-name:hover {
+      color: #3949ab;
+    }
+    
+    .book-author, .book-published {
+      color: #546e7a;
+      margin: 5px 0;
+      font-size: 0.95rem;
+    }
+    
+    /* Rating styling */
+    .aveRating {
+      margin-top: 10px;
+    }
+    
+    .product-rating {
+      font-weight: bold;
+      color: #1976d2;
+      font-size: 1.1rem;
+    }
+    
+    .fa-star {
+      color: #ffc107;
+    }
+    
+    /* Wishlist button styling */
+    .right-content button {
+      background-color: #1976d2;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 20px;
+      font-weight: 500;
+    }
+    
+    .right-content button:hover {
+      background-color: #1565c0;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(25, 118, 210, 0.2);
+    }
+    
+    /* List styling */
+    #book-form {
+      list-style-type: none;
+      padding: 0;
+    }
+    
+    #book-form li {
+      margin-bottom: 10px;
+    }
+    
+    /* Category header styling (same as index.html) */
+    .category-header {
+      position: relative;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .category-header .header-icon {
+      color: #1a237e;
+      font-size: 1.2rem;
+      margin-right: 8px;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .search-result {
+        padding: 20px;
+        margin: 15px;
+      }
+      
+      .book-name {
+        font-size: 1.1rem;
+      }
+    }
+    
+    /* Empty state styling */
+    .empty-state {
+        min-height: 60vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .empty-state-container {
+        background: white;
+        padding: 3rem;
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(25, 118, 210, 0.1);
+        max-width: 600px;
+        width: 90%;
+        border: 1px solid rgba(25, 118, 210, 0.1);
+    }
+    .btn-primary {
+        background-color: #1976d2;
+        border: none;
+        padding: 0.8rem 2rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+        background-color: #1565c0;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(25, 118, 210, 0.15);
+    }
+    .fas.fa-search {
+        margin-right: 8px;
+    }
+</style>
 {% endblock pack %}
 
 {% block content %}
 <div class="search-result">
     {% if page_obj %}
     <div class="search-book-content container-fluid justify-content-center">
+        <div class="category-header">
+            <span class="header-icon"><i class="fas fa-bookmark"></i></span>
+            <h5 class="mb-4">Sách Đã Lưu</h5>
+        </div>
         <ul id="book-form">
             {% comment %} thông tin sách {% endcomment %}
             {% for book in page_obj %}
-                
                 <div class="book-found">
                     <li>
                         <div class="row">
@@ -34,10 +236,11 @@
 
                             <div class="right-content col-md-3">
                                 <div id='wishlist{{book.book_id}}' hx-post = "/wishCheck_post/"  hx-vals = '{"book_id": {{book.book_id}}}' hx-trigger="load" hx-target="#wishlist{{book.book_id}}">
-                                    <button hx-post = "/wishList_post/" hx-vals = '{"book_id": {{book.book_id}}}' hx-trigger="click delay:0.25s">...</button>
+                                    <button hx-post = "/wishList_post/" hx-vals = '{"book_id": {{book.book_id}}}' hx-trigger="click delay:0.25s">Đã Lưu</button>
                                 </div>
                             </div>
-                    </li><br>
+                        </div>
+                    </li>
                 </div>
             {% endfor %}
         </ul>
@@ -46,49 +249,17 @@
     {% elif not page_obj %}
     <div class="empty-state text-center py-5">
         <div class="empty-state-container">
-            <i class="fas fa-book-open mb-4" style="font-size: 4rem; color: #6c757d;"></i>
-            <h3 class="mb-3" style="color: #343a40;">Không tìm thấy sách</h3>
+            <i class="fas fa-book-open mb-4" style="font-size: 4rem; color: #1a237e;"></i>
+            <h3 class="mb-3" style="color: #1a237e;">Chưa có sách đã lưu</h3>
             <p class="text-muted mb-4" style="max-width: 500px; margin: 0 auto;">
-                Rất tiếc, chúng tôi không thể tìm thấy cuốn sách nào phù hợp với từ khóa tìm kiếm của bạn.
-                Vui lòng thử lại với từ khóa khác.
+                Bạn chưa lưu cuốn sách nào vào danh sách yêu thích.
+                Hãy khám phá thư viện và lưu những cuốn sách bạn quan tâm!
             </p>
             <a href="/" class="btn btn-primary">
-                <i class="fas fa-home"></i> Quay lại trang chủ
+                <i class="fas fa-search"></i> Khám phá thư viện
             </a>
         </div>
     </div>
-
-    <style>
-        .empty-state {
-            min-height: 60vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .empty-state-container {
-            background: white;
-            padding: 3rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
-            max-width: 600px;
-            width: 90%;
-        }
-        .btn-primary {
-            background-color: #007bff;
-            border: none;
-            padding: 0.8rem 2rem;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-        .btn-primary:hover {
-            background-color: #0056b3;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
-        }
-        .fas.fa-home {
-            margin-right: 8px;
-        }
-    </style>
     {% endif %}
 </div>
 {% endblock content %}

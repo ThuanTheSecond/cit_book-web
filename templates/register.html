@@ -27,6 +27,8 @@
 
   <!-- Font Awesome Icon -->
   <link rel="stylesheet" href="{% static 'Css/font-awesome.min.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="{% static 'Css/customSlick.css' %}">
 
   <!-- Custom stlylesheet -->
   <link type="text/css" rel="stylesheet" href="{% static 'Css/style.css' %}" />
@@ -73,7 +75,7 @@
       transform: scaleX(1);
     }
     
-    /* Xóa phần CSS ẩn header */
+    /* The padding-top will be handled by header.html script */
     
     .register-page {
       min-height: calc(100vh - 180px);
@@ -81,7 +83,6 @@
       align-items: center;
       justify-content: center;
       padding: 40px 0;
-      margin-top: 90px; /* Để có khoảng cách phía trên cho header */
     }
     
     .register-container {
@@ -544,7 +545,7 @@
                             </div>
                             
                             <div class="form-group">
-                                <button type="submit" class="btn-register">Đăng ký</button>
+                                <button type="submit" class="btn-register"><i class="fas fa-user-plus"></i> Đăng ký</button>
                             </div>
                             
                             <div class="separator">
@@ -553,7 +554,7 @@
                             
                             <div class="form-group">
                                 <a href="{% url 'social:begin' 'google-oauth2' %}?prompt=select_account" class="btn-google">
-                                    <i class="fa fa-google"></i> Đăng ký bằng Google
+                                    <i class="fab fa-google"></i> Đăng ký bằng Google
                                 </a>
                             </div>
                             

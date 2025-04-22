@@ -15,13 +15,13 @@
   <style>
     /* Background styling for index page */
     body {
-      background: linear-gradient(to bottom, #f8f9fa, #e7eff7);
+      background: linear-gradient(to bottom, #f0f5fa, #e5eef7);
       background-attachment: fixed;
       font-family: 'Roboto', sans-serif;
     }
     
     .body {
-      background-color: rgba(255, 255, 255, 0.9);
+      background-color: rgba(255, 255, 255, 0.95);
       padding: 30px;
       border-radius: 15px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
@@ -41,7 +41,7 @@
       height: 100%;
       background-image: url('{% static "img/pattern.png" %}');
       background-size: 200px;
-      opacity: 0.03;
+      opacity: 0.02;
       pointer-events: none;
       z-index: 0;
     }
@@ -57,14 +57,14 @@
     }
     
     .category-header .header-icon {
-      color: #3498db;
+      color: #1a237e;
       font-size: 1.2rem;
       margin-right: 8px;
       animation: pulse 2s infinite;
     }
     
     #container-header {
-      color: #2c3e50;
+      color: #1a237e;
       font-size: 1.3rem;
       font-weight: 600;
       position: relative;
@@ -82,7 +82,7 @@
     }
     
     #container-header:hover {
-      color: #3498db;
+      color: #3949ab;
       transform: translateX(5px);
     }
     
@@ -93,7 +93,7 @@
       height: 2px;
       bottom: -5px;
       left: 0;
-      background: linear-gradient(to right, #3498db, #2ecc71);
+      background: linear-gradient(to right, #1a237e, #3949ab);
       transition: width 0.3s ease;
       border-radius: 3px;
     }
@@ -106,10 +106,11 @@
     .slider-container {
       position: relative;
       margin-bottom: 40px;
-      padding: 10px 5px;
+      padding: 15px 10px;
       background: white;
       border-radius: 15px;
-      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
+      border: 1px solid rgba(25, 118, 210, 0.1);
     }
     
     /* Book item styling */
@@ -122,16 +123,18 @@
       background: white;
       border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
       transition: all 0.3s ease;
       height: 100%;
       display: flex;
       flex-direction: column;
+      border: 1px solid rgba(25, 118, 210, 0.08);
     }
     
     .book-card:hover {
       transform: translateY(-8px);
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 15px 30px rgba(25, 118, 210, 0.12);
+      border-color: rgba(25, 118, 210, 0.2);
     }
     
     .book-cover {
@@ -141,7 +144,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #f0f0f0;
+      background: #f5f7fa;
     }
     
     .book-image {
@@ -157,7 +160,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(52, 152, 219, 0.85);
+      background: rgba(25, 118, 210, 0.85);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -191,7 +194,7 @@
     
     .view-details:hover {
       background: white;
-      color: #3498db;
+      color: #1976d2;
     }
     
     .book-info {
@@ -204,7 +207,7 @@
     .book-title {
       font-size: 1rem;
       font-weight: 600;
-      color: #2c3e50;
+      color: #263238;
       margin-bottom: 10px;
       line-height: 1.4;
       display: -webkit-box;
@@ -220,7 +223,7 @@
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      background: #3498db;
+      background: #1976d2;
       z-index: 1;
       transition: all 0.3s ease;
     }
@@ -233,7 +236,7 @@
     
     .book-slider .slick-prev:hover,
     .book-slider .slick-next:hover {
-      background: #2980b9;
+      background: #1565c0;
       transform: scale(1.1);
     }
     
