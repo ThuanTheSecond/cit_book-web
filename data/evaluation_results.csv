@@ -1,0 +1,2 @@
+RMSE,MAE,Precision@10,Recall@10,Best_params,Runtime_seconds
+1.09636162348462,0.8131809793254697,0.9973637961335676,1.0,"{'n_factors': 250, 'n_epochs': 30, 'lr_all': 0.005, 'reg_all': 0.01}",4.733824014663696

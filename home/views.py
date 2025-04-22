@@ -272,7 +272,7 @@ def myBook(request):
     }
     return render(request, 'myBook.html', context)   
 
-@login_required
+
 def bookDetail(request, id):
     detail = get_object_or_404(Book, book_id=id+3000)
     

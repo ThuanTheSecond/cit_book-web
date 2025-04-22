@@ -28,18 +28,18 @@ class Book(models.Model):
         VN = 'Vietnamese'
         FL = 'Foreign'
     book_id = models.AutoField(primary_key=True)
-    book_title = models.CharField(max_length=250)
-    book_author = models.CharField(max_length=150)
+    book_title = models.CharField(max_length=300)
+    book_author = models.CharField(max_length=250)
     book_position = models.CharField(max_length= 100)
     book_MFN = models.PositiveIntegerField()
     book_slug = models.SlugField(blank=True)
-    book_publish = models.CharField(max_length=100, default='No information', blank=True)
+    book_publish = models.CharField(max_length=200, default='No information', blank=True)
     topic = models.ManyToManyField(Topic, through= "Book_Topic")
     book_view = models.PositiveIntegerField(default=0)
     book_lang = models.CharField(max_length=10, choices=Language.choices, default=Language.FL)
     bookImage = models.ImageField(upload_to='imgBooks\\', default='imgBooks\\nothumb.jpg')
-    isbn_10 = models.CharField(max_length=10, blank=True)
-    isbn_13 = models.CharField(max_length=13, blank=True)
+    isbn_10 = models.CharField(max_length=15, blank=True)
+    isbn_13 = models.CharField(max_length=15, blank=True)
     is_active = models.BooleanField(default= True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -81,7 +81,7 @@ class ToReads(models.Model):
 
 class ContentBook(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
-    content = models.CharField(max_length= 300)
+    content = models.CharField(max_length= 500)
 
 class AmazonUser(models.Model):
     id = models.AutoField(primary_key=True)
