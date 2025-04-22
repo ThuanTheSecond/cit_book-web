@@ -508,16 +508,16 @@
 {% if has_permission %}
 <div class="task-bar">
   <div class="task-bar-actions">
-    <a href="{% url 'admin:app_list' app_label='home' %}book/add/" class="task-button">
+    <a href="{% url 'admin:home_book_add' %}" class="task-button">
       <i class="fas fa-book-medical"></i> Thêm sách
     </a>
-    <a href="{% url 'admin:app_list' app_label='home' %}topic/add/" class="task-button">
+    <a href="{% url 'admin:home_topic_add' %}" class="task-button">
       <i class="fas fa-bookmark"></i> Thêm chủ đề
     </a>
     <a href="{% url 'admin:auth_user_add' %}" class="task-button">
       <i class="fas fa-user-plus"></i> Thêm người dùng
     </a>
-    <a href="{% url 'admin:app_list' app_label='home' %}book/" class="task-button">
+    <a href="{% url 'admin:home_book_changelist' %}" class="task-button">
       <i class="fas fa-list"></i> Tất cả sách
     </a>
     <a href="{% url 'admin:auth_user_changelist' %}" class="task-button">
