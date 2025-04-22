@@ -1,29 +1,174 @@
-<footer id="footer">
-    <!-- container -->
-    <div class="container-fluid justify-content-center">
-        <div class="footer">
-            <h3 class="footer-title">Liên hệ với tôi</h3>
-            
-            <ul class="footer-links">
-                <li><a href="#">&nbsp;<i class="fa fa-map-marker"></i>&nbsp;Can Tho University, Ninh Kieu, Can Tho.</a></li>
-                {% comment %} <li><a href="#"><i class="fa fa-phone"></i>+91 9106473664</a></li> {% endcomment %}
-            </ul>
-        </div>
-    </div>
-    <!-- /container -->
-
-    <!-- bottom footer -->
-    <div id="bottom-footer" class="section">
-        <div class="container-fluid justify-content-center">
-            <div class="bottom-footer">
-
-                <span class="copyright">
-                    <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                    Copyright &copy;
-                    <script>document.write(new Date().getFullYear());</script> All rights reserved | This website template
-                    is made with <i class="fa fa-heart-o" aria-hidden="true"></i>
-                </span>
+{% load static %}
+<footer style="background-color: #1a237e; color: white; padding: 40px 0 20px; margin-top: 50px;">
+    <div class="container">
+        <div class="row">
+            <!-- Logo & Giới thiệu -->
+            <div class="col-md-4 mb-4">
+                <div style="margin-bottom: 20px;">
+                    <img src="https://yu.ctu.edu.vn/images/upload/article/2020/03/0305-logo-ctu.png" alt="CTU Logo" style="max-width: 120px; height: auto;">
+                </div>
+                <h4 style="color: white; margin-bottom: 20px;">CIT LIBRARY</h4>
+                <p style="color: #b3e5fc;">Thư viện Trường Đại học Cần Thơ là trung tâm thông tin học thuật phục vụ công tác đào tạo.</p>
             </div>
+            
+            <!-- Liên hệ -->
+            <div class="col-md-4 mb-4">
+                <h4 style="color: white; margin-bottom: 20px;">Liên hệ</h4>
+                <ul style="list-style: none; padding-left: 0;">
+                    <li style="margin-bottom: 10px;"><i class="fa fa-map-marker"></i> Khu II, Đường 3/2, P. Xuân Khánh, Q. Ninh Kiều</li>
+                    <li style="margin-bottom: 10px;"><i class="fa fa-phone"></i> (84-292) 3832663</li>
+                    <li style="margin-bottom: 10px;"><i class="fa fa-envelope"></i> dhct@ctu.edu.vn</li>
+                </ul>
+            </div>
+            
+            <!-- Liên kết nhanh -->
+            <div class="col-md-4 mb-4">
+                <h4 style="color: white; margin-bottom: 20px;">Liên kết nhanh</h4>
+                <ul style="list-style: none; padding-left: 0;">
+                    <li style="margin-bottom: 10px;"><a href="https://www.ctu.edu.vn" style="color: #b3e5fc; text-decoration: none;">Trang chủ CTU</a></li>
+                    <li style="margin-bottom: 10px;"><a href="https://lrc.ctu.edu.vn" style="color: #b3e5fc; text-decoration: none;">Trung tâm học liệu</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Copyright -->
+        <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <p style="color: #b3e5fc; font-size: 14px;">© <script>document.write(new Date().getFullYear());</script> Trường Đại học Cần Thơ. All rights reserved.</p>
         </div>
     </div>
 </footer>
+
+<style>
+.footer-section {
+    background: #1a237e;
+    color: #fff;
+    padding: 70px 0 20px;
+    font-family: 'Roboto', sans-serif;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.footer-col {
+    padding: 0 15px;
+}
+
+.footer-logo {
+    margin-bottom: 20px;
+}
+
+.ctu-logo {
+    max-width: 200px;
+    height: auto;
+}
+
+.footer-about {
+    color: #b3e5fc;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.footer-col h4 {
+    font-size: 18px;
+    color: #fff;
+    margin-bottom: 20px;
+    font-weight: 500;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.footer-col h4::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 2px;
+    width: 50px;
+    background: #2196f3;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-links li {
+    margin-bottom: 15px;
+}
+
+.footer-links a {
+    color: #b3e5fc;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: #fff;
+    padding-left: 8px;
+}
+
+.footer-contact li {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    color: #b3e5fc;
+}
+
+.footer-contact i {
+    margin-right: 10px;
+    color: #2196f3;
+}
+
+.social-links {
+    display: flex;
+    gap: 15px;
+}
+
+.social-links a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    width: 40px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+    color: #fff;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.social-links a:hover {
+    background: #2196f3;
+    transform: translateY(-3px);
+}
+
+.footer-divider {
+    border-color: rgba(255,255,255,0.1);
+    margin: 20px 0;
+}
+
+.footer-bottom {
+    text-align: center;
+    padding-top: 20px;
+}
+
+.copyright {
+    color: #b3e5fc;
+    font-size: 14px;
+}
+
+@media (max-width: 768px) {
+    .footer-content {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+    }
+    
+    .footer-col {
+        padding: 0 10px;
+    }
+}
+</style>
