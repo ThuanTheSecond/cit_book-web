@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from .models import Book, Rating, Book_Topic, Topic, ToReads, ContentBook, BookViewHistory, BookReview
 from django.http import HttpResponse, JsonResponse
 from .forms import searchForm, SearchFormset
-from .utils import normalize_vietnamese, pagePaginator, HTTPResponseHXRedirect, login_required, get_recommendations
+from .utils import normalize_vietnamese, get_content_based_recommendations,pagePaginator, HTTPResponseHXRedirect, login_required, get_recommendations
 from django.shortcuts import redirect
 import json
 from django.contrib.auth.decorators import login_required
@@ -358,17 +358,18 @@ def bookDetail(request, id):
     countRate = countRating(book_id=detail.book_id)
 
     # Sach tuong tu
-    bookList = Book.objects.all()
+    similar_books = get_content_based_recommendations(detail.book_id, 10)
 
     # Get all reviews for this book
     reviews = BookReview.objects.filter(book=detail).select_related('user').order_by('-created_at')
 
+    
     context = {
         'detail': detail,
         'rating': rating,
         'averRate': averRate,
         'countRate': countRate,
-        'bookList': bookList,
+        'bookList': similar_books,
         'user_has_reviewed': user_has_reviewed,
         'reviews': reviews,  # Add reviews to context
     }

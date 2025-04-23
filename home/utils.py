@@ -256,3 +256,27 @@ def get_recommendations(user_id, num_recommendations=10):
     except Exception as e:
         print(f"Lỗi khi tạo gợi ý cho user {user_id}: {e}")
         return []
+
+from django.core.cache import cache
+from .content_based_recommender import ContentBasedRecommender
+import logging
+
+logger = logging.getLogger(__name__)
+
+def get_content_based_recommendations(book_id, n_recommendations=5):
+    """Get recommendations với caching"""
+    try:
+        recommender = ContentBasedRecommender()
+        return recommender.get_recommendations(book_id, n_recommendations)
+    except Exception as e:
+        logger.error(f"Error getting recommendations: {str(e)}")
+        return []
+
+def update_recommendation_model():
+    """Update model với cache invalidation"""
+    try:
+        recommender = ContentBasedRecommender()
+        return recommender.update_recommendations()
+    except Exception as e:
+        logger.error(f"Error updating model: {str(e)}")
+        return False

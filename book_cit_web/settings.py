@@ -186,16 +186,37 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_AUTH_EXTRA_ARGUMENTS = {
 }
 
 
-# Celery redis
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+# Celery + Redis settings
+CELERY_BROKER_URL = 'redis://localhost:6379/0'  # DB 0 for Celery broker
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'  # DB 0 for Celery results
+
+# Cache + Redis settings
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",  # DB 1 for caching
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
+            "IGNORE_EXCEPTIONS": True,
+        }
+    }
+}
+
+# Cache timeout settings
+CACHE_TTL = 60 * 60 * 24  # 24 hours
+
 CELERY_BROKER_CONNECTION_RETRY_ON_ERROR = True
 CELERY_BEAT_SCHEDULE = {
     'finetune-svd-model-daily': {
         'task': 'home.tasks.finetune_svd_model_task',
         'schedule': 86400.0,  # Every 24 hours
     },
-}
+    'update-content-recommendations-weekly': {  # Thêm task mới
+        'task': 'home.tasks.update_content_recommendations_task',
+        'schedule': 86400.0 * 7,  # Every 7 days
+    },
+}  # Add new task to CELERY_BEAT_SCHEDULE
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'

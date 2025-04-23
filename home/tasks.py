@@ -12,8 +12,10 @@ from surprise.accuracy import rmse, mae
 from surprise import dump
 from home.models import Rating, Book
 from django.contrib.auth.models import User
+from .utils import update_recommendation_model
+import logging
 
-logger = get_task_logger(__name__)
+logger = logging.getLogger(__name__)
 
 @shared_task(
     name='home.tasks.finetune_svd_model_task'
@@ -181,3 +183,18 @@ def finetune_svd_model_task():
     except Exception as exc:
         logger.error(f"Error in fine-tuning task: {exc}", exc_info=True)
         raise 
+
+
+@shared_task
+def update_content_recommendations_task():
+    """Async task để update recommendations"""
+    try:
+        success = update_recommendation_model()
+        if success:
+            logger.info("Content recommendations updated successfully")
+        else:
+            logger.error("Failed to update content recommendations")
+        return success
+    except Exception as e:
+        logger.error(f"Error in update_content_recommendations_task: {str(e)}")
+        return False
