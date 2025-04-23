@@ -13,7 +13,11 @@ from operator import and_
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
+from home.tasks import finetune_svd_model_task
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Logic xử lí
 def checkRate(userid = None, bookid = None):
@@ -96,6 +100,31 @@ def categoryPost(request):
         context+= f'<li><a href="/category/filter/id={topic.topic_id - 3000}">{ topic.topic_name }</a></li>'
     return HttpResponse(context)
 
+# def ratingPost(request):
+#     # kiem tra nguoi dung da dang nhap chua khi nhan vao rating
+#     if not request.user.is_authenticated:
+#         login_url = reverse('login')  # URL của trang login
+#         current_url = request.POST.get('current_url', '/')
+#         return JsonResponse({"redirect": True, "url": f"{login_url}?next={current_url}"}, status=200)
+    
+#     rate = request.POST.get('rate')
+#     book_id = request.POST.get('book_id')
+#     # ----------- Thêm hoặc cập nhật rating----------
+#     rating, created = Rating.objects.update_or_create(
+#         user_id = request.user.id,
+#         book_id = book_id,
+#         defaults={'rating' : rate}
+#     )
+#     hx_vals_data = json.dumps({"rate": int(rate),
+#                                "book_id": int(book_id),
+#                                })
+#     val = "rate-" + rate
+#     return HttpResponse(f'''
+#                         <input type="button" onclick="hidebutton(this)" name="clear" id="clear-rating" hx-post ='/clear_rating_post/' hx-trigger="click delay:0.25s" hx-target='#{val}' hx-swap = "outerHTML" value="Xóa đánh giá" hx-vals ='{hx_vals_data}'>
+#                         ''')
+
+
+
 def ratingPost(request):
     # kiem tra nguoi dung da dang nhap chua khi nhan vao rating
     if not request.user.is_authenticated:
@@ -111,13 +140,45 @@ def ratingPost(request):
         book_id = book_id,
         defaults={'rating' : rate}
     )
+    logger.info(f"Saved rating for user {request.user.id}, book {book_id}, rating {rate}")
+     
+    # Check number of ratings
+    rating_count = Rating.objects.filter(user=request.user).count()
+    print(rating_count)
+    logger.info(f"User {request.user.id} has {rating_count} ratings")
+    hx_vals_data = json.dumps({"rate": int(rate), "book_id": int(book_id)})
+    val = f"rate-{rate}"    
+    
     hx_vals_data = json.dumps({"rate": int(rate),
                                "book_id": int(book_id),
                                })
     val = "rate-" + rate
-    return HttpResponse(f'''
-                        <input type="button" onclick="hidebutton(this)" name="clear" id="clear-rating" hx-post ='/clear_rating_post/' hx-trigger="click delay:0.25s" hx-target='#{val}' hx-swap = "outerHTML" value="Xóa đánh giá" hx-vals ='{hx_vals_data}'>
-                        ''')
+   
+    # Prepare response
+    response_html = f'''
+            <input type="button" onclick="hidebutton(this)" name="clear" id="clear-rating"
+                   hx-post="/clear_rating_post/" hx-trigger="click delay:0.25s"
+                   hx-target="#{val}" hx-swap="outerHTML" value="Xóa đánh giá"
+                   hx-vals='{hx_vals_data}'>
+        '''
+        
+        # If user has 5 or more ratings, trigger fine-tuning and show message
+    if rating_count >= 5:
+        if finetune_svd_model_task:
+            try:
+                    finetune_svd_model_task.delay()
+                    logger.info("Fine-tuning task queued successfully")
+            except Exception as e:
+                    logger.error(f"Failed to queue fine-tuning task: {e}")
+        else:
+            logger.warning("Fine-tuning task not available")
+        response_html += '''
+                <div id="recommendation-message" class="alert alert-success" hx-swap-oob="true">
+                    You have rated enough books! Go to the <a href="/">homepage</a> to see recommendations.
+                </div>
+            '''
+        
+    return HttpResponse(response_html)   
 
 def ratingCheckPost(request):
     if not request.user.is_authenticated:

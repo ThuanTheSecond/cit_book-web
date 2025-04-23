@@ -17,6 +17,9 @@
                   <li><a href="{% url 'profile' %}"><i class="fas fa-user"></i>Xin chào {{user.username}}</a></li>
                   <li class="active"><a href="{% url 'index' %}"><i class="fas fa-home"></i>Home</a></li>
                   <li><a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i>Đăng xuất</a></li>
+                    {% if user.is_superuser %}
+                    <li><a href="/admin/"><i class="fas fa-cogs"></i>Quản lý</a></li>
+                    {% endif %}
                 {% else %}
                   <li><a href="#"><i class="far fa-user"></i>Xin chào Guest</a></li>
                   <li class="active"><a href="{% url 'index' %}"><i class="fas fa-home"></i>Home</a></li>

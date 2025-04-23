@@ -189,12 +189,18 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_AUTH_EXTRA_ARGUMENTS = {
 # Celery redis
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_BROKER_CONNECTION_RETRY_ON_ERROR = True
 CELERY_BEAT_SCHEDULE = {
     'finetune-svd-model-daily': {
         'task': 'home.tasks.finetune_svd_model_task',
         'schedule': 86400.0,  # Every 24 hours
     },
 }
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+
 
 # Debug settings - turn on for development only
 SOCIAL_AUTH_SANITIZE_REDIRECTS = False
