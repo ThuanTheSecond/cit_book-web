@@ -866,6 +866,41 @@
             font-size: 1.3rem;
         }
     }
+
+    .book-topics {
+        margin-top: 20px;
+        padding: 10px 0;
+    }
+
+    .book-topics label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    .topics-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .topic-tag {
+        display: inline-block;
+        padding: 5px 12px;
+        background-color: #f0f0f0;
+        border-radius: 15px;
+        color: #333;
+        text-decoration: none;
+        font-size: 0.9em;
+        transition: all 0.2s ease;
+    }
+
+    .topic-tag:hover {
+        background-color: #2980b9;
+        color: white;
+        transform: translateY(-2px);
+    }
   </style>
 {% endblock pack %}
 
@@ -958,6 +993,27 @@
                         <div class="info-item">
                             <label>MFN</label>
                             <p>{{ detail.book_MFN }}</p>
+                        </div>
+                        {% if detail.isbn_10 %}
+                        <div class="info-item">
+                            <label>ISBN-10</label>
+                            <p>{{ detail.isbn_10 }}</p>
+                        </div>
+                        {% endif %}
+                        {% if detail.isbn_13 %}
+                        <div class="info-item">
+                            <label>ISBN-13</label>
+                            <p>{{ detail.isbn_13 }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="book-topics">
+                        <label>Thể loại:</label>
+                        <div class="topics-list">
+                            {% for topic in book_topics %}
+                                <a href="/topicFilter/{{topic.topic_id}}/1" class="topic-tag">{{ topic.topic_name }}</a>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>

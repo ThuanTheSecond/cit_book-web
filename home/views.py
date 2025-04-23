@@ -234,10 +234,12 @@ def wishCheckPost(request):
 
 def topicListPost(request):
     topicList = Topic.objects.all().order_by('topic_name')
-    context = ''
+    context = []
     for topic in topicList:
-        context += f'<li><a class="dropdown-item" id="t-{int(topic.topic_id) - 3000}" href="/topicFilter/{str((topic.topic_id) - 3000)}/1">{topic.topic_name}</a></li>'
-    return HttpResponse(context)
+        context.append(
+            f'<li><a class="dropdown-item" id="t-{topic.topic_id}" href="/topicFilter/{topic.topic_id}/1">{topic.topic_name}</a></li>'
+        )
+    return HttpResponse('\n'.join(context))
 
 
 # middle logic
@@ -363,7 +365,11 @@ def bookDetail(request, id):
     # Get all reviews for this book
     reviews = BookReview.objects.filter(book=detail).select_related('user').order_by('-created_at')
 
-    
+    # Get book topics
+    book_topics = Book_Topic.objects.filter(book_id=detail).select_related('topic_id')
+    topics = [{'topic_id': bt.topic_id.topic_id, 'topic_name': bt.topic_id.topic_name} 
+             for bt in book_topics]
+
     context = {
         'detail': detail,
         'rating': rating,
@@ -372,6 +378,7 @@ def bookDetail(request, id):
         'bookList': similar_books,
         'user_has_reviewed': user_has_reviewed,
         'reviews': reviews,  # Add reviews to context
+        'book_topics': topics,  # Add this line
     }
     
     return render(request, 'bookDetail.html', context)
@@ -439,50 +446,60 @@ def search(request, search_type, query, ftype):
     }
     return render(request, 'searchBook.html', context)
 
-def topicFilter(request,tid, type = 1):
+def topicFilter(request, tid, type=1):
     from home.utils import filterBasedType
-    id = int(tid) + 3000
-    bookTopic = Book_Topic.objects.prefetch_related('topic_id').filter(topic_id = id)
-    topicName = None
-    bid = []
-    for id in bookTopic:
-        if topicName == None:
-            topicName = id.topic_id.topic_name
-        bid.append(id.book_id.book_id)
-    books = Book.objects.filter(book_id__in = bid)
-
-    # phan loai dua vao loc
-    books = filterBasedType(books=books,type=type)
+    
+    # Lấy topic trực tiếp từ database
+    topic = get_object_or_404(Topic, topic_id=tid)
+    topicName = topic.topic_name
+    
+    # Lấy danh sách sách thuộc topic
+    bookTopic = Book_Topic.objects.filter(topic_id=tid)
+    bid = [bt.book_id.book_id for bt in bookTopic]
+    
+    # Lấy tất cả sách có id trong danh sách bid
+    books = Book.objects.filter(book_id__in=bid)
+    
+    # Kiểm tra và lọc sách
+    if not books.exists():
+        books = []
+    else:
+        # Phân loại dựa vào filter type
+        books = filterBasedType(books=books, type=type)
+    
     countRates = {}
     averRates = {}
     for book in books:
         book_id = book.book_id
-        countRates[book_id] = countRating(book_id=book_id)  # Lưu số lượng đánh giá của từng sách
+        countRates[book_id] = countRating(book_id=book_id)
         averRates[book_id] = averRating(book_id=book_id)
+    
+    # Xử lý phân trang
     page_obj = pagePaginator(request, books)
     page_numbers = []
-    # Hiển thị trang đầu, cuối, và các trang gần trang hiện tại
-    for num in page_obj.paginator.page_range:
-        if (
-            num == 1 or 
-            num == page_obj.paginator.num_pages or 
-            abs(num - page_obj.number) <= 2  # Số trang gần trang hiện tại
-        ):
-            page_numbers.append(num)
-        elif (
-            abs(num - page_obj.number) == 3  # Thêm dấu "..." khi cần
-            and num not in page_numbers
-        ):
-            page_numbers.append('...')
+    if page_obj:
+        for num in page_obj.paginator.page_range:
+            if (
+                num == 1 or 
+                num == page_obj.paginator.num_pages or 
+                abs(num - page_obj.number) <= 2
+            ):
+                page_numbers.append(num)
+            elif (
+                abs(num - page_obj.number) == 3
+                and num not in page_numbers
+            ):
+                page_numbers.append('...')
+
     context = {
         'tid': tid,
-        'topicName': topicName,
+        'topicName': topicName,  # Luôn có giá trị, kể cả khi không có sách
         'page_obj': page_obj,
         'countRates': countRates,
         'averRates': averRates,
         'page_numbers': page_numbers,
+        'filter_type': type,
     }
-    # Cần thêm một html để hiển thị filter theo thể loại
     return render(request, 'filterBook.html', context)
 
 def searchAdvance(request):
@@ -598,47 +615,55 @@ def test(request):
     }
     return render(request, 'test.html',context)
 
-def categoryFilter(request,cid,type = 1):
+def categoryFilter(request, cid, type=1):
     from home.utils import filterBasedType
     books = Book.objects.all()
-    # phan loai dua vao category
+    
+    # Phân loại dựa vào category
     if cid != 'Trending':
         lang = 'Foreign'
         if cid == 'Tiếng Việt':
             lang = 'Vietnamese'
-        books = books.filter(book_lang = lang)
-    # phan loai dua vao loc
-    books = filterBasedType(books=books,type=type)
+        books = books.filter(book_lang=lang)
+    
+    # Phân loại dựa vào filter type
+    books = filterBasedType(books=books, type=type)
+    
+    # Kiểm tra nếu không có sách
+    if not books.exists():
+        books = []
     
     countRates = {}
     averRates = {}
     for book in books:
         book_id = book.book_id
-        countRates[book_id] = countRating(book_id=book_id)  # Lưu số lượng đánh giá của từng sách
+        countRates[book_id] = countRating(book_id=book_id)
         averRates[book_id] = averRating(book_id=book_id)
-        
-    # phan trang
+    
+    # Phân trang
     page_obj = pagePaginator(request, books)
     page_numbers = []
-    # Hiển thị trang đầu, cuối, và các trang gần trang hiện tại
-    for num in page_obj.paginator.page_range:
-        if (
-            num == 1 or 
-            num == page_obj.paginator.num_pages or 
-            abs(num - page_obj.number) <= 2  # Số trang gần trang hiện tại
-        ):
-            page_numbers.append(num)
-        elif (
-            abs(num - page_obj.number) == 3  # Thêm dấu "..." khi cần
-            and num not in page_numbers
-        ):
-            page_numbers.append('...')
+    if page_obj:
+        for num in page_obj.paginator.page_range:
+            if (
+                num == 1 or 
+                num == page_obj.paginator.num_pages or 
+                abs(num - page_obj.number) <= 2
+            ):
+                page_numbers.append(num)
+            elif (
+                abs(num - page_obj.number) == 3
+                and num not in page_numbers
+            ):
+                page_numbers.append('...')
+
     context = {
         'cid': cid,
         'page_obj': page_obj,
         'page_numbers': page_numbers,
         'countRates': countRates,
         'averRates': averRates,
+        'filter_type': type,  # Thêm filter type vào context
     }
     return render(request, 'filterBook.html', context)
 

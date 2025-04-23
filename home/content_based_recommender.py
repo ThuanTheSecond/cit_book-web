@@ -35,20 +35,27 @@ class ContentBasedRecommender:
         self.vietnamese_stop_words = [
             "và", "là", "của", "những", "với", "từ", "một", "được", 
             "khi", "đã", "cho", "vì", "ở", "này", "giáo", "trình", 
-            "lập", "trình", "các", "để", "trong", "về"
+            "lập", "trình", "các", "để", "trong", "về", "theo",
+            "như", "có", "không", "được", "tại", "bởi", "nhà",
+            "qua", "bạn", "rất", "làm", "sau", "đến", "việc"
         ]
+        
+        # Combine với English stopwords
         self.stop_words = list(text.ENGLISH_STOP_WORDS) + self.vietnamese_stop_words
         
+        # Cấu hình TF-IDF cho tiếng Việt
         self.tfidf = TfidfVectorizer(
             stop_words=self.stop_words,
             max_features=5000,
-            ngram_range=(1, 2)
+            ngram_range=(1, 2),
+            token_pattern=r'(?u)\b\w+\b',  # Pattern phù hợp với tiếng Việt
+            strip_accents='unicode'  # Xử lý dấu tiếng Việt
         )
         
         self.model_dir = os.path.join(settings.BASE_DIR, 'models')
         os.makedirs(self.model_dir, exist_ok=True)
         
-        # Pre-load model khi khởi tạo
+        self._load_data()
         self._load_model()
         self._initialized = True
 
@@ -112,14 +119,17 @@ class ContentBasedRecommender:
             return self.train_model()
 
     def train_model(self):
-        """Train model với optimizations"""
         try:
-            df = self._load_data()
+            self._load_data()
             
-            # Sử dụng parallel processing cho TF-IDF
-            self.tfidf_matrix = self.tfidf.fit_transform(df['content'])
+            # Tiền xử lý nội dung
+            self.df['content'] = self.df['content'].fillna('')
+            self.df['content'] = self.df['content'].astype(str)
             
-            # Tính cosine similarity với chunks để tiết kiệm memory
+            # Vector hóa với cấu hình mới
+            self.tfidf_matrix = self.tfidf.fit_transform(self.df['content'])
+            
+            # Tính cosine similarity với chunks
             chunk_size = 1000
             n_samples = self.tfidf_matrix.shape[0]
             cosine_sim = np.zeros((n_samples, n_samples))
@@ -130,12 +140,18 @@ class ContentBasedRecommender:
                 cosine_sim[i:chunk_end] = cosine_similarity(chunk, self.tfidf_matrix)
             
             self.cosine_sim = cosine_sim
-            self._save_model()
             
-            # Clear cache khi train model mới
-            cache.delete('content_book_df')
-            self._compute_similarity_scores.cache_clear()
+            # Lưu model
+            model_data = {
+                'tfidf': self.tfidf,
+                'cosine_sim': self.cosine_sim,
+                'book_indices': self.df.index.tolist()
+            }
             
+            with open(os.path.join(self.model_dir, 'content_model.pkl'), 'wb') as f:
+                pickle.dump(model_data, f)
+            
+            logger.info("Model trained and saved successfully")
             return True
             
         except Exception as e:
@@ -146,6 +162,10 @@ class ContentBasedRecommender:
         """Get recommendations với caching và error handling"""
         from .models import Book  # Move import here
         
+        # Kiểm tra và load lại data nếu df chưa được khởi tạo
+        if not hasattr(self, 'df') or self.df is None:
+            self._load_data()
+            
         cache_key = self._get_cache_key(book_id, n_recommendations)
         
         cached_recommendations = cache.get(cache_key)
@@ -153,6 +173,11 @@ class ContentBasedRecommender:
             return Book.objects.filter(book_id__in=cached_recommendations)
         
         try:
+            # Kiểm tra xem book_id có tồn tại trong df không
+            if book_id not in self.df['book_id'].values:
+                logger.warning(f"Book ID {book_id} not found in content data")
+                return []
+                
             idx = self.df[self.df['book_id'] == book_id].index[0]
             sim_scores = self._compute_similarity_scores(idx)
             similar_indices = np.argsort(sim_scores)[-n_recommendations-1:][::-1][1:]
@@ -178,3 +203,5 @@ class ContentBasedRecommender:
         except Exception as e:
             logger.error(f"Error updating recommendations: {str(e)}")
             return False
+
+

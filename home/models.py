@@ -7,6 +7,9 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from .utils import createBookContent, updateContentRecommend, updateBookContent
 from django.utils import timezone
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Create your models here.
 class Topic(models.Model):
@@ -26,21 +29,21 @@ class Book(models.Model):
         VN = 'Vietnamese'
         FL = 'Foreign'
     book_id = models.AutoField(primary_key=True)
-    book_title = models.CharField(max_length=300)
-    book_author = models.CharField(max_length=250)
-    book_position = models.CharField(max_length= 100)
+    book_title = models.CharField(max_length=300)  # Đã ok
+    book_author = models.CharField(max_length=250)  # Đã ok
+    book_position = models.CharField(max_length=200)  # Tăng từ 100 lên 200
     book_MFN = models.PositiveIntegerField()
-    book_slug = models.SlugField(blank=True)
+    book_slug = models.SlugField(blank=True, max_length=350)  # Tăng độ dài
     book_publish = models.CharField(max_length=200, default='No information', blank=True)
-    topic = models.ManyToManyField(Topic, through= "Book_Topic")
+    topic = models.ManyToManyField(Topic, through="Book_Topic")
     book_view = models.PositiveIntegerField(default=0)
     book_lang = models.CharField(max_length=10, choices=Language.choices, default=Language.FL)
     bookImage = models.ImageField(upload_to='imgBooks\\', default='imgBooks\\nothumb.jpg')
     isbn_10 = models.CharField(max_length=15, blank=True)
     isbn_13 = models.CharField(max_length=15, blank=True)
-    is_active = models.BooleanField(default= True)
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(auto_now=True)  # Đã ok
     
     def __str__(self):
         return f'{self.book_id-3000}-{self.book_title},{self.book_author},{self.book_publish},{self.book_position},{self.book_MFN},{self.is_active}' 
@@ -118,11 +121,17 @@ CharField.register_lookup(Unaccent)
 def createBookContent_signal(sender, instance, created, **kwargs):
     try:
         if created:
-            createBookContent(instance)
+            content = createBookContent(instance)
         else:
-            updateBookContent(instance)
+            content = updateBookContent(instance)
+            
+        # Retrain model sau khi thêm/cập nhật sách
+        from .content_based_recommender import ContentBasedRecommender
+        recommender = ContentBasedRecommender()
+        recommender.train_model()
+        
     except Exception as e:
-        print(f'Error in Book signal handler for {instance.book_title}: {str(e)}')
+        logger.error(f'Error in Book signal handler for {instance.book_title}: {str(e)}')
 # tạo lịch sử xem sách :>>
 class BookViewHistory(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -167,14 +176,17 @@ class AuthorViewHistory(models.Model):
 @receiver([post_save, post_delete], sender=Book_Topic)
 def update_content_on_topic_change(sender, instance, **kwargs):
     try:
-        # Lấy book instance từ Book_Topic
         book = instance.book_id
-        # Refresh book instance
         book.refresh_from_db()
-        # Cập nhật ContentBook
-        updateBookContent(book)
+        content = updateBookContent(book)
+        
+        # Retrain model sau khi cập nhật topic
+        from .content_based_recommender import ContentBasedRecommender
+        recommender = ContentBasedRecommender()
+        recommender.train_model()
+        
     except Exception as e:
-        print(f'Error in Book_Topic signal handler: {str(e)}')
+        logger.error(f'Error in Book_Topic signal handler: {str(e)}')
     
         
         

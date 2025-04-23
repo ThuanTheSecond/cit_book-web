@@ -9,7 +9,6 @@
 
 
 {% block bonusContent %}
-
 <div class="body">
     <div class="overall container-fluid justify-content-center">
         {% if cid %}
@@ -18,22 +17,96 @@
             <h3><i>#{{ topicName }}</i></h3>
         {% endif %}
         <div class="filter">
-            <span>Lọc theo: </span>
-            
-            {% if cid %}
-                <span><a href="/categoryFilter/{{cid}}/1">Lượt xem</a> | </span>
-                <span><a href="/categoryFilter/{{cid}}/2">Xuất bản gần đây</a> | </span>
-                <span><a href="/categoryFilter/{{cid}}/3">Đánh giá nhiều</a> | </span>
-                <span><a href="/categoryFilter/{{cid}}/4">Đánh giá tốt nhất</a> | </span> 
-            {% elif tid %}
-                <span><a href="/topicFilter/{{tid}}/1">Lượt xem</a> | </span>
-                <span><a href="/topicFilter/{{tid}}/2">Xuất bản gần đây</a> | </span>
-                <span><a href="/topicFilter/{{tid}}/3">Đánh giá nhiều</a> | </span>
-                <span><a href="/topicFilter/{{tid}}/4">Đánh giá tốt nhất</a> | </span> 
-            {% endif %}
+            <span>Sắp xếp theo: </span>
+            <div class="filter-options">
+                {% if cid %}
+                    <a href="/categoryFilter/{{cid}}/1" class="{% if filter_type == 1 %}active{% endif %}">Lượt xem</a>
+                    <span class="separator">|</span>
+                    <a href="/categoryFilter/{{cid}}/2" class="{% if filter_type == 2 %}active{% endif %}">Xuất bản gần đây</a>
+                    <span class="separator">|</span>
+                    <a href="/categoryFilter/{{cid}}/3" class="{% if filter_type == 3 %}active{% endif %}">Đánh giá nhiều</a>
+                    <span class="separator">|</span>
+                    <a href="/categoryFilter/{{cid}}/4" class="{% if filter_type == 4 %}active{% endif %}">Đánh giá tốt nhất</a>
+                {% elif tid %}
+                    <a href="/topicFilter/{{tid}}/1" class="{% if filter_type == 1 %}active{% endif %}">Lượt xem</a>
+                    <span class="separator">|</span>
+                    <a href="/topicFilter/{{tid}}/2" class="{% if filter_type == 2 %}active{% endif %}">Xuất bản gần đây</a>
+                    <span class="separator">|</span>
+                    <a href="/topicFilter/{{tid}}/3" class="{% if filter_type == 3 %}active{% endif %}">Đánh giá nhiều</a>
+                    <span class="separator">|</span>
+                    <a href="/topicFilter/{{tid}}/4" class="{% if filter_type == 4 %}active{% endif %}">Đánh giá tốt nhất</a>
+                {% endif %}
+            </div>
         </div>
-     </div>
+    </div>
 </div>
+
+<style>
+.filter {
+    background: #fff;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    margin: 15px 0;
+    border: 1px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.filter span {
+    color: #333;
+    font-weight: 500;
+}
+
+.filter-options {
+    display: flex;
+    align-items: center;
+}
+
+.filter a {
+    color: #666;
+    text-decoration: none;
+    padding: 6px 16px;
+    transition: all 0.2s ease;
+}
+
+.filter a:hover {
+    color: #0d6efd;
+}
+
+.filter a.active {
+    color: #fff;
+    background-color: #0d6efd;
+    border-radius: 4px;
+}
+
+.separator {
+    color: #ccc;
+    margin: 0 5px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .filter {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .filter-options {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .separator {
+        display: none;
+    }
+    
+    .filter a {
+        padding: 4px 12px;
+    }
+}
+</style>
 {% endblock bonusContent %}  
 
 {% block content %}
@@ -75,10 +148,15 @@
 
     {% comment %} Đây là khi khong tim thay sach {% endcomment %}
     {% elif not page_obj%}
-    {% comment %} Chỉnh sửa thông báo khi không tìm thấy sách {% endcomment %}
-            <div style="color:red">
-                Can not found book with your search key
-            </div>
+        <div class="no-results">
+            <h4>Không tìm thấy sách</h4>
+            {% if cid %}
+                <p>Không tìm thấy sách nào trong danh mục "{{ cid }}" với bộ lọc hiện tại.</p>
+            {% elif tid %}
+                <p>Không tìm thấy sách nào trong chủ đề "{{ topicName }}" với bộ lọc hiện tại.</p>
+            {% endif %}
+            <p>Vui lòng thử lại với bộ lọc khác hoặc quay lại <a href="/">trang chủ</a>.</p>
+        </div>
     {% endif %}
 </div>
 {% endblock content %}

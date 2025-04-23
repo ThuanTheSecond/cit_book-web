@@ -1,98 +1,220 @@
-{% extends 'base.html' %}
-{% load widget_tweaks %}
+{% extends "base.html" %}
+{% load static %}
 {% load filters %}
 
 {% block bonusContent %}
-<style>
-    /* Empty state styling */
-    .empty-state {
-        min-height: 60vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 2rem 0;
-    }
-    
-    .empty-state-container {
-        background: white;
-        padding: 3rem;
-        border-radius: 12px;
-        box-shadow: 0 5px 20px rgba(25, 118, 210, 0.1);
-        max-width: 600px;
-        width: 90%;
-        border: 1px solid rgba(25, 118, 210, 0.1);
-        animation: fadeIn 0.6s ease;
-    }
-    
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .btn-primary {
-        background-color: #1976d2;
-        border: none;
-        padding: 0.8rem 2rem;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-        color: white;
-        text-decoration: none;
-        display: inline-block;
-    }
-    
-    .btn-primary:hover {
-        background-color: #1565c0;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(25, 118, 210, 0.15);
-    }
-    
-    .mb-3 {
-        margin-bottom: 1rem;
-    }
-    
-    .mb-4 {
-        margin-bottom: 1.5rem;
-    }
-    
-    .py-5 {
-        padding-top: 3rem;
-        padding-bottom: 3rem;
-    }
-    
-    .text-center {
-        text-align: center;
-    }
-    
-    .text-muted {
-        color: #6c757d;
-    }
-</style>
-
 <div class="body">
     <div class="overall container-fluid justify-content-center">
-        <h3>Search Books</h3>
+        <div class="search-results-header">
+            <h3 class="search-header-title">
+                {% if query %}
+                    Kết quả tìm kiếm cho từ khóa: "<span class="search-keyword">{{ query }}</span>"
+                {% else %}
+                    Tất cả sách
+                {% endif %}
+            </h3>
+            {% if search_type != 'all' %}
+                <div class="search-type-label">
+                    <i class="fas fa-filter"></i>
+                    Lọc theo: 
+                    {% if search_type == 'book_title' %}Tên sách
+                    {% elif search_type == 'book_author' %}Tác giả
+                    {% elif search_type == 'book_publish' %}Nhà xuất bản
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+
         <div class="filter">
-            <span>Lọc theo: </span>
-                <span><a href="{% url 'search' ftype=5 query=query search_type=search_type %}">Liên quan nhất</a> | </span>
-                <span><a href="{% url 'search' ftype=1 query=query search_type=search_type %}">Lượt xem</a> | </span>
-                <span><a href="{% url 'search' ftype=2 query=query search_type=search_type %}">Xuất bản gần đây</a> | </span>
-                <span><a href="{% url 'search' ftype=3 query=query search_type=search_type %}">Đánh giá nhiều</a> | </span>
-                <span><a href="{% url 'search' ftype=4 query=query search_type=search_type %}">Đánh giá tốt nhất</a></span> 
+            <span>Sắp xếp theo: </span>
+            <div class="filter-options">
+                <a href="{% url 'search' ftype=5 query=query search_type=search_type %}" 
+                   class="{% if ftype == 5 %}active{% endif %}">Liên quan nhất</a>
+                <span class="separator">|</span>
+                <a href="{% url 'search' ftype=1 query=query search_type=search_type %}" 
+                   class="{% if ftype == 1 %}active{% endif %}">Lượt xem</a>
+                <span class="separator">|</span>
+                <a href="{% url 'search' ftype=2 query=query search_type=search_type %}" 
+                   class="{% if ftype == 2 %}active{% endif %}">Xuất bản gần đây</a>
+                <span class="separator">|</span>
+                <a href="{% url 'search' ftype=3 query=query search_type=search_type %}" 
+                   class="{% if ftype == 3 %}active{% endif %}">Đánh giá nhiều</a>
+                <span class="separator">|</span>
+                <a href="{% url 'search' ftype=4 query=query search_type=search_type %}" 
+                   class="{% if ftype == 4 %}active{% endif %}">Đánh giá tốt nhất</a>
+            </div>
         </div>
     </div>
 </div>
+
+<style>
+.search-results-header {
+    margin-bottom: 20px;
+}
+
+.search-header-title {
+    color: #1a237e;
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+}
+
+.search-keyword {
+    color: #1976d2;
+    font-weight: 600;
+}
+
+.search-type-label {
+    color: #666;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.search-type-label i {
+    color: #1976d2;
+}
+
+.filter {
+    background: #fff;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    margin: 15px 0;
+    border: 1px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.filter span {
+    color: #333;
+    font-weight: 500;
+}
+
+.filter a {
+    color: #666;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    height: 36px;
+}
+
+.filter a:hover {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+.filter a.active {
+    color: #fff;
+    background-color: #1976d2;
+    box-shadow: 0 2px 4px rgba(25, 118, 210, 0.2);
+}
+
+.filter .separator {
+    color: #ccc;
+    margin: 0 5px;
+    display: inline-flex;
+    align-items: center;
+    height: 36px;
+}
+
+.filter-options {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.filter a {
+    position: relative;
+    overflow: hidden;
+}
+
+.filter a:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #1976d2;
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.filter a:hover:after {
+    transform: scaleX(1);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin: 2rem auto;
+    max-width: 600px;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: #1a237e;
+    margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+    color: #1a237e;
+    margin-bottom: 1rem;
+}
+
+.empty-state p {
+    color: #495057;
+    margin-bottom: 1.5rem;
+}
+
+.empty-state .btn {
+    padding: 0.5rem 1.5rem;
+    font-size: 1rem;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .filter {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 10px 15px;
+    }
+
+    .filter-options {
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .filter a {
+        font-size: 14px;
+        padding: 6px 12px;
+    }
+
+    .search-header-title {
+        font-size: 1.2rem;
+    }
+
+    .search-type-label {
+        font-size: 0.8rem;
+    }
+}
+</style>
 {% endblock bonusContent %}
-    
 
 {% block content %}
 <div class="search-result">
     {% if page_obj %}
     <div class="search-book-content container-fluid justify-content-center">
         <ul id="book-form">
-            {% comment %} thông tin sách {% endcomment %}
             {% for book in page_obj %}
-                {% comment %} chỉnh sửa câu lệnh dưới để hiển thị từng cuốn sách {% endcomment %}
-                {% comment %} Cần chỉnh sửa lại wishlist post {% endcomment %}
                 <div class="book-found">
                     <li>
                         <div class="row">
@@ -111,25 +233,27 @@
                             </div>
 
                             <div class="right-content col-md-3">
-                                <div id='wishlist{{book.book_id}}' hx-post = "/wishCheck_post/"  hx-vals = '{"book_id": {{book.book_id}}}' hx-trigger="load" hx-target="#wishlist{{book.book_id}}">
-                                    <button hx-post = "/wishList_post/" hx-vals = '{"book_id": {{book.book_id}}}' hx-trigger="click delay:0.25s">...</button>
+                                <div id='wishlist{{book.book_id}}' hx-post="/wishCheck_post/" hx-vals='{"book_id": {{book.book_id}}}' hx-trigger="load" hx-target="#wishlist{{book.book_id}}">
+                                    <button hx-post="/wishList_post/" hx-vals='{"book_id": {{book.book_id}}}' hx-trigger="click delay:0.25s">...</button>
                                 </div>
                             </div>
+                        </div>
                     </li><br>
                 </div>
             {% endfor %}
         </ul>
     </div> 
-
-    {% comment %} Đây là khi khong tim thay sach {% endcomment %}
-    {% elif not page_obj%}
-    {% comment %} Chỉnh sửa thông báo khi không tìm thấy sách {% endcomment %}
+    {% else %}
     <div class="empty-state text-center py-5">
         <div class="empty-state-container">
             <i class="fas fa-search mb-4" style="font-size: 4rem; color: #1a237e;"></i>
             <h3 class="mb-3" style="color: #1a237e;">Không tìm thấy sách</h3>
             <p class="text-muted mb-4" style="max-width: 500px; margin: 0 auto;">
-                Không tìm thấy sách phù hợp với từ khóa "{{ query }}".
+                {% if query %}
+                    Không tìm thấy sách phù hợp với từ khóa "<span class="search-keyword">{{ query }}</span>".
+                {% else %}
+                    Không tìm thấy sách nào phù hợp với tiêu chí tìm kiếm.
+                {% endif %}
                 Hãy thử tìm kiếm với từ khóa khác hoặc duyệt thư viện của chúng tôi.
             </p>
             <a href="/" class="btn btn-primary">
@@ -147,5 +271,5 @@
 {% endblock navBot %}
 
 {% block scripts %}
-<script src="https://unpkg.com/htmx.org@2.0.2/dist/htmx.js" integrity="sha384-yZq+5izaUBKcRgFbxgkRYwpHhHHCpp5nseXp0MEQ1A4MTWVMnqkmcuFez8x5qfxr"crossorigin="anonymous"></script>
+<script src="https://unpkg.com/htmx.org@2.0.2/dist/htmx.js" integrity="sha384-yZq+5izaUBKcRgFbxgkRYwpHhHHCpp5nseXp0MEQ1A4MTWVMnqkmcuFez8x5qfxr" crossorigin="anonymous"></script>
 {% endblock scripts %}

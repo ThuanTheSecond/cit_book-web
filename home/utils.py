@@ -186,10 +186,28 @@ def filterBasedType(books, type):
     if type == 1:
         books = books.order_by('-book_view')
     if type == 2:
-        from django.db.models import IntegerField
-        from django.db.models.functions import Cast,  Substr, Length
+        from django.db.models import IntegerField, Value
+        from django.db.models.functions import Cast, Substr, Length, Coalesce
+        from django.db.models import F
+        import re
+
+        def extract_year(publish_str):
+            # Tìm năm trong chuỗi có dạng "... (2023)" hoặc "... 2023"
+            year_pattern = r'.*?(\d{4})\)?$'
+            match = re.search(year_pattern, publish_str or '')
+            return int(match.group(1)) if match else 0
+
         books = books.annotate(
-                year = Cast(Substr('book_publish', Length('book_publish') - 3),output_field=IntegerField())
+            # Trích xuất năm từ book_publish sử dụng custom function
+            year=Coalesce(
+                Cast(
+                    Substr('book_publish', 
+                          Length('book_publish') - 4,  # Lấy 4 ký tự cuối
+                          4),                          # Độ dài là 4
+                    output_field=IntegerField()
+                ),
+                Value(0)  # Giá trị mặc định nếu không tìm thấy năm
+            )
         ).order_by("-year")
     if type == 3:
         from django.db.models import Avg, Count, Value
