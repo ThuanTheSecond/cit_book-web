@@ -94,11 +94,28 @@ def searchTypePost(request):
     return
 
 def categoryPost(request):
-    topics = Topic.objects.all()
-    context = None
+    from itertools import groupby
+    from django.template.loader import render_to_string
+
+    # Lấy tất cả topics và sắp xếp theo tên
+    topics = Topic.objects.all().order_by('topic_name')
+    
+    # Nhóm topics theo chữ cái đầu tiên
+    grouped_topics = {}
     for topic in topics:
-        context+= f'<li><a href="/category/filter/id={topic.topic_id - 3000}">{ topic.topic_name }</a></li>'
-    return HttpResponse(context)
+        first_letter = topic.topic_name[0].upper()
+        if first_letter not in grouped_topics:
+            grouped_topics[first_letter] = []
+        grouped_topics[first_letter].append(topic)
+    
+    # Sắp xếp các nhóm theo alphabet
+    sorted_groups = dict(sorted(grouped_topics.items()))
+    
+    html = render_to_string('topic_groups.html', {
+        'grouped_topics': sorted_groups
+    })
+    
+    return HttpResponse(html)
 
 def ratingPost(request):
     if not request.user.is_authenticated:
@@ -233,13 +250,28 @@ def wishCheckPost(request):
                                 ''')
 
 def topicListPost(request):
-    topicList = Topic.objects.all().order_by('topic_name')
-    context = []
-    for topic in topicList:
-        context.append(
-            f'<li><a class="dropdown-item" id="t-{topic.topic_id}" href="/topicFilter/{topic.topic_id}/1">{topic.topic_name}</a></li>'
-        )
-    return HttpResponse('\n'.join(context))
+    from itertools import groupby
+    from django.template.loader import render_to_string
+
+    # Lấy tất cả topics và sắp xếp theo tên
+    topics = Topic.objects.all().order_by('topic_name')
+    
+    # Nhóm topics theo chữ cái đầu tiên
+    grouped_topics = {}
+    for topic in topics:
+        first_letter = topic.topic_name[0].upper()
+        if first_letter not in grouped_topics:
+            grouped_topics[first_letter] = []
+        grouped_topics[first_letter].append(topic)
+    
+    # Sắp xếp các nhóm theo alphabet
+    sorted_groups = dict(sorted(grouped_topics.items()))
+    
+    html = render_to_string('topic_groups.html', {
+        'grouped_topics': sorted_groups
+    })
+    
+    return HttpResponse(html)
 
 
 # middle logic

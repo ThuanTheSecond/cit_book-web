@@ -69,21 +69,42 @@ class ContentBasedRecommender:
 
     def _load_data(self):
         """Load và tiền xử lý dữ liệu với caching"""
-        from .models import ContentBook  # Move import here
+        from .models import ContentBook, Book  # Import thêm Book model
         
-        cache_key = 'content_book_df'
-        df = cache.get(cache_key)
-        
-        if df is None:
-            contents = ContentBook.objects.all().values('book_id', 'content')
+        try:
+            # Xóa cache cũ để load lại data mới
+            cache_key = 'content_book_df'
+            cache.delete(cache_key)
+            
+            # Load tất cả ContentBook có book active
+            contents = ContentBook.objects.select_related('book').filter(
+                book__is_active=True
+            ).values('book_id', 'content')
+            
+            if not contents.exists():
+                logger.warning("No content books found in database")
+                return pd.DataFrame(columns=['book_id', 'content'])
+                
             df = pd.DataFrame(contents)
+            
+            # Log để debug
+            logger.info(f"Loaded {len(df)} books into DataFrame")
+            logger.info(f"Sample of loaded data:\n{df.head()}")
+            logger.info(f"Book IDs in DataFrame: {df['book_id'].tolist()[:5]}...")
+            
+            # Tiền xử lý
             df['content'] = df['content'].fillna('')
             df['content'] = df['content'].astype(str)
             
+            # Lưu vào cache
             cache.set(cache_key, df, timeout=self.CACHE_TIMEOUT)
-        
-        self.df = df
-        return df
+            
+            self.df = df
+            return df
+            
+        except Exception as e:
+            logger.error(f"Error loading data: {str(e)}")
+            raise
 
     def _save_model(self):
         """Lưu model với compression"""
@@ -203,5 +224,6 @@ class ContentBasedRecommender:
         except Exception as e:
             logger.error(f"Error updating recommendations: {str(e)}")
             return False
+
 
 

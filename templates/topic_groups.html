@@ -1,0 +1,21 @@
+<div class="dropdown-menu-content">
+    <div class="topics-columns">
+        {% for letter, topics in grouped_topics.items %}
+            <div class="topic-column">
+                <div class="letter-header">{{ letter }}</div>
+                <div class="topic-list">
+                    {% for topic in topics %}
+                    <a href="/topicFilter/{{topic.topic_id}}/1" class="topic-link">
+                        {{ topic.topic_name }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% if forloop.counter|divisibleby:4 %}
+                </div><div class="topics-columns">
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
+

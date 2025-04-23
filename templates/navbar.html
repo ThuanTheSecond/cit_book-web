@@ -24,12 +24,17 @@
                         <a class="nav-link" href="{% url 'myBook' %}">Wishlist của tôi</a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false" hx-post='/topicList_post/' hx-trigger = 'click' hx-target = '#topicList'>
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false" hx-post='/topicList_post/' hx-trigger='click' hx-target='#topicList'>
                             Thể loại sách
                         </a>
-                        <ul class="dropdown-menu" id="topicList" aria-labelledby="navbarDropdownMenuLink">
-                            
-                        </ul>
+                        <div class="dropdown-menu alphabet-menu" id="topicList" aria-labelledby="navbarDropdownMenuLink">
+                            <div class="menu-header">
+                                <input type="text" class="topic-search" placeholder="Tìm thể loại..." oninput="filterTopics(this.value)">
+                            </div>
+                            <div class="menu-content">
+                                <!-- Sẽ được điền bởi HTMX -->
+                            </div>
+                        </div>
                     </li>
                 </ul>
             </div>
