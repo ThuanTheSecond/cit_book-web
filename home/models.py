@@ -21,8 +21,6 @@ class Topic(models.Model):
         return f'{self.topic_name}'
 
 
-
-
 class Book(models.Model):
     class Language(models.TextChoices):
         VN = 'Vietnamese'
@@ -81,7 +79,7 @@ class ToReads(models.Model):
 
 class ContentBook(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
-    content = models.CharField(max_length= 500)
+    content = models.CharField(max_length= 700)
 
 class AmazonUser(models.Model):
     id = models.AutoField(primary_key=True)
@@ -118,12 +116,13 @@ CharField.register_lookup(Unaccent)
 
 @receiver(post_save, sender=Book)
 def createBookContent_signal(sender, instance, created, **kwargs):
-    if created:
-        createBookContent()
-        print('create new book content')
-    else:
-        updateBookContent()
-        print('update book content')
+    try:
+        if created:
+            createBookContent(instance)
+        else:
+            updateBookContent(instance)
+    except Exception as e:
+        print(f'Error in Book signal handler for {instance.book_title}: {str(e)}')
 # tạo lịch sử xem sách :>>
 class BookViewHistory(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -165,6 +164,17 @@ class AuthorViewHistory(models.Model):
     def __str__(self):
         return f"{self.user.username} viewed author {self.author}"
 
+@receiver([post_save, post_delete], sender=Book_Topic)
+def update_content_on_topic_change(sender, instance, **kwargs):
+    try:
+        # Lấy book instance từ Book_Topic
+        book = instance.book_id
+        # Refresh book instance
+        book.refresh_from_db()
+        # Cập nhật ContentBook
+        updateBookContent(book)
+    except Exception as e:
+        print(f'Error in Book_Topic signal handler: {str(e)}')
     
         
         

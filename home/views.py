@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from .models import Book, Rating, Book_Topic, Topic, ToReads, ContentBook, BookViewHistory, BookReview
 from django.http import HttpResponse, JsonResponse
 from .forms import searchForm, SearchFormset
-from .utils import normalize_vietnamese, pagePaginator, HTTPResponseHXRedirect, login_required
+from .utils import normalize_vietnamese, pagePaginator, HTTPResponseHXRedirect, login_required, get_recommendations
 from django.shortcuts import redirect
 import json
 from django.contrib.auth.decorators import login_required
@@ -100,61 +100,32 @@ def categoryPost(request):
         context+= f'<li><a href="/category/filter/id={topic.topic_id - 3000}">{ topic.topic_name }</a></li>'
     return HttpResponse(context)
 
-# def ratingPost(request):
-#     # kiem tra nguoi dung da dang nhap chua khi nhan vao rating
-#     if not request.user.is_authenticated:
-#         login_url = reverse('login')  # URL của trang login
-#         current_url = request.POST.get('current_url', '/')
-#         return JsonResponse({"redirect": True, "url": f"{login_url}?next={current_url}"}, status=200)
-    
-#     rate = request.POST.get('rate')
-#     book_id = request.POST.get('book_id')
-#     # ----------- Thêm hoặc cập nhật rating----------
-#     rating, created = Rating.objects.update_or_create(
-#         user_id = request.user.id,
-#         book_id = book_id,
-#         defaults={'rating' : rate}
-#     )
-#     hx_vals_data = json.dumps({"rate": int(rate),
-#                                "book_id": int(book_id),
-#                                })
-#     val = "rate-" + rate
-#     return HttpResponse(f'''
-#                         <input type="button" onclick="hidebutton(this)" name="clear" id="clear-rating" hx-post ='/clear_rating_post/' hx-trigger="click delay:0.25s" hx-target='#{val}' hx-swap = "outerHTML" value="Xóa đánh giá" hx-vals ='{hx_vals_data}'>
-#                         ''')
-
-
-
 def ratingPost(request):
-    # kiem tra nguoi dung da dang nhap chua khi nhan vao rating
     if not request.user.is_authenticated:
-        login_url = reverse('login')  # URL của trang login
+        login_url = reverse('login')
         current_url = request.POST.get('current_url', '/')
+        current_url = current_url.replace('http://127.0.0.1:8000', '')
         return JsonResponse({"redirect": True, "url": f"{login_url}?next={current_url}"}, status=200)
     
     rate = request.POST.get('rate')
     book_id = request.POST.get('book_id')
-    # ----------- Thêm hoặc cập nhật rating----------
+    
+    # Update or create rating
     rating, created = Rating.objects.update_or_create(
-        user_id = request.user.id,
-        book_id = book_id,
-        defaults={'rating' : rate}
+        user_id=request.user.id,
+        book_id=book_id,
+        defaults={'rating': rate}
     )
+    
     logger.info(f"Saved rating for user {request.user.id}, book {book_id}, rating {rate}")
      
     # Check number of ratings
     rating_count = Rating.objects.filter(user=request.user).count()
-    print(rating_count)
     logger.info(f"User {request.user.id} has {rating_count} ratings")
+    
     hx_vals_data = json.dumps({"rate": int(rate), "book_id": int(book_id)})
     val = f"rate-{rate}"    
     
-    hx_vals_data = json.dumps({"rate": int(rate),
-                               "book_id": int(book_id),
-                               })
-    val = "rate-" + rate
-   
-    # Prepare response
     response_html = f'''
             <input type="button" onclick="hidebutton(this)" name="clear" id="clear-rating"
                    hx-post="/clear_rating_post/" hx-trigger="click delay:0.25s"
@@ -162,23 +133,22 @@ def ratingPost(request):
                    hx-vals='{hx_vals_data}'>
         '''
         
-        # If user has 5 or more ratings, trigger fine-tuning and show message
-    if rating_count >= 5:
+    # If user has 5 or more ratings, trigger fine-tuning
+    if rating_count == 5:
         if finetune_svd_model_task:
             try:
-                    finetune_svd_model_task.delay()
-                    logger.info("Fine-tuning task queued successfully")
+                finetune_svd_model_task.delay()
+                logger.info("Fine-tuning task queued successfully")
             except Exception as e:
-                    logger.error(f"Failed to queue fine-tuning task: {e}")
+                logger.error(f"Failed to queue fine-tuning task: {e}")
         else:
             logger.warning("Fine-tuning task not available")
-        response_html += '''
-                <div id="recommendation-message" class="alert alert-success" hx-swap-oob="true">
-                    You have rated enough books! Go to the <a href="/">homepage</a> to see recommendations.
-                </div>
-            '''
+        
+        # Add a flag in response to trigger the toast
+        response_html += '<div style="display:none">You have rated enough books!</div>'
         
     return HttpResponse(response_html)   
+
 
 def ratingCheckPost(request):
     if not request.user.is_authenticated:
@@ -283,10 +253,24 @@ def index(request):
     bookList = {}
     books_query = Book.objects.order_by('book_view')
     bookList['popular'] = books_query[:10]  
-    bookList['topVn'] = books_query.filter(book_lang = 'Vietnamese')[0:10]
-    bookList['topFl'] = books_query.filter(book_lang = 'Foreign')[0:10]
+    bookList['topVn'] = books_query.filter(book_lang='Vietnamese')[:10]
+    bookList['topFl'] = books_query.filter(book_lang='Foreign')[:10]
+
+    # Kiểm tra gợi ý cho người dùng đã đăng nhập
+    recommended_books = []
+    show_recommendations = False
+    if request.user.is_authenticated:
+        rating_count = Rating.objects.filter(user=request.user).count()
+        if rating_count >= 5:
+            recommended_books = get_recommendations(request.user.id, num_recommendations=10)
+            if recommended_books:
+                show_recommendations = True
+                logger.info(f"Đã tạo gợi ý cho user {request.user.id}: {len(recommended_books)} sách")
+
     context = {
-        'bookList' : bookList,
+        'bookList': bookList,
+        'recommended_books': recommended_books,
+        'show_recommendations': show_recommendations,
     }
     return render(request, 'index.html', context)
  
@@ -373,7 +357,7 @@ def bookDetail(request, id):
     # Count number of ratings
     countRate = countRating(book_id=detail.book_id)
 
-    # Get similar books
+    # Sach tuong tu
     bookList = Book.objects.all()
 
     # Get all reviews for this book

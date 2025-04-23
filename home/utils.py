@@ -53,41 +53,75 @@ def login_required(function=None, login_url=None, redirect_field_name=REDIRECT_F
 
 
 # Thêm mới record vào ContentBook
-def createBookContent():
-    from home.models import ContentBook, Book, Book_Topic
+def createBookContent(book_instance):
+    from home.models import ContentBook, Book_Topic
+    from django.db import transaction
     
-    latest_book = Book.objects.latest('created_at')
-    content = latest_book.book_title
-    content = str(content)
-    #  take topics of just insert book's topics
-    # sai 
-    topics = Book_Topic.objects.filter(book_id_id=latest_book.book_id).select_related('topic_id')
-    for topic in topics:
-        content +=f" {topic.topic_id.topic_name}"
-        print(content) 
-    content += f" {latest_book.book_author}"
-    # insert new Content Book 
-    newContent = ContentBook.objects.create(book = latest_book, content = content)
-    print(newContent.content)
+    # Đảm bảo transaction đã hoàn tất
+    with transaction.atomic():
+        # Refresh instance để đảm bảo dữ liệu mới nhất
+        book_instance.refresh_from_db()
+        
+        # Sử dụng trực tiếp instance
+        content = str(book_instance.book_title)
+        
+        # Lấy topics của sách cụ thể này
+        topics = Book_Topic.objects.filter(book_id=book_instance).select_related('topic_id')
+        
+        for topic in topics:
+            content += f" {topic.topic_id.topic_name}"
+        
+        content += f" {book_instance.book_author}"
+        
+        # Tạo ContentBook với instance sách đã có
+        newContent, created = ContentBook.objects.get_or_create(
+            book=book_instance,
+            defaults={'content': content}
+        )
+        
+        if created:
+            print(f"Created ContentBook for book: {book_instance.book_title} (ID: {book_instance.book_id})")
+        else:
+            # Nếu đã tồn tại, cập nhật content
+            newContent.content = content
+            newContent.save()
+            print(f"Updated existing ContentBook for book: {book_instance.book_title} (ID: {book_instance.book_id})")
+            
+        return newContent
 
 # Cập nhật nội dung trong table ContentBook
-def updateBookContent():
-    from home.models import ContentBook, Book, Book_Topic
+def updateBookContent(book_instance):
+    from home.models import ContentBook, Book_Topic
+    from django.db import transaction
     
-    lasted_update = Book.objects.latest('updated_at')
-
-    content = lasted_update.book_title
-    content = str(content)
-    
-    topics = Book_Topic.objects.filter(book_id_id = lasted_update.book_id).select_related('topic_id')
-    for topic in topics:
-        content+=' '+ str(topic.topic_id.topic_name)
-        print(content)
+    # Đảm bảo transaction đã hoàn tất
+    with transaction.atomic():
+        # Refresh instance để đảm bảo dữ liệu mới nhất
+        book_instance.refresh_from_db()
         
-    content += f" {lasted_update.book_author}"
-    content_update = ContentBook.objects.get(book_id = lasted_update.book_id)
-    content_update.content = content
-    content_update.save()
+        # Sử dụng trực tiếp instance
+        content = str(book_instance.book_title)
+        
+        # Lấy topics của sách cụ thể này
+        topics = Book_Topic.objects.filter(book_id=book_instance).select_related('topic_id')
+        
+        for topic in topics:
+            content += f" {topic.topic_id.topic_name}"
+        
+        content += f" {book_instance.book_author}"
+        
+        try:
+            # Cập nhật ContentBook với instance sách đã có
+            content_update, created = ContentBook.objects.update_or_create(
+                book=book_instance,
+                defaults={'content': content}
+            )
+            print(f"{'Created' if created else 'Updated'} ContentBook for book: {book_instance.book_title} (ID: {book_instance.book_id})")
+            return content_update
+        except Exception as e:
+            print(f"Error updating ContentBook for book: {book_instance.book_title}")
+            print(f"Error details: {str(e)}")
+            return None
 
 # cập nhật ma trận consine_similarity (không dùng nữa)
 def updateContentRecommend():
@@ -173,3 +207,52 @@ def filterBasedType(books, type):
         ).order_by('-rateavg', '-ratecount')
     return books
     
+import pickle
+import os
+from django.conf import settings
+
+# Gợi ý lọc cộng tác dựa trên ngươif dùng
+def get_recommendations(user_id, num_recommendations=10):
+    try:
+        # Xác định đường dẫn file mô hình
+        models_dir = os.path.join(settings.BASE_DIR, 'models')
+        model_path = os.path.join(models_dir, 'finetuned_svd_model.pkl')
+        if not os.path.exists(model_path):
+            model_path = os.path.join(models_dir, 'pretrain_svd_model.pkl')
+            if not os.path.exists(model_path):
+                print("Không tìm thấy mô hình để tạo gợi ý")
+                return []
+
+        # Tải mô hình
+        with open(model_path, 'rb') as f:
+            loaded_data = pickle.load(f)
+        
+        # Kiểm tra định dạng file
+        if isinstance(loaded_data, dict) and 'model' in loaded_data:
+            model = loaded_data['model']
+        else:
+            model = loaded_data
+            print("Đã tải trực tiếp đối tượng SVD (định dạng cũ)")
+
+        # Lấy tất cả sách trong hệ thống
+        from .models import Book, Rating
+        all_books = Book.objects.all()
+        user_rated_books = set(Rating.objects.filter(user_id=user_id).values_list('book_id', flat=True))
+
+        # Dự đoán điểm số cho các sách chưa được đánh giá
+        predictions = []
+        for book in all_books:
+            if book.book_id not in user_rated_books:
+                # Dự đoán điểm số bằng SVD
+                pred = model.predict(str(user_id), str(book.book_id))
+                predictions.append((book, pred.est))
+
+        # Sắp xếp theo điểm dự đoán giảm dần và lấy top N
+        predictions.sort(key=lambda x: x[1], reverse=True)
+        recommended_books = [pred[0] for pred in predictions[:num_recommendations]]
+        
+        return recommended_books
+
+    except Exception as e:
+        print(f"Lỗi khi tạo gợi ý cho user {user_id}: {e}")
+        return []

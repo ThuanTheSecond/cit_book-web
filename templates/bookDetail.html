@@ -1092,18 +1092,15 @@
     let initialWishlistLoad = true;
     let previousButtonState = null;
 
-    // Listen for successful wishlist updates
+    // Listen for successful updates
     document.body.addEventListener('htmx:afterSwap', function(evt) {
+        // Handle wishlist updates
         if (evt.detail.target.id.startsWith('wishlist')) {
             const button = evt.detail.target.querySelector('button');
             
             if (button) {
                 const isCurrentlySaved = button.textContent.includes('✓');
                 
-                // Chỉ hiển thị toast khi:
-                // 1. Không phải lần tải đầu tiên
-                // 2. Button có dấu ✓
-                // 3. Trạng thái trước đó của button không phải là đã lưu
                 if (!initialWishlistLoad && isCurrentlySaved && previousButtonState === false) {
                     Toastify({
                         text: "Đã thêm sách vào danh sách xem sau",
@@ -1115,15 +1112,38 @@
                     }).showToast();
                 }
                 
-                // Cập nhật trạng thái trước đó của button
                 previousButtonState = isCurrentlySaved;
             }
             
-            // Đánh dấu đã qua lần tải đầu tiên
             if (initialWishlistLoad) {
                 initialWishlistLoad = false;
             }
         }
+
+        // Handle rating updates
+        if (evt.detail.target.id === 'clear-rating') {
+            const response = evt.detail.xhr.response;
+            // Chỉ hiển thị toast nếu response chứa marker và chưa hiển thị trước đó
+            if (response.includes('You have rated enough books!') && !window.ratingToastShown) {
+                window.ratingToastShown = true; // Đánh dấu đã hiển thị
+                Toastify({
+                    text: "Bạn đã đánh giá đủ 5 cuốn sách! Hãy vào trang chủ để xem gợi ý sách cho bạn.",
+                    duration: 5000,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#4CAF50",
+                    stopOnFocus: true,
+                    onClick: function() {
+                        window.location.href = '/';
+                    }
+                }).showToast();
+            }
+        }
+    });
+
+    // Reset rating toast flag when leaving the page
+    window.addEventListener('beforeunload', function() {
+        window.ratingToastShown = false;
     });
 
     // Handle review form submission

@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.text import slugify
 from .models import Book, Topic, Book_Topic, Rating, ToReads, BookViewHistory, AuthorViewHistory, FavList
 from django.db.models import Count
 from django.utils import timezone
@@ -13,31 +14,47 @@ class TopicAdmin(admin.ModelAdmin):
         "topic_slug": ("topic_name",),
     }
 
+class Book_TopicInline(admin.TabularInline):
+    model = Book_Topic
+    extra = 1  # Số lượng form trống để thêm mới
+
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
-    prepopulated_fields ={
+    inlines = [Book_TopicInline]
+    prepopulated_fields = {
         "book_slug": ("book_title",),
     }
     list_display = ('book_title', 'book_author', 'book_lang')
     search_fields = ('book_title', 'book_author')
     list_filter = ('book_lang', 'created_at')
+    
+    # Chỉ sử dụng fieldsets, không sử dụng fields
+    fieldsets = (
+        ('Thông tin cơ bản', {
+            'fields': ('book_title', 'book_author', 'book_position', 'book_MFN')
+        }),
+        ('Thông tin xuất bản', {
+            'fields': ('book_publish', 'isbn_10', 'isbn_13')
+        }),
+        ('Phân loại', {
+            'fields': ('book_lang',)  # Bỏ trường topic ra khỏi đây
+        }),
+        ('Thông tin khác', {
+            'fields': ('book_slug', 'bookImage', 'is_active')
+        }),
+    )
 
-    def delete_model(self, request, obj):
-        # Xóa tất cả FavList entries liên quan
-        FavList.objects.filter(book=obj).delete()
-        # Sau đó xóa sách
-        obj.delete()
-
-    def delete_queryset(self, request, queryset):
-        # Xử lý xóa nhiều sách cùng lúc
-        for obj in queryset:
-            FavList.objects.filter(book=obj).delete()
-        queryset.delete()
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        if not obj.book_slug:
+            obj.book_slug = slugify(obj.book_title)
+            obj.save()
 
 @admin.register(Book_Topic)
 class Book_TopicAdmin(admin.ModelAdmin):
     list_display = ('book_id', 'topic_id')
     list_filter = ('topic_id',)
+    search_fields = ('book_id__book_title', 'topic_id__topic_name')
     
 @admin.register(Rating)
 class RatingAdmin(admin.ModelAdmin):

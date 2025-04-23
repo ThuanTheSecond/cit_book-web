@@ -271,6 +271,60 @@
 {% block content %}
 <div class="body">
   <div class="container-fluid justify-content-center">
+
+    {% if user.is_authenticated %}
+        {% if show_recommendations %}
+        <div class="slider-container">
+            <div class="category-header">
+                <span class="header-icon"><i class="fas fa-star"></i></span>
+                <h5><a id="container-header">Sách Gợi Ý Cho Bạn</a></h5>
+            </div>
+            <div class="book-slider">
+                {% for book in recommended_books %}
+                <div class="book-item">
+                    <div class="book-card">
+                        <div class="book-cover">
+                            <img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}">
+                            <div class="book-overlay" onclick="window.location.href='/book/detail/id={{ book.book_id|subtract:3000 }}'">
+                                <span class="view-details">Xem chi tiết</span>
+                            </div>
+                        </div>
+                        <div class="book-info">
+                            <h5 class="book-title">{{ book.book_title }}</h5>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="book-item">
+                    <p>Không có gợi ý sách phù hợp.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="slider-container">
+            <div class="category-header">
+                <span class="header-icon"><i class="fas fa-star"></i></span>
+                <h5><a id="container-header">Sách Gợi Ý Cho Bạn</a></h5>
+            </div>
+            <div class="text-center py-4">
+                <i class="fas fa-book-reader fa-3x mb-3" style="color: #1a237e;"></i>
+                <p class="lead">Hãy đánh giá 5 cuốn sách để nhận được gợi ý</p>
+            </div>
+        </div>
+        {% endif %}
+    {% else %}
+    <div class="slider-container">
+        <div class="category-header">
+            <span class="header-icon"><i class="fas fa-star"></i></span>
+            <h5><a id="container-header">Sách Gợi Ý Cho Bạn</a></h5>
+        </div>
+        <div class="text-center py-4">
+            <i class="fas fa-user-lock fa-3x mb-3" style="color: #1a237e;"></i>
+            <p class="lead">Hãy <a href="{% url 'login' %}" style="color: #1a237e; text-decoration: underline;">đăng nhập</a> để nhận được gợi ý sách</p>
+        </div>
+    </div>
+    {% endif %}
     <!-- Trending Books Section -->
     <div class="slider-container">
       <div class="category-header">
