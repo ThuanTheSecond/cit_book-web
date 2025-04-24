@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% load filters %}
+{% load custom_filters %}
 
 {% block pack %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -598,7 +599,7 @@
                         <div class="wishlist-meta">
                             <div>
                                 <i class="fas fa-star" style="color: #ffc107;"></i>
-                                <span>{{ averRates|get_item:book.book_id|default:"0.0" }}/5</span>
+                                <span>{{ averRates|get_number:book.book_id|default:"0.0" }}</span>
                             </div>
                             <div>
                                 <i class="fas fa-eye"></i>

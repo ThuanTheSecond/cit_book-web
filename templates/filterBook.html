@@ -2,6 +2,7 @@
 {% load static %}
 {% load widget_tweaks %}
 {% load filters %}
+{% load custom_filters %}
 
 {% block pack %}
     
@@ -131,7 +132,9 @@
                                 <p class="book-published">Xuất bản: {{ book.book_publish }}</p>
                                 
                                 <div class="aveRating">
-                                    <span class="product-rating">{{ averRates|get_item:book.book_id }}</span><span>/5 <span class="fa fa-star aveRating-start"></span> ({{ countRates|get_item:book.book_id }} - {{ book.book_view }} lượt xem)</span>
+                                    <span class="product-rating">{{ averRates|get_number:book.book_id }}</span><span>/5 
+                                    <span class="fa fa-star aveRating-start"></span> 
+                                    ({{ countRates|get_number:book.book_id }} - {{ book.book_view }} lượt xem)</span>
                                 </div>
                             </div>
 
