@@ -671,17 +671,26 @@ def categoryFilter(request, cid, type=1):
     books = Book.objects.all()
     
     # Phân loại dựa vào category
-    if cid != 'Trending':
+    if cid == 'Recommended':
+        if not request.user.is_authenticated:
+            return redirect('login')
+        rating_count = Rating.objects.filter(user=request.user).count()
+        if rating_count < 5:
+            messages.info(request, "Bạn cần đánh giá ít nhất 5 cuốn sách để nhận được gợi ý")
+            return redirect('home')
+        books = get_recommendations(request.user.id, num_recommendations=20)
+    elif cid != 'Trending':
         lang = 'Foreign'
         if cid == 'Tiếng Việt':
             lang = 'Vietnamese'
         books = books.filter(book_lang=lang)
     
     # Phân loại dựa vào filter type
-    books = filterBasedType(books=books, type=type)
+    if cid != 'Recommended':  # Không áp dụng filter cho sách gợi ý
+        books = filterBasedType(books=books, type=type)
     
     # Kiểm tra nếu không có sách
-    if not books.exists():
+    if not books:
         books = []
     
     countRates = {}
@@ -696,16 +705,9 @@ def categoryFilter(request, cid, type=1):
     page_numbers = []
     if page_obj:
         for num in page_obj.paginator.page_range:
-            if (
-                num == 1 or 
-                num == page_obj.paginator.num_pages or 
-                abs(num - page_obj.number) <= 2
-            ):
+            if num == 1 or num == page_obj.paginator.num_pages or abs(num - page_obj.number) <= 2:
                 page_numbers.append(num)
-            elif (
-                abs(num - page_obj.number) == 3
-                and num not in page_numbers
-            ):
+            elif abs(num - page_obj.number) == 3 and num not in page_numbers:
                 page_numbers.append('...')
 
     context = {
@@ -714,7 +716,7 @@ def categoryFilter(request, cid, type=1):
         'page_numbers': page_numbers,
         'countRates': countRates,
         'averRates': averRates,
-        'filter_type': type,  # Thêm filter type vào context
+        'filter_type': type
     }
     return render(request, 'filterBook.html', context)
 

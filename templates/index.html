@@ -263,6 +263,55 @@
         height: 180px;
       }
     }
+
+    .recommendation-message {
+      padding: 30px;
+      text-align: center;
+      background: #fff;
+      border-radius: 12px;
+      margin: 20px 0;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e0e0e0;
+    }
+
+    .recommendation-message .message-icon {
+      font-size: 48px;
+      color: #3b82f6;
+      margin-bottom: 15px;
+    }
+
+    .recommendation-message h4 {
+      color: #2d3748;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .recommendation-message p {
+      margin: 0;
+      color: #4a5568;
+      font-size: 1.1em;
+      line-height: 1.5;
+    }
+
+    .recommendation-message a {
+      color: #3b82f6;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .recommendation-message a:hover {
+      color: #2563eb;
+      text-decoration: underline;
+    }
+
+    .recommendation-message .action-hint {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background: #f0f9ff;
+      border-radius: 8px;
+      display: inline-block;
+    }
   </style>
 {% endblock pack %}
  
@@ -272,12 +321,13 @@
 <div class="body">
   <div class="container-fluid justify-content-center">
 
+    <!-- Recommended Books Section -->
     {% if user.is_authenticated %}
         {% if show_recommendations %}
         <div class="slider-container">
             <div class="category-header">
-                <span class="header-icon"><i class="fas fa-star"></i></span>
-                <h5><a id="container-header">Sách Gợi Ý Cho Bạn</a></h5>
+                <span class="header-icon"><i class="fas fa-lightbulb"></i></span>
+                <h5><a id="container-header" href="/categoryFilter/Recommended/1">Sách Gợi Ý Cho Bạn</a></h5>
             </div>
             <div class="book-slider">
                 {% for book in recommended_books %}
@@ -294,37 +344,48 @@
                         </div>
                     </div>
                 </div>
-                {% empty %}
-                <div class="book-item">
-                    <p>Không có gợi ý sách phù hợp.</p>
-                </div>
                 {% endfor %}
             </div>
         </div>
         {% else %}
         <div class="slider-container">
             <div class="category-header">
-                <span class="header-icon"><i class="fas fa-star"></i></span>
-                <h5><a id="container-header">Sách Gợi Ý Cho Bạn</a></h5>
+                <span class="header-icon"><i class="fas fa-lightbulb"></i></span>
+                <h5>Sách Gợi Ý Cho Bạn</h5>
             </div>
-            <div class="text-center py-4">
-                <i class="fas fa-book-reader fa-3x mb-3" style="color: #1a237e;"></i>
-                <p class="lead">Hãy đánh giá 5 cuốn sách để nhận được gợi ý</p>
+            <div class="recommendation-message">
+                <div class="message-icon">
+                    <i class="fas fa-star-half-alt"></i>
+                </div>
+                <h4>Nhận Gợi Ý Sách Phù Hợp Với Bạn</h4>
+                <p>Để nhận được những gợi ý sách phù hợp nhất với sở thích của bạn</p>
+                <div class="action-hint">
+                    <i class="fas fa-info-circle"></i>
+                    Hãy đánh giá ít nhất 5 cuốn sách bạn đã đọc
+                </div>
             </div>
         </div>
         {% endif %}
     {% else %}
     <div class="slider-container">
         <div class="category-header">
-            <span class="header-icon"><i class="fas fa-star"></i></span>
-            <h5><a id="container-header">Sách Gợi Ý Cho Bạn</a></h5>
+            <span class="header-icon"><i class="fas fa-lightbulb"></i></span>
+            <h5>Sách Gợi Ý Cho Bạn</h5>
         </div>
-        <div class="text-center py-4">
-            <i class="fas fa-user-lock fa-3x mb-3" style="color: #1a237e;"></i>
-            <p class="lead">Hãy <a href="{% url 'login' %}" style="color: #1a237e; text-decoration: underline;">đăng nhập</a> để nhận được gợi ý sách</p>
+        <div class="recommendation-message">
+            <div class="message-icon">
+                <i class="fas fa-user-lock"></i>
+            </div>
+            <h4>Khám Phá Sách Phù Hợp Với Bạn</h4>
+            <p>Để nhận được những gợi ý sách được cá nhân hóa</p>
+            <div class="action-hint">
+                <i class="fas fa-sign-in-alt"></i>
+                Vui lòng <a href="{% url 'login' %}">đăng nhập</a> hoặc <a href="{% url 'register' %}">đăng ký</a> tài khoản
+            </div>
         </div>
     </div>
     {% endif %}
+
     <!-- Trending Books Section -->
     <div class="slider-container">
       <div class="category-header">
