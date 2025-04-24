@@ -1,3 +1,5 @@
+{% load custom_filters %}
+
 {% if reviews %}
     {% for review in reviews %}
         <div class="review-item">
@@ -12,13 +14,19 @@
                     </div>
                 </div>
                 <div class="review-rating">
-                    {% for i in "12345"|make_list %}
-                        {% if forloop.counter <= review.rating %}
-                            <i class="fas fa-star text-warning"></i>
+                    {% with user_rating=ratings|get_item:review.user.id %}
+                        {% if user_rating %}
+                            {% for i in "12345"|make_list %}
+                                {% if forloop.counter <= user_rating %}
+                                    <i class="fas fa-star text-warning"></i>
+                                {% else %}
+                                    <i class="far fa-star text-warning"></i>
+                                {% endif %}
+                            {% endfor %}
                         {% else %}
-                            <i class="far fa-star text-warning"></i>
+                            <span class="no-rating">Chưa đánh giá sách</span>
                         {% endif %}
-                    {% endfor %}
+                    {% endwith %}
                 </div>
             </div>
             <p class="review-content">{{ review.comment }}</p>
@@ -28,6 +36,5 @@
     <div class="empty-reviews">
         <i class="far fa-comment-dots"></i>
         <h4>Chưa có đánh giá nào</h4>
-        <p>Hãy là người đầu tiên đánh giá cuốn sách này</p>
     </div>
 {% endif %} 

@@ -149,14 +149,14 @@ class BookViewHistory(models.Model):
 class BookReview(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='reviews')
-    rating = models.IntegerField(choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')])
+    rating = models.IntegerField(choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')], blank=True, null=True)  # Thêm null=True
     comment = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['-created_at']
-        unique_together = ['user', 'book']  # Một user chỉ có thể review một lần cho mỗi sách
+        unique_together = ['user', 'book']
 
     def __str__(self):
         return f'{self.user.username} - {self.book.book_title} - {self.rating}★'

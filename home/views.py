@@ -6,7 +6,7 @@ from .utils import normalize_vietnamese, get_content_based_recommendations,pageP
 from django.shortcuts import redirect
 import json
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q, Avg, Count
+from django.db.models import Q, Avg, Count, F
 import re
 from functools import reduce
 from operator import and_
@@ -356,52 +356,70 @@ def bookDetail(request, id):
     
     # Update or create view history if user is authenticated
     if request.user.is_authenticated:
-        # Update or create view history
         BookViewHistory.objects.update_or_create(
             user=request.user,
             book=detail,
             defaults={'viewed_at': timezone.now()}
         )
         
-        # Increment view count
-        detail.book_view += 1
-        detail.save()
-
-        # Check if user has already reviewed this book
-        user_has_reviewed = BookReview.objects.filter(user=request.user, book=detail).exists()
+        # Get user's rating
+        user_rating = Rating.objects.filter(
+            user=request.user, 
+            book=detail
+        ).first()
+        
+        rating = str(user_rating.rating) if user_rating else 'None'
+        
+        # Check if user has already reviewed
+        user_has_reviewed = BookReview.objects.filter(
+            user=request.user, 
+            book=detail
+        ).exists()
     else:
         user_has_reviewed = False
-        # Increment view count even for anonymous users
-        detail.book_view += 1
-        detail.save()
+        rating = 'None'
 
-    # Get user's rating if exists
-    rating = 'None'
-    if request.user.is_authenticated:
-        rating_obj = detail.rating_set.filter(user=request.user).first()
-        if rating_obj:
-            rating = str(rating_obj.rating)
+    # Increment view count
+    detail.book_view = F('book_view') + 1
+    detail.save()
 
-    # Calculate average rating
-    averRate = detail.rating_set.all().aggregate(Avg('rating'))['rating__avg']
-    if averRate is None:
-        averRate = 0
-    averRate = "{:.1f}".format(averRate)
+    # Get ratings statistics
+    rating_stats = Rating.objects.filter(book=detail).aggregate(
+        average=Avg('rating'),
+        count=Count('id')
+    )
     
-    # Count number of ratings
-    countRate = countRating(book_id=detail.book_id)
+    averRate = "{:.1f}".format(rating_stats['average'] or 0)
+    countRate = rating_stats['count']
 
-    # Sach tuong tu
+    # Get reviews for comments only
+    reviews = BookReview.objects.filter(book=detail)\
+        .select_related('user')\
+        .order_by('-created_at')
+
+    # Get book topics
+    book_topics = Book_Topic.objects.filter(book_id=detail)\
+        .select_related('topic_id')
+    topics = [
+        {'topic_id': bt.topic_id.topic_id, 'topic_name': bt.topic_id.topic_name} 
+        for bt in book_topics
+    ]
+
+    # Get similar books
     similar_books = get_content_based_recommendations(detail.book_id, 10)
 
     # Get all reviews for this book
-    reviews = BookReview.objects.filter(book=detail).select_related('user').order_by('-created_at')
-
-    # Get book topics
-    book_topics = Book_Topic.objects.filter(book_id=detail).select_related('topic_id')
-    topics = [{'topic_id': bt.topic_id.topic_id, 'topic_name': bt.topic_id.topic_name} 
-             for bt in book_topics]
-
+    reviews = detail.reviews.select_related('user').all()
+    
+    # Get ratings for all users who reviewed
+    ratings = {
+        str(rating.user_id): rating.rating  # Convert user_id to string
+        for rating in Rating.objects.filter(
+            book=detail,
+            user_id__in=reviews.values_list('user_id', flat=True)
+        )
+    }
+    
     context = {
         'detail': detail,
         'rating': rating,
@@ -409,8 +427,9 @@ def bookDetail(request, id):
         'countRate': countRate,
         'bookList': similar_books,
         'user_has_reviewed': user_has_reviewed,
-        'reviews': reviews,  # Add reviews to context
-        'book_topics': topics,  # Add this line
+        'reviews': reviews,
+        'book_topics': topics,
+        'ratings': ratings,
     }
     
     return render(request, 'bookDetail.html', context)
@@ -751,29 +770,32 @@ def profile(request):
 def add_review(request, book_id):
     if request.method == 'POST':
         book = get_object_or_404(Book, book_id=book_id)
-        rating = request.POST.get('rating')
         comment = request.POST.get('comment')
 
-        # Cập nhật hoặc tạo mới review
         review, created = BookReview.objects.update_or_create(
             user=request.user,
             book=book,
             defaults={
-                'rating': rating,
-                'comment': comment
+                'comment': comment,
+                'rating': None
             }
         )
 
-        # Cập nhật rating trung bình của sách
-        avg_rating = book.reviews.aggregate(Avg('rating'))['rating__avg']
-        book.book_rating = round(avg_rating, 1) if avg_rating else 0
-        book.save()
-
         if request.headers.get('HX-Request'):
-            # Nếu là request từ HTMX, trả về phần HTML của reviews
             reviews = book.reviews.select_related('user').all()
-            return render(request, 'partials/reviews.html', {'reviews': reviews})
+            # Lấy ratings cho tất cả users đã review
+            ratings = {
+                rating.user_id: rating.rating 
+                for rating in Rating.objects.filter(
+                    book=book,
+                    user_id__in=reviews.values_list('user_id', flat=True)
+                )
+            }
+            return render(request, 'partials/reviews_list.html', {
+                'reviews': reviews,
+                'ratings': ratings
+            })
         
         return redirect('book_detail', id=book_id)
-
+    
     return JsonResponse({'error': 'Invalid request method'}, status=400)
