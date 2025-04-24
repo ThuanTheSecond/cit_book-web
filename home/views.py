@@ -740,20 +740,17 @@ def profile(request):
     # Get user's view history
     history_list = BookViewHistory.objects.filter(
         user=request.user
-    ).select_related('book').order_by('-viewed_at')[:12]  # Show last 12 viewed books
+    ).select_related('book').order_by('-viewed_at')[:12]
     
     # Get user's wishlist books
     wishlist_books = [toreads.book for toreads in ToReads.objects.filter(
         user=request.user
     ).select_related('book').order_by('-created_at')]
-    
-    # Lấy đánh giá và lượt xem cho sách yêu thích
-    countRates = {}
-    averRates = {}
-    for book in wishlist_books:
-        book_id = book.book_id
-        countRates[book_id] = countRating(book_id=book_id)
-        averRates[book_id] = averRating(book_id=book_id)
+
+    # Get user's rated books
+    rated_books = Rating.objects.filter(
+        user=request.user
+    ).select_related('book').order_by('-created_at')
 
     context = {
         'books_viewed': books_viewed,
@@ -761,8 +758,7 @@ def profile(request):
         'books_saved': books_saved,
         'history_list': history_list,
         'wishlist_books': wishlist_books,
-        'countRates': countRates,
-        'averRates': averRates,
+        'rated_books': rated_books,
     }
     return render(request, 'profile.html', context)
 
