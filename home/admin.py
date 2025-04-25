@@ -16,7 +16,20 @@ class TopicAdmin(admin.ModelAdmin):
 
 class Book_TopicInline(admin.TabularInline):
     model = Book_Topic
-    extra = 1  # Số lượng form trống để thêm mới
+    extra = 1
+    min_num = 0
+    max_num = None
+    can_delete = True
+    verbose_name = 'Chủ đề'
+    verbose_name_plural = 'Các chủ đề'
+    
+    class Media:
+        js = ('js/dynamic_topics.js',)  # Thêm custom JavaScript
+    
+    def get_formset(self, request, obj=None, **kwargs):
+        """Tùy chỉnh formset để validate dữ liệu"""
+        formset = super().get_formset(request, obj, **kwargs)
+        return formset
 
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
@@ -28,7 +41,6 @@ class BookAdmin(admin.ModelAdmin):
     search_fields = ('book_title', 'book_author')
     list_filter = ('book_lang', 'created_at')
     
-    # Chỉ sử dụng fieldsets, không sử dụng fields
     fieldsets = (
         ('Thông tin cơ bản', {
             'fields': ('book_title', 'book_author', 'book_position', 'book_MFN')
@@ -37,18 +49,45 @@ class BookAdmin(admin.ModelAdmin):
             'fields': ('book_publish', 'isbn_10', 'isbn_13')
         }),
         ('Phân loại', {
-            'fields': ('book_lang',)  # Bỏ trường topic ra khỏi đây
+            'fields': ('book_lang',)  # Đã xóa 'topic' khỏi đây
         }),
         ('Thông tin khác', {
             'fields': ('book_slug', 'bookImage', 'is_active')
         }),
     )
 
+    class Media:
+        js = ('admin/js/admin/RelatedObjectLookups.js', 'js/dynamic_topics.js')
+
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
         if not obj.book_slug:
             obj.book_slug = slugify(obj.book_title)
             obj.save()
+            
+    def save_related(self, request, form, formsets, change):
+        """Đảm bảo lưu đúng các quan hệ many-to-many"""
+        super().save_related(request, form, formsets, change)
+        form.save_m2m()  # Lưu các quan hệ many-to-many
+
+    def get_inline_instances(self, request, obj=None):
+        """Đảm bảo inlines được load đúng cách"""
+        if not obj:  # Nếu đang tạo mới object
+            return []
+        return super().get_inline_instances(request, obj)
+
+    def get_form(self, request, obj=None, **kwargs):
+        """Tùy chỉnh form"""
+        form = super().get_form(request, obj, **kwargs)
+        return form
+
+    def response_change(self, request, obj):
+        """Xử lý sau khi lưu thành công"""
+        response = super().response_change(request, obj)
+        if "_continue" not in request.POST:
+            # Refresh lại object để đảm bảo dữ liệu mới nhất
+            obj.refresh_from_db()
+        return response
 
 @admin.register(Book_Topic)
 class Book_TopicAdmin(admin.ModelAdmin):
