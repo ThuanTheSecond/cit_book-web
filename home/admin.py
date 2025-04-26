@@ -16,19 +16,30 @@ class TopicAdmin(admin.ModelAdmin):
 
 class Book_TopicInline(admin.TabularInline):
     model = Book_Topic
-    extra = 1
-    min_num = 0
-    max_num = None
-    can_delete = True
     verbose_name = 'Chủ đề'
     verbose_name_plural = 'Các chủ đề'
+    extra = 1
+    
     
     class Media:
-        js = ('js/dynamic_topics.js',)  # Thêm custom JavaScript
+        js = ('js/dynamic_topics.js',)
+        css = {
+            'all': ('css/admin_custom.css',)
+        }
     
     def get_formset(self, request, obj=None, **kwargs):
         """Tùy chỉnh formset để validate dữ liệu"""
         formset = super().get_formset(request, obj, **kwargs)
+        
+        # Override clean method để thêm validation
+        def clean(self):
+            cleaned_data = super(formset.form, self).clean()
+            if not cleaned_data.get('DELETE', False):  # Chỉ validate nếu form không bị đánh dấu xóa
+                if not cleaned_data.get('topic_id'):
+                    raise forms.ValidationError('Vui lòng chọn chủ đề')
+            return cleaned_data
+            
+        formset.form.clean = clean
         return formset
 
 @admin.register(Book)
@@ -66,9 +77,29 @@ class BookAdmin(admin.ModelAdmin):
             obj.save()
             
     def save_related(self, request, form, formsets, change):
-        """Đảm bảo lưu đúng các quan hệ many-to-many"""
-        super().save_related(request, form, formsets, change)
-        form.save_m2m()  # Lưu các quan hệ many-to-many
+        """Xử lý lưu các quan hệ many-to-many và inline formsets"""
+        for formset in formsets:
+            # Kiểm tra xem có phải là Book_TopicInline formset không
+            if isinstance(formset, Book_TopicInline):
+                instances = formset.save(commit=False)
+                
+                # Xử lý các instance bị xóa
+                for obj in formset.deleted_objects:
+                    obj.delete()
+                
+                # Lưu các instance mới và cập nhật
+                for instance in instances:
+                    if not instance.pk:  # Nếu là instance mới
+                        instance.book_id = form.instance
+                    instance.save()
+                
+                # Đảm bảo tất cả các m2m relations được lưu
+                formset.save_m2m()
+            else:
+                formset.save()
+        
+        # Lưu các quan hệ many-to-many khác
+        form.save_m2m()
 
     def get_inline_instances(self, request, obj=None):
         """Đảm bảo inlines được load đúng cách"""

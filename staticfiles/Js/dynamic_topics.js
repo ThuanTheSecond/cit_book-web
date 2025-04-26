@@ -1,55 +1,106 @@
 (function($) {
     'use strict';
     
-    // Hàm để refresh các select fields của topic
-    function updateTopicSelects(win, newId, newRepr) {
-        // Tìm tất cả các select fields của topic trong inline formsets
-        const topicSelects = document.querySelectorAll('select[id$="-topic_id"]');
+    // Hàm xử lý khi select thay đổi
+    function handleTopicSelect(select) {
+        const row = select.closest('tr');
         
-        topicSelects.forEach(select => {
-            // Thêm option mới vào mỗi select
-            const option = new Option(newRepr, newId);
-            select.add(option);
+        // Nếu là empty-form, chuyển đổi thành form-row bình thường
+        if (row.classList.contains('empty-form')) {
+            row.classList.remove('empty-form');
+            row.classList.add('form-row');
+            row.classList.add('dynamic-book_topics');
             
-            // Sắp xếp lại các options theo alphabet
-            const options = Array.from(select.options);
-            options.sort((a, b) => a.text.localeCompare(b.text));
+            // Cập nhật ID của row
+            const newId = 'book_topics-' + (document.querySelectorAll('tr.form-row.dynamic-book_topics').length - 1);
+            row.id = newId;
             
-            select.innerHTML = '';
-            options.forEach(item => select.add(item));
+            // Cập nhật các input/select trong row
+            row.querySelectorAll('input, select').forEach(input => {
+                const oldName = input.name;
+                const oldId = input.id;
+                input.name = oldName.replace('__prefix__', newId.split('-')[1]);
+                input.id = oldId.replace('__prefix__', newId.split('-')[1]);
+            });
+        }
+
+        const titleCell = row.querySelector('td.original');
+        if (select.value && titleCell) {
+            const selectedOption = select.options[select.selectedIndex];
+            titleCell.textContent = selectedOption.text;
+            
+            // Thêm nút Remove nếu chưa có
+            const deleteCell = row.querySelector('td.delete');
+            if (deleteCell && !deleteCell.querySelector('.remove-btn')) {
+                const removeBtn = document.createElement('a');
+                removeBtn.textContent = 'Remove';
+                removeBtn.className = 'remove-btn';
+                removeBtn.href = '#';
+                removeBtn.onclick = function(e) {
+                    e.preventDefault();
+                    row.remove();
+                    updateFormIndexes();
+                };
+                deleteCell.appendChild(removeBtn);
+            }
+        }
+    }
+
+    // Hàm cập nhật index cho các form
+    function updateFormIndexes() {
+        const rows = document.querySelectorAll('tr.form-row.dynamic-book_topics');
+        rows.forEach((row, index) => {
+            row.id = `book_topics-${index}`;
+            row.querySelectorAll('input, select').forEach(input => {
+                input.name = input.name.replace(/\d+/, index);
+                input.id = input.id.replace(/\d+/, index);
+            });
+        });
+        
+        // Cập nhật TOTAL_FORMS
+        const totalForms = document.querySelector('#id_book_topics-TOTAL_FORMS');
+        if (totalForms) {
+            totalForms.value = rows.length;
+        }
+    }
+
+    // Khởi tạo các select fields
+    function initializeTopicSelects() {
+        document.querySelectorAll('select[id*="topic_id"]').forEach(select => {
+            // Xóa event listener cũ nếu có
+            const newSelect = select.cloneNode(true);
+            select.parentNode.replaceChild(newSelect, select);
+            
+            // Thêm event listener mới
+            newSelect.addEventListener('change', () => handleTopicSelect(newSelect));
+            
+            // Xử lý các select đã có giá trị
+            if (newSelect.value) {
+                handleTopicSelect(newSelect);
+            }
         });
     }
 
-    // Override hàm dismissAddRelatedObjectPopup mặc định của Django
-    window.dismissAddRelatedObjectPopup = function(win, newId, newRepr) {
-        const name = windowname_to_id(win.name);
-        const elem = document.getElementById(name);
+    // Khởi tạo khi trang được load
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeTopicSelects();
         
-        if (elem) {
-            if (elem.nodeName === 'SELECT') {
-                elem.options[elem.options.length] = new Option(newRepr, newId, true, true);
-                // Cập nhật tất cả các topic selects khác
-                updateTopicSelects(win, newId, newRepr);
-            } else {
-                const href = document.getElementById(name + '_link');
-                if (href) {
-                    href.innerHTML = newRepr;
-                    href.href = href.href.replace(/(.*\/)(\d+)(\/)$/, '$1' + newId + '$3');
-                }
-            }
+        // Xử lý khi thêm hàng mới
+        const addButton = document.querySelector('.add-row a');
+        if (addButton) {
+            addButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                // Đợi một chút để DOM được cập nhật
+                setTimeout(() => {
+                    const emptyForm = document.querySelector('tr.empty-form');
+                    if (emptyForm) {
+                        const clone = emptyForm.cloneNode(true);
+                        emptyForm.parentNode.insertBefore(clone, emptyForm);
+                        initializeTopicSelects();
+                    }
+                }, 100);
+            });
         }
-        // Đóng window và xóa reference
-        if (win && !win.closed) {
-            win.close();
-        }
-    };
+    });
 
-    // Override hàm showAddAnotherPopup mặc định của Django
-    window.showAddAnotherPopup = function(triggeringLink) {
-        const name = triggeringLink.id.replace(/^add_/, '');
-        const href = triggeringLink.href;
-        const win = window.open(href, name, 'height=500,width=800,resizable=yes,scrollbars=yes');
-        win.focus();
-        return false;
-    };
 })(django.jQuery);
