@@ -902,6 +902,78 @@
         color: white;
         transform: translateY(-2px);
     }
+
+    /* Cải tiến Star Rating */
+    .rating-container {
+      margin: 15px 0;
+      background: rgba(255, 255, 255, 0.7);
+      padding: 12px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      text-align: center;
+    }
+
+    .rating-title {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 8px;
+      font-weight: 500;
+      text-align: center;
+      padding-left: 0;
+    }
+
+    .rating {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      margin: 0 auto;
+    }
+
+    .rating p {
+      margin: 0;
+    }
+
+    .star-rating {
+      display: flex;
+      flex-direction: row;
+    }
+
+    .rating label {
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 2px;
+      color: #ddd;
+      transition: all 0.2s ease;
+    }
+
+    .rating label:hover,
+    .rating label:hover ~ label,
+    .rating input:checked ~ label {
+      color: #ffc107;
+    }
+
+    .rating input {
+      display: none;
+    }
+
+    /* Nút xóa đánh giá */
+    .clear-rating-btn {
+      margin-top: 8px;
+      padding: 5px 10px;
+      font-size: 12px;
+      background: transparent;
+      border: 1px solid #ddd;
+      color: #666;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .clear-rating-btn:hover {
+      background: #f8f8f8;
+      color: #e74c3c;
+      border-color: #e74c3c;
+    }
   </style>
 {% endblock pack %}
 
@@ -912,32 +984,34 @@
         <div class="row">
             <div class="left-container col-md-3 justify-content-center">
                 <img src="{{ detail.bookImage.url }}" alt="image of book {{myManga.title}}" class="book-detail-image">
-                 <div id="rating">
-                    <form action="">
-                        <div class="rating">
-                            <p><span class="star-rating">
-                                {% for i in "12345" %} 
-                                    {% if i == rating %}
-                                        <label for="rate-{{i}}" style="--i: {{i}}"><i class="fa fa-star" title="{{i}} star"></i></label>
-                                        <input class="star" type="radio" name="rating" id="rate-{{i}}" hx-vals='{"rate": {{i}}, "book_id": {{detail.book_id}}}' hx-post ="/rating_post/" hx-trigger="click delay:0.25s" hx-target="#clear-rating" hx-swap="outerHTML" checked>
-                                        <input type="radio" name="rating" id="rate-{{i}}" hx-vals='{"rate": {{i}}, "book_id": {{detail.book_id}}}' hx-post ="/rating_post/" hx-trigger="click delay:0.25s" hx-target="#clear-rating" hx-swap="outerHTML" checked>
-                                    {% else %}
-                                        <label for="rate-{{i}}" style="--i: {{i}}"><i class="fa fa-star" title="{{i}} star"></i></label>
-                                        <input type="radio" name="rating" id="rate-{{i}}" hx-vals='{"rate": {{i}}, "book_id": {{detail.book_id}}}' hx-post ="/rating_post/" hx-trigger="click delay:0.25s" hx-target="#clear-rating" hx-swap="outerHTML">
-                                        <input class="star" type="radio" name="rating" id="rate-{{i}}" hx-vals='{"rate": {{i}}, "book_id": {{detail.book_id}}}' hx-post ="/rating_post/" hx-trigger="click delay:0.25s" hx-target="#clear-rating" hx-swap="outerHTML">
-                                    {% endif %}
-                                {% endfor %}    
-                            </span></p>
-                        </div>
-                        <div class="clear_rating">
-                            <input style="display: none;" type="button"  name="clear" id="clear-rating" >
-                            {% if rating != 'None' %}
-                                <input type="button" onclick="hidebutton(this)" name="clear" id="clear-rating" hx-post ='/clear_rating_post/' hx-trigger="click delay:0.25s" hx-target='#rate-{{rating}}' hx-swap = "outerHTML" value="Xóa đánh giá" hx-vals ='{"rate": {{rating}}, "book_id": {{detail.book_id}}}'>
-                            {% else %}
-                                <input style="display: none;" type="button"  name="clear" id="clear-rating" >
-                            {% endif %}
-                        </div>
-                    </form>
+                <div class="rating-container">
+                    <div class="rating-title">Đánh giá của bạn</div>
+                    <div id="rating">
+                        <form action="">
+                            <div class="rating">
+                                <span class="star-rating">
+                                    {% for i in "54321" %}
+                                        {% if i == rating %}
+                                            <label for="rate-{{i}}" title="{{i}} sao"><i class="fa fa-star"></i></label>
+                                            <input type="radio" name="rating" id="rate-{{i}}" hx-vals='{"rate": {{i}}, "book_id": {{detail.book_id}}}' hx-post="/rating_post/" hx-trigger="click delay:0.25s" hx-target="#clear-rating" hx-swap="outerHTML" checked>
+                                        {% else %}
+                                            <label for="rate-{{i}}" title="{{i}} sao"><i class="fa fa-star"></i></label>
+                                            <input type="radio" name="rating" id="rate-{{i}}" hx-vals='{"rate": {{i}}, "book_id": {{detail.book_id}}}' hx-post="/rating_post/" hx-trigger="click delay:0.25s" hx-target="#clear-rating" hx-swap="outerHTML">
+                                        {% endif %}
+                                    {% endfor %}
+                                </span>
+                            </div>
+                            <div class="clear_rating">
+                                {% if rating != 'None' %}
+                                    <button type="button" onclick="hidebutton(this)" id="clear-rating" class="clear-rating-btn" hx-post="/clear_rating_post/" hx-trigger="click delay:0.25s" hx-target="#rate-{{rating}}" hx-swap="outerHTML" hx-vals='{"rate": {{rating}}, "book_id": {{detail.book_id}}}'>
+                                        <i class="fas fa-times"></i> Xóa đánh giá
+                                    </button>
+                                {% else %}
+                                    <input style="display: none;" type="button" id="clear-rating" >
+                                {% endif %}
+                            </div>
+                        </form>
+                    </div>
                 </div>
                 <div class="mfn">
                     <a href="https://lrcopac.ctu.edu.vn/pages/opac/wpid-detailbib-id-{{ detail.book_slug }}.html">Thông tin thêm</a>

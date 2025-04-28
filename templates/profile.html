@@ -6,10 +6,42 @@
 {% block pack %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <style>
+    body {
+      background: linear-gradient(to bottom, #f0f5fa, #e5eef7);
+      background-attachment: fixed;
+      font-family: 'Roboto', sans-serif;
+    }
+    
+    .body {
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      margin: 20px auto;
+      max-width: 1200px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    /* Overlay pattern for texture */
+    .body:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('{% static "img/pattern.png" %}');
+      background-size: 200px;
+      opacity: 0.02;
+      pointer-events: none;
+      z-index: 0;
+    }
+    
     .profile-container {
-        max-width: 1200px;
-        margin: 2rem auto;
-        padding: 0 1rem;
+        max-width: 100%;
+        position: relative;
+        z-index: 1;
     }
 
     .profile-header {
@@ -487,190 +519,192 @@
 {% endblock %}
 
 {% block content %}
-<div class="profile-container">
+<div class="body">
+  <div class="profile-container">
     <div class="profile-header">
-        <div class="profile-content">
-            <div class="profile-avatar">
-                <i class="fas fa-user"></i>
-            </div>
-            <div class="profile-info">
-                <h1>{{ user.username }}</h1>
-                <p>{{ user.email }}</p>
-                <div class="profile-stats">
-                    <div class="stat-item">
-                        <div class="stat-value">{{ books_viewed }}</div>
-                        <div class="stat-label">Sách đã xem</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">{{ books_rated }}</div>
-                        <div class="stat-label">Sách đã đánh giá</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">{{ books_saved }}</div>
-                        <div class="stat-label">Sách đã lưu</div>
-                    </div>
-                </div>
-            </div>
+      <div class="profile-content">
+        <div class="profile-avatar">
+          <i class="fas fa-user"></i>
         </div>
+        <div class="profile-info">
+          <h1>{{ user.username }}</h1>
+          <p>{{ user.email }}</p>
+          <div class="profile-stats">
+            <div class="stat-item">
+              <div class="stat-value">{{ books_viewed }}</div>
+              <div class="stat-label">Sách đã xem</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">{{ books_rated }}</div>
+              <div class="stat-label">Sách đã đánh giá</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">{{ books_saved }}</div>
+              <div class="stat-label">Sách đã lưu</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="profile-tabs">
-        <div class="tab-buttons">
-            <button class="tab-button active" onclick="showTab('history')">
-                <i class="fas fa-clock"></i>
-                <span>Lịch sử xem</span>
-            </button>
-            <button class="tab-button" onclick="showTab('saved')">
-                <i class="fas fa-heart"></i>
-                <span>Sách đã lưu</span>
-            </button>
-            <button class="tab-button" onclick="showTab('rated')">
-                <i class="fas fa-star"></i>
-                <span>Đánh giá của tôi</span>
-            </button>
-        </div>
+      <div class="tab-buttons">
+        <button class="tab-button active" onclick="showTab('history')">
+          <i class="fas fa-clock"></i>
+          <span>Lịch sử xem</span>
+        </button>
+        <button class="tab-button" onclick="showTab('saved')">
+          <i class="fas fa-heart"></i>
+          <span>Sách đã lưu</span>
+        </button>
+        <button class="tab-button" onclick="showTab('rated')">
+          <i class="fas fa-star"></i>
+          <span>Đánh giá của tôi</span>
+        </button>
+      </div>
 
-        <div class="tab-content" id="history-tab">
-            {% if history_list %}
-            <div class="history-grid">
-                {% for history in history_list %}
-                <div class="history-item">
-                    <a href="{% url 'book_detail' history.book.book_id|add:'-3000' %}">
-                        <img src="{{ history.book.bookImage.url }}" alt="{{ history.book.book_title }}" class="history-item-image">
-                    </a>
-                    <div class="history-item-content">
-                        <div class="book-info">
-                            <h3 class="history-item-title">{{ history.book.book_title }}</h3>
-                            <div class="book-position">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <span>{{ history.book.book_position }}</span>
-                            </div>
-                        </div>
-                        <div class="history-item-meta">
-                            <div>
-                                <i class="far fa-clock"></i>
-                                <span>{{ history.viewed_at|timesince }} trước</span>
-                            </div>
-                            <div>
-                                <i class="fas fa-eye"></i>
-                                <span>Lượt xem: {{ history.book.book_view }}</span>
-                            </div>
-                        </div>
-                    </div>
+      <div class="tab-content" id="history-tab">
+        {% if history_list %}
+        <div class="history-grid">
+          {% for history in history_list %}
+          <div class="history-item">
+            <a href="{% url 'book_detail' history.book.book_id|add:'-3000' %}">
+              <img src="{{ history.book.bookImage.url }}" alt="{{ history.book.book_title }}" class="history-item-image">
+            </a>
+            <div class="history-item-content">
+              <div class="book-info">
+                <h3 class="history-item-title">{{ history.book.book_title }}</h3>
+                <div class="book-position">
+                  <i class="fas fa-map-marker-alt"></i>
+                  <span>{{ history.book.book_position }}</span>
                 </div>
-                {% endfor %}
+              </div>
+              <div class="history-item-meta">
+                <div>
+                  <i class="far fa-clock"></i>
+                  <span>{{ history.viewed_at|timesince }} trước</span>
+                </div>
+                <div>
+                  <i class="fas fa-eye"></i>
+                  <span>Lượt xem: {{ history.book.book_view }}</span>
+                </div>
+              </div>
             </div>
-            {% else %}
-            <div class="empty-state">
-                <i class="far fa-clock"></i>
-                <p>Bạn chưa xem cuốn sách nào</p>
-            </div>
-            {% endif %}
+          </div>
+          {% endfor %}
         </div>
+        {% else %}
+        <div class="empty-state">
+          <i class="far fa-clock"></i>
+          <p>Bạn chưa xem cuốn sách nào</p>
+        </div>
+        {% endif %}
+      </div>
 
-        <div class="tab-content" id="saved-tab" style="display: none;">
-            {% if wishlist_books %}
-            <div class="wishlist-header">
-                <h3>Sách Yêu Thích Của Bạn</h3>
-                <p>Những cuốn sách bạn đã lưu để đọc sau</p>
-            </div>
-            
-            <div class="wishlist-grid">
-                {% for book in wishlist_books %}
-                <div class="wishlist-item">
-                    <div class="wishlist-image">
-                        <a href="/book/detail/id={{book.book_id|add:'-3000'}}">
-                            <img src="{{ book.bookImage.url }}" alt="{{ book.book_title }}">
-                        </a>
-                    </div>
-                    <div class="wishlist-content">
-                        <h3 class="wishlist-title">
-                            <a href="/book/detail/id={{book.book_id|add:'-3000'}}">{{ book.book_title }}</a>
-                        </h3>
-                        <p class="wishlist-author">
-                            <i class="fas fa-user-edit"></i> {{ book.book_author }}
-                        </p>
-                        {% if book.book_position %}
-                        <div class="book-position">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span>{{ book.book_position }}</span>
-                        </div>
-                        {% endif %}
-                        <div class="wishlist-meta">
-                            <div>
-                                <i class="fas fa-star" style="color: #ffc107;"></i>
-                                <span>{{ averRates|get_number:book.book_id|default:"0.0" }}</span>
-                            </div>
-                            <div>
-                                <i class="fas fa-eye"></i>
-                                <span>Lượt xem: {{ book.book_view }}</span>
-                            </div>
-                            <div id="wishlist{{book.book_id}}" hx-post="/wishCheck_post/" hx-vals='{"book_id": {{book.book_id}}}' hx-trigger="load" hx-target="#wishlist{{book.book_id}}">
-                                <button class="save-status" hx-post="/wishList_post/" hx-vals='{"book_id": {{book.book_id}}}' hx-trigger="click">
-                                    <i class="fas fa-check-circle"></i> Đã Lưu
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="empty-state">
-                <i class="fas fa-heart"></i>
-                <p>Bạn chưa lưu cuốn sách nào vào danh sách yêu thích</p>
-                <a href="/" class="btn btn-primary mt-3">
-                    <i class="fas fa-book"></i> Khám phá sách ngay
-                </a>
-            </div>
-            {% endif %}
+      <div class="tab-content" id="saved-tab" style="display: none;">
+        {% if wishlist_books %}
+        <div class="wishlist-header">
+          <h3>Sách Yêu Thích Của Bạn</h3>
+          <p>Những cuốn sách bạn đã lưu để đọc sau</p>
         </div>
+        
+        <div class="wishlist-grid">
+          {% for book in wishlist_books %}
+          <div class="wishlist-item">
+            <div class="wishlist-image">
+              <a href="/book/detail/id={{book.book_id|add:'-3000'}}">
+                <img src="{{ book.bookImage.url }}" alt="{{ book.book_title }}">
+              </a>
+            </div>
+            <div class="wishlist-content">
+              <h3 class="wishlist-title">
+                <a href="/book/detail/id={{book.book_id|add:'-3000'}}">{{ book.book_title }}</a>
+              </h3>
+              <p class="wishlist-author">
+                <i class="fas fa-user-edit"></i> {{ book.book_author }}
+              </p>
+              {% if book.book_position %}
+              <div class="book-position">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>{{ book.book_position }}</span>
+              </div>
+              {% endif %}
+              <div class="wishlist-meta">
+                <div>
+                  <i class="fas fa-star" style="color: #ffc107;"></i>
+                  <span>{{ averRates|get_number:book.book_id|default:"0.0" }}</span>
+                </div>
+                <div>
+                  <i class="fas fa-eye"></i>
+                  <span>Lượt xem: {{ book.book_view }}</span>
+                </div>
+                <div id="wishlist{{book.book_id}}" hx-post="/wishCheck_post/" hx-vals='{"book_id": {{book.book_id}}}' hx-trigger="load" hx-target="#wishlist{{book.book_id}}">
+                  <button class="save-status" hx-post="/wishList_post/" hx-vals='{"book_id": {{book.book_id}}}' hx-trigger="click">
+                    <i class="fas fa-check-circle"></i> Đã Lưu
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+          <i class="fas fa-heart"></i>
+          <p>Bạn chưa lưu cuốn sách nào vào danh sách yêu thích</p>
+          <a href="/" class="btn btn-primary mt-3">
+            <i class="fas fa-book"></i> Khám phá sách ngay
+          </a>
+        </div>
+        {% endif %}
+      </div>
 
-        <div class="tab-content" id="rated-tab" style="display: none;">
-            {% if rated_books %}
-            <div class="history-grid">
-                {% for rating in rated_books %}
-                <div class="history-item">
-                    <a href="{% url 'book_detail' rating.book.book_id|add:'-3000' %}">
-                        <img src="{{ rating.book.bookImage.url }}" alt="{{ rating.book.book_title }}" class="history-item-image">
-                    </a>
-                    <div class="history-item-content">
-                        <div class="book-info">
-                            <h3 class="history-item-title">{{ rating.book.book_title }}</h3>
-                            <div class="book-position">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <span>{{ rating.book.book_position }}</span>
-                            </div>
-                        </div>
-                        <div class="history-item-meta">
-                            <div class="rating-stars">
-                                <i class="fas fa-star" style="color: #ffc107;"></i>
-                                <span>Đánh giá của bạn: {{ rating.rating }}/5</span>
-                            </div>
-                            <div>
-                                <i class="far fa-clock"></i>
-                                <span>{{ rating.created_at|timesince }} trước</span>
-                            </div>
-                            <div>
-                                <i class="fas fa-eye"></i>
-                                <span>Lượt xem: {{ rating.book.book_view }}</span>
-                            </div>
-                        </div>
-                    </div>
+      <div class="tab-content" id="rated-tab" style="display: none;">
+        {% if rated_books %}
+        <div class="history-grid">
+          {% for rating in rated_books %}
+          <div class="history-item">
+            <a href="{% url 'book_detail' rating.book.book_id|add:'-3000' %}">
+              <img src="{{ rating.book.bookImage.url }}" alt="{{ rating.book.book_title }}" class="history-item-image">
+            </a>
+            <div class="history-item-content">
+              <div class="book-info">
+                <h3 class="history-item-title">{{ rating.book.book_title }}</h3>
+                <div class="book-position">
+                  <i class="fas fa-map-marker-alt"></i>
+                  <span>{{ rating.book.book_position }}</span>
                 </div>
-                {% endfor %}
+              </div>
+              <div class="history-item-meta">
+                <div class="rating-stars">
+                  <i class="fas fa-star" style="color: #ffc107;"></i>
+                  <span>Đánh giá của bạn: {{ rating.rating }}/5</span>
+                </div>
+                <div>
+                  <i class="far fa-clock"></i>
+                  <span>{{ rating.created_at|timesince }} trước</span>
+                </div>
+                <div>
+                  <i class="fas fa-eye"></i>
+                  <span>Lượt xem: {{ rating.book.book_view }}</span>
+                </div>
+              </div>
             </div>
-            {% else %}
-            <div class="empty-state">
-                <i class="fas fa-star"></i>
-                <p>Bạn chưa đánh giá cuốn sách nào</p>
-                <a href="/" class="btn btn-primary mt-3">
-                    <i class="fas fa-book"></i> Khám phá sách ngay
-                </a>
-            </div>
-            {% endif %}
+          </div>
+          {% endfor %}
         </div>
+        {% else %}
+        <div class="empty-state">
+          <i class="fas fa-star"></i>
+          <p>Bạn chưa đánh giá cuốn sách nào</p>
+          <a href="/" class="btn btn-primary mt-3">
+            <i class="fas fa-book"></i> Khám phá sách ngay
+          </a>
+        </div>
+        {% endif %}
+      </div>
     </div>
+  </div>
 </div>
 
 <script>

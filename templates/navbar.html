@@ -23,8 +23,8 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'myBook' %}">Wishlist của tôi</a>
                     </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false" hx-post='/topicList_post/' hx-trigger='click' hx-target='#topicList'>
+                    <li class="nav-item dropdown" id="topic-dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" aria-expanded="false" hx-post='/topicList_post/' hx-trigger='mouseenter once' hx-target='#topicList'>
                             Thể loại sách
                         </a>
                         <div class="dropdown-menu alphabet-menu" id="topicList" aria-labelledby="navbarDropdownMenuLink">
@@ -480,34 +480,76 @@
     }
     
     /* Dropdown styling */
-    .dropdown-menu {
-        margin-top: 10px !important;
-        border: none !important;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1) !important;
-        border-radius: 12px !important;
-        padding: 10px !important;
-        min-width: 200px !important;
-        transform: translateY(10px);
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.3s ease;
-    }
-    
-    .dropdown-menu.show {
-        transform: translateY(0);
+    .dropdown:hover .dropdown-menu {
+        display: block;
         opacity: 1;
         visibility: visible;
+        transform: translateY(0);
+        transition: opacity 0.3s ease, transform 0.3s ease;
     }
     
-    .dropdown-item {
-        padding: 8px 15px !important;
-        border-radius: 6px !important;
-        margin-bottom: 5px !important;
+    .dropdown-menu {
+        display: block;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(10px);
+        transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s linear 0.3s;
+        border-radius: 8px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        border: none;
+        padding: 12px;
+        min-width: 240px;
     }
     
-    .dropdown-item:hover {
-        background-color: #f8f9fa !important;
-        color: #007bff !important;
+    .menu-header {
+        margin-bottom: 10px;
+    }
+    
+    .topic-search {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+    
+    .menu-content {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+    /* Thiết kế cho các mục trong dropdown */
+    .topic-group h6 {
+        color: #3b82f6;
+        margin-top: 10px;
+        margin-bottom: 5px;
+        font-weight: 600;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 3px;
+    }
+    
+    .topic-list {
+        padding-left: 0;
+        list-style: none;
+        margin-bottom: 0;
+    }
+    
+    .topic-list li {
+        padding: 4px 0;
+    }
+    
+    .topic-list a {
+        color: #4b5563;
+        text-decoration: none;
+        display: block;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: all 0.2s;
+    }
+    
+    .topic-list a:hover {
+        background-color: #f3f4f6;
+        color: #1e40af;
     }
     
     /* Responsive */
@@ -526,3 +568,34 @@
         }
     }
 </style>
+
+<script>
+// Đảm bảo dropdown vẫn mở khi click vào trường tìm kiếm
+document.querySelector('.topic-search').addEventListener('click', function(e) {
+    e.stopPropagation();
+});
+
+// Hàm lọc các topics
+function filterTopics(query) {
+    query = query.toLowerCase();
+    const groups = document.querySelectorAll('.topic-group');
+    
+    groups.forEach(group => {
+        const topicItems = group.querySelectorAll('.topic-list li');
+        let visibleCount = 0;
+        
+        topicItems.forEach(item => {
+            const text = item.textContent.toLowerCase();
+            if (text.includes(query)) {
+                item.style.display = '';
+                visibleCount++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+        
+        // Ẩn/hiện cả nhóm dựa trên kết quả lọc
+        group.style.display = visibleCount > 0 ? '' : 'none';
+    });
+}
+</script>
