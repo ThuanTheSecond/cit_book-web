@@ -1,0 +1,271 @@
+/* Custom CSS for Django Admin */
+
+/* Import font */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap');
+
+/* Apply custom font */
+body, button, input, select, textarea {
+  font-family: 'Nunito', sans-serif;
+}
+
+/* Style table listing */
+#changelist table {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+#changelist table thead th {
+  background: #f1f5f9;
+  color: #334155;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+#changelist table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+/* Style form rows */
+.form-row {
+  padding: 10px 0;
+}
+
+/* Style submit row */
+.submit-row {
+  background: #f8fafc;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+/* Fix checkbox alignment */
+.checkbox-row input[type="checkbox"] {
+  vertical-align: middle;
+  margin-right: 5px;
+}
+
+/* Style help text */
+.help, p.help, form p.help, div.help, form div.help, div.help li {
+  color: #718096;
+  font-size: 12px;
+  padding-top: 4px;
+}
+
+/* Style Navbar */
+#header {
+  background: #78a4d4;
+  color: #fff;
+}
+
+#branding h1, #branding h1 a:link, #branding h1 a:visited {
+  color: #fff;
+}
+
+#user-tools a {
+  border-bottom: none;
+  text-decoration: none;
+}
+
+/* Style sidebar and modules */
+.dashboard .module {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
+}
+
+.dashboard .module h2, 
+.dashboard .module caption, 
+.inline-group h2 {
+  background: #78a4d4;
+  color: #ffffff;
+  padding: 12px 15px;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+/* Style form buttons */
+.button, input[type="submit"], input[type="button"] {
+  background: #78a4d4;
+  color: #fff;
+  border-radius: 6px;
+  padding: 8px 15px;
+  font-weight: 500;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.button:hover, input[type="submit"]:hover, input[type="button"]:hover {
+  background: #6993c2;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.button.default, input[type="submit"].default, .submit-row input.default {
+  background: #78a4d4;
+  font-weight: 600;
+}
+
+/* Style breadcrumbs */
+div.breadcrumbs {
+  background: #f1f5f9;
+  color: #718096;
+  padding: 10px 40px;
+}
+
+div.breadcrumbs a {
+  color: #4a5568;
+}
+
+div.breadcrumbs a:hover {
+  color: #78a4d4;
+}
+
+/* Style object-tools */
+.object-tools a {
+  background: #78a4d4;
+  font-weight: 500;
+  border-radius: 6px;
+}
+
+.object-tools a:hover {
+  background: #6993c2;
+}
+
+/* Style module h2 (section headers) */
+.module h2, .module caption, .inline-group h2 {
+  background: #78a4d4;
+  color: #fff;
+  border-radius: 6px 6px 0 0;
+}
+
+/* Style pagination */
+.paginator a:link, .paginator a:visited {
+  background: #78a4d4;
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 4px;
+}
+
+.paginator a:hover {
+  background: #6993c2;
+}
+
+/* Style filter sidebar */
+#changelist-filter {
+  background: #f8fafc;
+  border-left: none;
+  padding-left: 10px;
+}
+
+#changelist-filter h2 {
+  background: #78a4d4;
+  color: #fff;
+  border-radius: 6px 6px 0 0;
+}
+
+#changelist-filter li.selected {
+  border-left: 4px solid #78a4d4;
+  padding-left: 6px;
+  margin-left: -10px;
+}
+
+/* Style message containers */
+.messagelist li {
+  border-radius: 6px;
+  padding: 12px 15px;
+  margin-bottom: 10px;
+}
+
+.messagelist li.success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.messagelist li.warning {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+}
+
+.messagelist li.error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+/* Better styling for date fields */
+.datetimeshortcuts {
+  color: #718096;
+}
+
+.datetimeshortcuts a {
+  color: #78a4d4;
+  text-decoration: none;
+}
+
+/* Add more padding to the content */
+#content {
+  padding: 20px 20px;
+}
+
+/* Make non-default buttons softer */
+.button.default, input[type="submit"].default, .submit-row input.default {
+  margin-top: 5px;
+}
+
+/* Style errors */
+.errornote {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  border-radius: 6px;
+  padding: 12px 15px;
+}
+
+ul.errorlist {
+  margin: 0;
+  padding: 0;
+  color: #721c24;
+  background: none;
+}
+
+ul.errorlist li {
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin-bottom: 5px;
+}
+
+/* Make inputs nicer */
+input[type="text"], 
+input[type="password"], 
+input[type="email"], 
+input[type="url"], 
+input[type="number"], 
+input[type="tel"], 
+textarea, 
+select, 
+.vTextField {
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: #78a4d4;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(120, 164, 212, 0.1);
+}
+
+/* Apply general border-radius to elements */
+.module, fieldset, .form-row {
+  border-radius: 6px;
+}
+
+/* Override text color for better readability */
+body {
+  color: #4a5568;
+} 

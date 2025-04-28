@@ -49,8 +49,16 @@ class Book(models.Model):
         return f'{self.book_id-3000}-{self.book_title},{self.book_author},{self.book_publish},{self.book_position},{self.book_MFN},{self.is_active}' 
     
 class Book_Topic(models.Model):
-    book_id = models.ForeignKey(Book, on_delete=models.CASCADE)
-    topic_id = models.ForeignKey(Topic, on_delete=models.CASCADE)
+    book_id = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='book_topics')
+    topic_id = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name='topic_books')
+    
+    class Meta:
+        unique_together = ('book_id', 'topic_id')
+        verbose_name = 'Chủ đề sách'
+        verbose_name_plural = 'Các chủ đề sách'
+
+    def __str__(self):
+        return f"{self.book_id.book_title} - {self.topic_id.topic_name}"
 
 class Rating(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
