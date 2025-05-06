@@ -306,7 +306,7 @@ def index(request):
         'recommended_books': recommended_books,
         'show_recommendations': show_recommendations,
     }
-    return render(request, 'index.html', context)
+    return render(request, 'index_modern.html', context)
  
  
 def myBook(request):
