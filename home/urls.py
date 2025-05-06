@@ -4,6 +4,7 @@ from .admin import admin_site
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('modern/', views.index_modern, name='index_modern'),
     path('searchSlug', views.searchSlug, name='search_slug'),
     path('book/detail/id=<int:id>', views.bookDetail, name='book_detail'), 
     path('category/filter/id=<int:id>', views.categoryFilter, name='category'),

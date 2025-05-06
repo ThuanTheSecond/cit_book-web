@@ -1,0 +1,907 @@
+{% extends "base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% load filters %}
+
+{% block pack %}
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick.css"/>
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick-theme.css"/>
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick.min.js"></script>
+  <link rel="stylesheet" href="{% static 'Css/customSlick.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* Modern Library Website Theme */
+    body {
+      background: #f0f4f8;
+      color: #333;
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    .hero-section {
+      background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://lrc.ctu.edu.vn/images/slideshow/store-l2.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      padding: 120px 0;
+      margin-bottom: 50px;
+      border-radius: 0 0 50px 50px;
+      position: relative;
+      overflow: hidden;
+      animation: fadeIn 1.2s ease-out;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+    
+    .hero-section::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('{% static "img/pattern.png" %}');
+      background-size: 200px;
+      opacity: 0;
+      pointer-events: none;
+      animation: patternFadeIn 2s ease-out forwards;
+      animation-delay: 0.5s;
+    }
+    
+    @keyframes patternFadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 0.05;
+      }
+    }
+    
+    .hero-content {
+      max-width: 800px;
+      margin-left: 50px;
+      padding: 0 20px;
+      color: white;
+      text-align: left;
+      position: relative;
+      z-index: 10;
+      border-left: 4px solid rgba(255, 255, 255, 0.4);
+      padding-left: 30px;
+      animation: fadeInUp 0.8s ease-out;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .hero-title {
+      font-size: 3.8rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      letter-spacing: -0.5px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+      max-width: 700px;
+      background: linear-gradient(120deg, #ffffff, #e0e0e0);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      line-height: 1.2;
+      animation: slideInLeft 0.8s ease-out forwards;
+      opacity: 0;
+    }
+    
+    @keyframes slideInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    .hero-subtitle {
+      font-size: 1.5rem;
+      font-weight: 300;
+      margin-bottom: 40px;
+      opacity: 0;
+      text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      max-width: 600px;
+      color: #ffffff;
+      animation: slideInRight 0.8s ease-out forwards;
+      animation-delay: 0.3s;
+    }
+    
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    /* Để thêm hiệu ứng trang sách cho hero section */
+    .hero-book-effect {
+      position: absolute;
+      bottom: -10px;
+      left: 0;
+      width: 100%;
+      height: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      transform: rotate(-1deg) translateY(20px);
+      opacity: 0;
+      animation: slideUp 0.6s ease-out forwards;
+      animation-delay: 0.8s;
+    }
+    
+    @keyframes slideUp {
+      from {
+        transform: rotate(-1deg) translateY(20px);
+        opacity: 0;
+      }
+      to {
+        transform: rotate(-1deg) translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    /* Tăng độ nổi bật cho form tìm kiếm */
+    .search-container {
+      max-width: 700px;
+      width: 100%;
+      position: relative;
+      margin-top: 20px;
+      margin-bottom: 40px;
+      animation: fadeIn 1s ease-out 0.3s forwards;
+      opacity: 0;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+    
+    .search-bar {
+      display: flex;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 30px;
+      padding: 5px 5px 5px 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+    
+    .search-bar:hover, .search-bar:focus-within {
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
+    }
+    
+    .search-input {
+      flex-grow: 1;
+      border: none;
+      padding: 12px 15px;
+      font-size: 1.05rem;
+      font-weight: 400;
+      font-family: 'Poppins', sans-serif;
+      background: transparent;
+      color: #333;
+    }
+    
+    .search-input:focus {
+      outline: none;
+    }
+    
+    .search-input::placeholder {
+      color: #666;
+      opacity: 0.8;
+      font-weight: 300;
+    }
+    
+    .search-button {
+      background: #1a67e0;
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 30px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .search-button:hover {
+      background: #0056d6;
+      box-shadow: 0 0 15px rgba(37, 117, 252, 0.3);
+    }
+    
+    .search-button:active {
+      transform: scale(0.98);
+    }
+    
+    .search-button i {
+      font-size: 1rem;
+    }
+    
+    /* Main Content */
+    .main-content {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    /* Category Sections */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .section-icon {
+      color: #2575fc;
+      font-size: 1.3rem;
+    }
+    
+    .view-all {
+      color: #2575fc;
+      text-decoration: none;
+      font-weight: 500;
+      padding: 5px 15px;
+      border-radius: 20px;
+      background: rgba(37, 117, 252, 0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .view-all:hover {
+      background: rgba(37, 117, 252, 0.2);
+    }
+    
+    .books-row {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 50px;
+      overflow-x: auto;
+      padding: 10px 0;
+      scroll-behavior: smooth;
+      scrollbar-width: none;  /* For Firefox */
+    }
+    
+    .books-row::-webkit-scrollbar {
+      display: none;  /* For Chrome and Safari */
+    }
+    
+    /* Book Card Styling */
+    .book-card {
+      min-width: 200px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .book-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(37, 117, 252, 0.1);
+    }
+    
+    .book-cover {
+      height: 260px;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .book-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+    
+    .book-card:hover .book-image {
+      transform: scale(1.05);
+    }
+    
+    .book-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .book-card:hover .book-overlay {
+      opacity: 1;
+    }
+    
+    .view-details {
+      background: white;
+      color: #2575fc;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-weight: 500;
+      transform: translateY(20px);
+      opacity: 0;
+      transition: all 0.3s ease 0.1s;
+    }
+    
+    .book-card:hover .view-details {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    
+    .book-info {
+      padding: 20px;
+    }
+    
+    .book-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 5px;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    /* Collection Boxes */
+    .collections {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 50px;
+    }
+    
+    .collection-box {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .collection-box:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(37, 117, 252, 0.1);
+    }
+    
+    .collection-icon {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+      color: #2575fc;
+    }
+    
+    .collection-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    
+    .collection-desc {
+      color: #777;
+      font-size: 0.9rem;
+      margin-bottom: 15px;
+    }
+    
+    .collection-link {
+      color: #2575fc;
+      text-decoration: none;
+      font-weight: 500;
+      display: inline-block;
+      padding: 5px 15px;
+      border-radius: 20px;
+      background: rgba(37, 117, 252, 0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .collection-link:hover {
+      background: rgba(37, 117, 252, 0.2);
+    }
+    
+    /* Recommendation Message */
+    .recommendation-message {
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      margin-bottom: 50px;
+    }
+    
+    .recommendation-icon {
+      font-size: 3rem;
+      color: #2575fc;
+      margin-bottom: 15px;
+    }
+    
+    .recommendation-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    
+    .recommendation-desc {
+      color: #666;
+      margin-bottom: 20px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .recommendation-action {
+      background: rgba(37, 117, 252, 0.1);
+      padding: 10px 20px;
+      border-radius: 10px;
+      display: inline-block;
+      color: #333;
+    }
+    
+    /* Theme Switcher */
+    .theme-switcher {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 1000;
+    }
+    
+    .theme-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: white;
+      color: #2575fc;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .theme-btn:hover {
+      background: #f0f4f8;
+      transform: scale(1.1);
+    }
+    
+    .theme-btn i {
+      font-size: 1.5rem;
+    }
+    
+    /* Stats Section */
+    .stats-section {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 50px;
+    }
+    
+    .stat-box {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+    }
+    
+    .stat-box:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(37, 117, 252, 0.1);
+    }
+    
+    .stat-icon {
+      font-size: 2rem;
+      color: #2575fc;
+      margin-bottom: 10px;
+    }
+    
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 5px;
+    }
+    
+    .stat-label {
+      color: #777;
+      font-size: 0.9rem;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 1024px) {
+      .collections {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .stats-section {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 2.2rem;
+      }
+      
+      .hero-subtitle {
+        font-size: 1rem;
+      }
+      
+      .collections {
+        grid-template-columns: 1fr;
+      }
+      
+      .stats-section {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .book-card {
+        min-width: 160px;
+      }
+      
+      .book-cover {
+        height: 220px;
+      }
+      
+      .search-container {
+        max-width: 90%;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      
+      .search-input {
+        padding: 10px 15px;
+        font-size: 1rem;
+      }
+      
+      .search-button {
+        padding: 10px 20px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .stats-section {
+        grid-template-columns: 1fr;
+      }
+      
+      .search-bar {
+        flex-direction: column;
+        border-radius: 15px;
+      }
+      
+      .search-input {
+        width: 100%;
+        border-radius: 15px;
+        margin-bottom: 10px;
+      }
+      
+      .search-button {
+        width: 100%;
+        padding: 12px;
+      }
+      
+      .book-card {
+        min-width: 140px;
+      }
+      
+      .book-cover {
+        height: 180px;
+      }
+    }
+  </style>
+{% endblock pack %}
+
+{% block content %}
+  <!-- Hero Section with Search -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <h1 class="hero-title">Khám Phá Thế Giới Qua Từng Trang Sách</h1>
+      <p class="hero-subtitle">Thư viện trực tuyến với hơn 10,000 đầu sách và nội dung số</p>
+      
+      <!-- <div class="search-container">
+        <form action="{% url 'search_slug' %}" method="get" class="search-bar">
+          <input type="text" name="query" placeholder="Tìm kiếm sách, tác giả, chủ đề..." class="search-input">
+          <input type="hidden" name="search_type" value="all">
+          <button type="submit" class="search-button">
+            <i class="fas fa-search"></i> <span>Tìm Kiếm</span>
+          </button>
+        </form>
+      </div> -->
+    </div>
+    <div class="hero-book-effect"></div>
+  </section>
+
+  <div class="main-content">
+    <!-- Statistics Section -->
+    <section class="stats-section">
+      <div class="stat-box">
+        <div class="stat-icon">
+          <i class="fas fa-book"></i>
+        </div>
+        <div class="stat-number">10,000+</div>
+        <div class="stat-label">Đầu Sách</div>
+      </div>
+      
+      <div class="stat-box">
+        <div class="stat-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-number">5,000+</div>
+        <div class="stat-label">Độc Giả</div>
+      </div>
+      
+      <div class="stat-box">
+        <div class="stat-icon">
+          <i class="fas fa-download"></i>
+        </div>
+        <div class="stat-number">50,000+</div>
+        <div class="stat-label">Lượt Đọc</div>
+      </div>
+    </section>
+
+    <!-- Collections Section -->
+    <section class="collections">
+      <div class="collection-box">
+        <div class="collection-icon">
+          <i class="fas fa-graduation-cap"></i>
+        </div>
+        <h3 class="collection-title">Học Thuật</h3>
+        <p class="collection-desc">Khám phá nguồn tài liệu học thuật, sách giáo khoa và nghiên cứu.</p>
+        <a href="/categoryFilter/Academic/1" class="collection-link">Khám Phá</a>
+      </div>
+      
+      <div class="collection-box">
+        <div class="collection-icon">
+          <i class="fas fa-book-open"></i>
+        </div>
+        <h3 class="collection-title">Văn Học</h3>
+        <p class="collection-desc">Đắm chìm trong thế giới văn học với hàng ngàn tác phẩm kinh điển.</p>
+        <a href="/categoryFilter/Literature/1" class="collection-link">Khám Phá</a>
+      </div>
+      
+      <div class="collection-box">
+        <div class="collection-icon">
+          <i class="fas fa-laptop-code"></i>
+        </div>
+        <h3 class="collection-title">Công Nghệ</h3>
+        <p class="collection-desc">Cập nhật kiến thức với sách về công nghệ, IT, và chuyển đổi số.</p>
+        <a href="/categoryFilter/Technology/1" class="collection-link">Khám Phá</a>
+      </div>
+    </section>
+
+    <!-- Recommendations Section -->
+    {% if user.is_authenticated %}
+      {% if show_recommendations %}
+        <section>
+          <div class="section-header">
+            <h2 class="section-title">
+              <span class="section-icon"><i class="fas fa-lightbulb"></i></span>
+              Sách Gợi Ý Cho Bạn
+            </h2>
+            <a href="/categoryFilter/Recommended/1" class="view-all">Xem tất cả</a>
+          </div>
+          
+          <div class="books-row">
+            {% for book in recommended_books %}
+              <div class="book-card">
+                <div class="book-cover">
+                  <img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}">
+                  <div class="book-overlay" onclick="window.location.href='/book/detail/id={{ book.book_id|subtract:3000 }}'">
+                    <span class="view-details">Xem chi tiết</span>
+                  </div>
+                </div>
+                <div class="book-info">
+                  <h3 class="book-title">{{ book.book_title }}</h3>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </section>
+      {% else %}
+        <section class="recommendation-message">
+          <div class="recommendation-icon">
+            <i class="fas fa-star-half-alt"></i>
+          </div>
+          <h2 class="recommendation-title">Nhận Gợi Ý Sách Phù Hợp Với Bạn</h2>
+          <p class="recommendation-desc">Hệ thống của chúng tôi sẽ phân tích sở thích đọc sách của bạn để đề xuất những cuốn sách phù hợp nhất.</p>
+          <div class="recommendation-action">
+            <i class="fas fa-info-circle"></i>
+            Hãy đánh giá ít nhất 5 cuốn sách bạn đã đọc
+          </div>
+        </section>
+      {% endif %}
+    {% else %}
+      <section class="recommendation-message">
+        <div class="recommendation-icon">
+          <i class="fas fa-user-lock"></i>
+        </div>
+        <h2 class="recommendation-title">Khám Phá Sách Phù Hợp Với Bạn</h2>
+        <p class="recommendation-desc">Đăng nhập để nhận được gợi ý sách được cá nhân hóa và nhiều tính năng hấp dẫn khác.</p>
+        <div class="recommendation-action">
+          <i class="fas fa-sign-in-alt"></i>
+          Vui lòng <a href="{% url 'login' %}" style="color:#2575fc;">đăng nhập</a> hoặc <a href="{% url 'register' %}" style="color:#2575fc;">đăng ký</a> tài khoản
+        </div>
+      </section>
+    {% endif %}
+
+    <!-- Trending Books Section -->
+    <section>
+      <div class="section-header">
+        <h2 class="section-title">
+          <span class="section-icon"><i class="fas fa-fire"></i></span>
+          Sách Thịnh Hành
+        </h2>
+        <a href="/categoryFilter/Trending/1" class="view-all">Xem tất cả</a>
+      </div>
+      
+      <div class="books-row">
+        {% for book in bookList.popular %}
+          <div class="book-card">
+            <div class="book-cover">
+              <img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}">
+              <div class="book-overlay" onclick="window.location.href='/book/detail/id={{ book.book_id|subtract:3000 }}'">
+                <span class="view-details">Xem chi tiết</span>
+              </div>
+            </div>
+            <div class="book-info">
+              <h3 class="book-title">{{ book.book_title }}</h3>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- Foreign Books Section -->
+    <section>
+      <div class="section-header">
+        <h2 class="section-title">
+          <span class="section-icon"><i class="fas fa-globe-americas"></i></span>
+          Sách Ngoại Văn
+        </h2>
+        <a href="/categoryFilter/Ngoại Văn/1" class="view-all">Xem tất cả</a>
+      </div>
+      
+      <div class="books-row">
+        {% for book in bookList.topFl %}
+          <div class="book-card">
+            <div class="book-cover">
+              <img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}">
+              <div class="book-overlay" onclick="window.location.href='/book/detail/id={{ book.book_id|subtract:3000 }}'">
+                <span class="view-details">Xem chi tiết</span>
+              </div>
+            </div>
+            <div class="book-info">
+              <h3 class="book-title">{{ book.book_title }}</h3>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- Vietnamese Books Section -->
+    <section>
+      <div class="section-header">
+        <h2 class="section-title">
+          <span class="section-icon"><i class="fas fa-book"></i></span>
+          Sách Tiếng Việt
+        </h2>
+        <a href="/categoryFilter/Tiếng Việt/1" class="view-all">Xem tất cả</a>
+      </div>
+      
+      <div class="books-row">
+        {% for book in bookList.topVn %}
+          <div class="book-card">
+            <div class="book-cover">
+              <img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}">
+              <div class="book-overlay" onclick="window.location.href='/book/detail/id={{ book.book_id|subtract:3000 }}'">
+                <span class="view-details">Xem chi tiết</span>
+              </div>
+            </div>
+            <div class="book-info">
+              <h3 class="book-title">{{ book.book_title }}</h3>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+
+  <!-- Theme Switcher Button -->
+  <div class="theme-switcher">
+    <a href="{% url 'index' %}" class="theme-btn" title="Chuyển sang giao diện cổ điển">
+      <i class="fas fa-sync-alt"></i>
+    </a>
+  </div>
+{% endblock content %}
+
+{% block scripts %}
+<script>
+  // Smooth scroll for book rows
+  document.addEventListener('DOMContentLoaded', function() {
+    const booksRows = document.querySelectorAll('.books-row');
+    
+    booksRows.forEach(row => {
+      let isDown = false;
+      let startX;
+      let scrollLeft;
+      
+      row.addEventListener('mousedown', (e) => {
+        isDown = true;
+        row.style.cursor = 'grabbing';
+        startX = e.pageX - row.offsetLeft;
+        scrollLeft = row.scrollLeft;
+      });
+      
+      row.addEventListener('mouseleave', () => {
+        isDown = false;
+        row.style.cursor = 'grab';
+      });
+      
+      row.addEventListener('mouseup', () => {
+        isDown = false;
+        row.style.cursor = 'grab';
+      });
+      
+      row.addEventListener('mousemove', (e) => {
+        if(!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - row.offsetLeft;
+        const walk = (x - startX) * 2;
+        row.scrollLeft = scrollLeft - walk;
+      });
+    });
+  });
+</script>
+{% endblock scripts %} 
