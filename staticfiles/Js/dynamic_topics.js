@@ -34,12 +34,26 @@
             if (deleteCell && !deleteCell.querySelector('.remove-btn')) {
                 const removeBtn = document.createElement('a');
                 removeBtn.textContent = 'Remove';
-                removeBtn.className = 'remove-btn';
+                removeBtn.className = 'remove-btn btn-danger';
                 removeBtn.href = '#';
+                removeBtn.style.marginLeft = '5px';
+                removeBtn.style.color = 'white';
+                removeBtn.style.backgroundColor = '#dc3545';
+                removeBtn.style.padding = '2px 8px';
+                removeBtn.style.borderRadius = '3px';
+                removeBtn.style.textDecoration = 'none';
                 removeBtn.onclick = function(e) {
                     e.preventDefault();
-                    row.remove();
-                    updateFormIndexes();
+                    if (confirm('Bạn có chắc chắn muốn xóa chủ đề này?')) {
+                        // Đánh dấu form để xóa
+                        const deleteInput = row.querySelector('input[name$="-DELETE"]');
+                        if (deleteInput) {
+                            deleteInput.checked = true;
+                        }
+                        // Ẩn row
+                        row.style.display = 'none';
+                        updateFormIndexes();
+                    }
                 };
                 deleteCell.appendChild(removeBtn);
             }
@@ -92,12 +106,7 @@
                 e.preventDefault();
                 // Đợi một chút để DOM được cập nhật
                 setTimeout(() => {
-                    const emptyForm = document.querySelector('tr.empty-form');
-                    if (emptyForm) {
-                        const clone = emptyForm.cloneNode(true);
-                        emptyForm.parentNode.insertBefore(clone, emptyForm);
-                        initializeTopicSelects();
-                    }
+                    initializeTopicSelects();
                 }, 100);
             });
         }

@@ -1,25 +1,48 @@
 from django.contrib import admin
 from django.utils.text import slugify
+from django.utils.html import format_html
+from django.urls import path, reverse
+from django import forms
 from .models import Book, Topic, Book_Topic, Rating, ToReads, BookViewHistory, AuthorViewHistory, FavList
 from django.db.models import Count
 from django.utils import timezone
-from django.urls import path
 from . import stats
 
 
 # Register your models here.
 @admin.register(Topic)
 class TopicAdmin(admin.ModelAdmin):
-    prepopulated_fields ={
+    prepopulated_fields = {
         "topic_slug": ("topic_name",),
     }
+    list_display = ('topic_name', 'get_book_count', 'actions_column')
+    search_fields = ('topic_name',)
+    actions = ['delete_selected_topics']
+    
+    def get_book_count(self, obj):
+        return Book_Topic.objects.filter(topic_id=obj).count()
+    get_book_count.short_description = 'Số sách'
+    
+    def actions_column(self, obj):
+        return format_html(
+            '<a class="button" href="{}">Sửa</a> '
+            '<a class="button" style="background-color: #dc3545;" href="{}">Xóa</a>',
+            reverse('admin:home_topic_change', args=[obj.pk]),
+            reverse('admin:home_topic_delete', args=[obj.pk])
+        )
+    actions_column.short_description = 'Thao tác'
+    
+    def delete_selected_topics(self, request, queryset):
+        count = queryset.count()
+        queryset.delete()
+        self.message_user(request, f'Đã xóa {count} chủ đề.')
+    delete_selected_topics.short_description = "Xóa các chủ đề đã chọn"
 
 class Book_TopicInline(admin.TabularInline):
     model = Book_Topic
     verbose_name = 'Chủ đề'
     verbose_name_plural = 'Các chủ đề'
     extra = 1
-    
     
     class Media:
         js = ('js/dynamic_topics.js',)
@@ -48,27 +71,36 @@ class BookAdmin(admin.ModelAdmin):
     prepopulated_fields = {
         "book_slug": ("book_title",),
     }
-    list_display = ('book_title', 'book_author', 'book_lang')
+    list_display = ('book_title', 'book_author', 'book_lang', 'get_topics', 'actions_column')
     search_fields = ('book_title', 'book_author')
     list_filter = ('book_lang', 'created_at')
+    actions = ['delete_selected_books']
     
-    fieldsets = (
-        ('Thông tin cơ bản', {
-            'fields': ('book_title', 'book_author', 'book_position', 'book_MFN')
-        }),
-        ('Thông tin xuất bản', {
-            'fields': ('book_publish', 'isbn_10', 'isbn_13')
-        }),
-        ('Phân loại', {
-            'fields': ('book_lang',)  # Đã xóa 'topic' khỏi đây
-        }),
-        ('Thông tin khác', {
-            'fields': ('book_slug', 'bookImage', 'is_active')
-        }),
-    )
-
+    def get_topics(self, obj):
+        topics = Book_Topic.objects.filter(book_id=obj).values_list('topic_id__topic_name', flat=True)
+        return ", ".join(topics)
+    get_topics.short_description = 'Chủ đề'
+    
+    def actions_column(self, obj):
+        return format_html(
+            '<a class="button" href="{}">Sửa</a> '
+            '<a class="button" style="background-color: #dc3545;" href="{}">Xóa</a>',
+            reverse('admin:home_book_change', args=[obj.pk]),
+            reverse('admin:home_book_delete', args=[obj.pk])
+        )
+    actions_column.short_description = 'Thao tác'
+    
+    def delete_selected_books(self, request, queryset):
+        count = queryset.count()
+        queryset.delete()
+        self.message_user(request, f'Đã xóa {count} sách.')
+    delete_selected_books.short_description = "Xóa các sách đã chọn"
+    
     class Media:
         js = ('admin/js/admin/RelatedObjectLookups.js', 'js/dynamic_topics.js')
+        css = {
+            'all': ('css/admin_custom.css',)
+        }
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)

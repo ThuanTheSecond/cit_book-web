@@ -1,3 +1,38 @@
+/* Ẩn form trống */
 tr.empty-form {
     display: none !important;
+}
+
+/* Tùy chỉnh nút Remove */
+.remove-btn {
+    display: inline-block;
+    padding: 2px 8px;
+    background-color: #dc3545;
+    color: white;
+    border-radius: 3px;
+    text-decoration: none;
+    margin-left: 5px;
+}
+
+.remove-btn:hover {
+    background-color: #c82333;
+    color: white;
+    text-decoration: none;
+}
+
+/* Tùy chỉnh nút trong cột thao tác */
+.button {
+    display: inline-block;
+    padding: 3px 10px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 3px;
+    text-decoration: none;
+    margin-right: 5px;
+}
+
+.button:hover {
+    background-color: #0069d9;
+    color: white;
+    text-decoration: none;
 }
