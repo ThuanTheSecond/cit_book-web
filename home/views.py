@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from .models import Book, Rating, Book_Topic, Topic, ToReads, ContentBook, BookViewHistory, BookReview
 from django.http import HttpResponse, JsonResponse
-from .forms import searchForm, SearchFormset
+from .forms import searchForm, SearchFormset, CategorySelectionForm
 from .utils import normalize_vietnamese, get_content_based_recommendations,pagePaginator, HTTPResponseHXRedirect, login_required, get_recommendations
 from django.shortcuts import redirect
 import json
@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Avg, Count, F
 import re
 from functools import reduce
-from operator import and_
+from operator import and_, or_
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
@@ -555,80 +555,216 @@ def topicFilter(request, tid, type=1):
 
 def searchAdvance(request):
     formset = SearchFormset(request.POST or None)
+    category_form = CategorySelectionForm(request.POST or None)
     final_query = None
     queries = []
-    subquery = Q()
     i = 1
-    # Lưu các tham số tìm kiếm vào session nếu form hợp lệ
-    if formset.is_valid():
-        for form in formset:
-            field_name = form.cleaned_data.get('field_name')
-            search_type = form.cleaned_data.get('search_type')
-            value = form.cleaned_data.get('value')
-            value = normalize_vietnamese(value)
-            keywords = re.split(r'[ ,]+', value)
+    
+    # Lấy danh sách topics từ model Topic
+    topics = Topic.objects.filter(is_active=True).order_by('topic_name').values('topic_id', 'topic_name')
 
-            if search_type == 'iexact':
-                queries.append(Q(**{f"{field_name}__unaccent__iexact": value}))
-            elif search_type == 'not_icontains':
-                subquery = ~Q(**{f"{field_name}__unaccent__icontains": keywords[0]})
-                for word in keywords[1:]:
-                    subquery &= ~Q(**{f"{field_name}__unaccent__icontains": word})
-                queries.append(subquery)
-            elif search_type == 'icontains':
-                subquery = Q(**{f"{field_name}__unaccent__icontains": keywords[0]})
-                for word in keywords[1:]:
-                    subquery &= Q(**{f"{field_name}__unaccent__icontains": word})
-                queries.append(subquery)
-         
-            # Lưu vào session
-            request.session[f'search_params{i}'] = {
-                'field_name': field_name,
-                'search_type': search_type,
-                'value': value
-            }
-            i += 1
-        if queries:
-            final_query = reduce(and_, queries)
-            books = Book.objects.filter(final_query)
+    if request.method == 'POST':
+        formset_valid = formset.is_valid()
+        category_valid = category_form.is_valid()
+        
+        if formset_valid and category_valid:
+            # Lấy selected_categories từ category_form
+            selected_categories_str = category_form.cleaned_data.get('selected_categories', '')
+            selected_categories = []
+            
+            print(f"POST request với selected_categories_str: {selected_categories_str}")
+            
+            # Tạo query cho thể loại
+            category_query = None
+            if selected_categories_str:
+                try:
+                    selected_categories = json.loads(selected_categories_str)
+                    logger.info(f"Đã parse selected_categories: {selected_categories}")
+                    
+                    if selected_categories:
+                        # Lấy danh sách book_id từ Book_Topic dựa trên topic_id
+                        book_ids = Book_Topic.objects.filter(topic_id__in=selected_categories).values_list('book_id', flat=True)
+                        print(f"Số lượng book_ids tìm thấy: {len(list(book_ids))}")
+                        
+                        # Tạo query cho thể loại
+                        if book_ids:
+                            category_query = Q(book_id__in=book_ids)
+                            logger.info(f"Đã tạo điều kiện tìm kiếm theo topic")
+                except json.JSONDecodeError as e:
+                    logger.error(f"Lỗi khi parse selected_categories: {str(e)}")
+            
+            # Tạo query cho từ khóa
+            keyword_queries = []
+            for form in formset:
+                field_name = form.cleaned_data.get('field_name')
+                search_type = form.cleaned_data.get('search_type')
+                value = form.cleaned_data.get('value')
+                
+                if value:  # Chỉ xử lý nếu có giá trị nhập vào
+                    value = normalize_vietnamese(value)
+                    keywords = re.split(r'[ ,]+', value)
+                    
+                    if search_type == 'iexact':
+                        keyword_queries.append(Q(**{f"{field_name}__unaccent__iexact": value}))
+                    elif search_type == 'icontains':
+                        subquery = Q(**{f"{field_name}__unaccent__icontains": keywords[0]})
+                        for word in keywords[1:]:
+                            subquery &= Q(**{f"{field_name}__unaccent__icontains": word})
+                        keyword_queries.append(subquery)
+                    elif search_type == 'not_icontains':
+                        subquery = ~Q(**{f"{field_name}__unaccent__icontains": keywords[0]})
+                        for word in keywords[1:]:
+                            subquery &= ~Q(**{f"{field_name}__unaccent__icontains": word})
+                        keyword_queries.append(subquery)
+                
+                # Lưu tham số tìm kiếm vào session
+                request.session[f'search_params{i}'] = {
+                    'field_name': field_name,
+                    'search_type': search_type,
+                    'value': value
+                }
+                i += 1
+            
+            # Lưu thể loại đã chọn vào session
+            request.session['selected_categories'] = selected_categories_str
+            
+            # Kết hợp các query từ khóa bằng phép OR
+            keyword_query = None
+            if keyword_queries:
+                keyword_query = reduce(and_, keyword_queries)
+            
+            # Kết hợp query thể loại và query từ khóa bằng phép AND
+            final_query = None
+            if category_query and keyword_query:
+                final_query = category_query & keyword_query
+                logger.info("Kết hợp tìm kiếm theo thể loại VÀ từ khóa")
+            elif category_query:
+                final_query = category_query
+                logger.info("Chỉ tìm kiếm theo thể loại")
+            elif keyword_query:
+                final_query = keyword_query
+                logger.info("Chỉ tìm kiếm theo từ khóa")
+            
+            # Thực hiện truy vấn
+            if final_query:
+                books = Book.objects.filter(final_query)
+                logger.info(f"SQL Query: {str(books.query)}")
+                logger.info(f"Số lượng sách tìm thấy: {books.count()}")
+            else:
+                # Nếu không có điều kiện tìm kiếm nào, hiển thị tất cả sách
+                logger.info("Không có query nào được tạo, hiển thị tất cả sách")
+                books = Book.objects.all()
+            
             request.session['paramslen'] = {
                 'paramslen': i-1
             }
         else:
+            # Form không hợp lệ, kiểm tra xem có giá trị tìm kiếm hoặc thể loại không
+            has_search_value = any(form.cleaned_data.get('value') for form in formset if hasattr(form, 'cleaned_data'))
+            has_categories = False
+            
+            try:
+                selected_categories = request.POST.get('selected_categories', '')
+                if selected_categories:
+                    categories = json.loads(selected_categories)
+                    has_categories = bool(categories)
+            except (json.JSONDecodeError, TypeError):
+                pass
+            
+            if not has_search_value and not has_categories:
+                # Không có giá trị tìm kiếm và không có thể loại, hiển thị thông báo lỗi
+                messages.error(request, "Vui lòng nhập ít nhất một giá trị tìm kiếm hoặc chọn ít nhất một thể loại")
+                return render(request, 'searchAdvance.html', {
+                    'formset': formset,
+                    'category_form': category_form,
+                    'topics': list(topics)
+                })
+            
+            # Nếu có giá trị tìm kiếm hoặc thể loại nhưng form không hợp lệ vì lý do khác
+            # Hiển thị tất cả sách
             books = Book.objects.all()
     else:
         # Lấy các tham số tìm kiếm từ session nếu tồn tại
         paramslen = request.session.get('paramslen')
-        books = None
-        if paramslen != None:
-            for i in range(1,paramslen['paramslen']+1):
-                search_params = request.session.get(f'search_params{i}')    
+        selected_categories_str = request.session.get('selected_categories', '')
+        selected_categories = []
+        
+        # Tạo query cho thể loại
+        category_query = None
+        if selected_categories_str:
+            try:
+                selected_categories = json.loads(selected_categories_str)
                 
-                field_name = search_params['field_name']
-                search_type = search_params['search_type']
-                value = search_params['value']
+                if selected_categories:
+                    # Lấy danh sách book_id từ Book_Topic dựa trên topic_id
+                    book_ids = Book_Topic.objects.filter(topic_id__in=selected_categories).values_list('book_id', flat=True)
+                    
+                    # Tạo query cho thể loại
+                    if book_ids:
+                        category_query = Q(book_id__in=book_ids)
+            except json.JSONDecodeError:
+                pass
+        
+        # Tạo query cho từ khóa
+        keyword_queries = []
+        if paramslen:
+            for i in range(1, paramslen['paramslen']+1):
+                search_params = request.session.get(f'search_params{i}')
+                if not search_params:
+                    continue
                 
-                keywords = re.split(r'[ ,]+', value)
-
-                # Xây dựng lại query dựa trên session
-                if search_type == 'iexact':
-                    queries.append(Q(**{f"{field_name}__unaccent__iexact": value}))
-                elif search_type == 'icontains':
-                    subquery = Q(**{f"{field_name}__unaccent__icontains": keywords[0]})
-                    for word in keywords[1:]:
-                        subquery &= Q(**{f"{field_name}__unaccent__icontains": word})
-                    queries.append(subquery)
-                elif search_type == 'not_icontains':
-                    subquery = ~Q(**{f"{field_name}__unaccent__icontains": keywords[0]})
-                    for word in keywords[1:]:
-                        subquery &= ~Q(**{f"{field_name}__unaccent__icontains": word})
-                    queries.append(subquery)
-            
-            final_query = reduce(and_, queries)
+                field_name = search_params.get('field_name')
+                search_type = search_params.get('search_type')
+                value = search_params.get('value')
+                
+                if value:
+                    value = normalize_vietnamese(value)
+                    keywords = re.split(r'[ ,]+', value)
+                    
+                    if search_type == 'iexact':
+                        keyword_queries.append(Q(**{f"{field_name}__unaccent__iexact": value}))
+                    elif search_type == 'icontains':
+                        subquery = Q(**{f"{field_name}__unaccent__icontains": keywords[0]})
+                        for word in keywords[1:]:
+                            subquery &= Q(**{f"{field_name}__unaccent__icontains": word})
+                        keyword_queries.append(subquery)
+                    elif search_type == 'not_icontains':
+                        subquery = ~Q(**{f"{field_name}__unaccent__icontains": keywords[0]})
+                        for word in keywords[1:]:
+                            subquery &= ~Q(**{f"{field_name}__unaccent__icontains": word})
+                        keyword_queries.append(subquery)
+        
+        # Kết hợp các query từ khóa bằng phép OR
+        keyword_query = None
+        if keyword_queries:
+            keyword_query = reduce(and_, keyword_queries)
+        
+        # Kết hợp query thể loại và query từ khóa bằng phép AND
+        final_query = None
+        if category_query and keyword_query:
+            final_query = category_query & keyword_query
+            logger.info("Kết hợp tìm kiếm theo thể loại VÀ từ khóa")
+        elif category_query:
+            final_query = category_query
+            logger.info("Chỉ tìm kiếm theo thể loại")
+        elif keyword_query:
+            final_query = keyword_query
+            logger.info("Chỉ tìm kiếm theo từ khóa")
+        
+        # Thực hiện truy vấn
+        if final_query:
             books = Book.objects.filter(final_query)
+            logger.info(f"SQL Query (từ session): {str(books.query)}")
+            logger.info(f"Số lượng sách tìm thấy (từ session): {books.count()}")
         else:
-            books = Book.objects.all()
-                
+            books = Book.objects.all() 
+    #lay rate
+    countRates = {}
+    averRates = {}
+    for book in books:
+        book_id = book.book_id
+        countRates[book_id] = countRating(book_id=book_id)
+        averRates[book_id] = averRating(book_id=book_id)               
     # Phân trang
     page_obj = pagePaginator(request, books)
     page_numbers = []
@@ -650,7 +786,16 @@ def searchAdvance(request):
         html = render_to_string('advanceBooks.html', {'page_obj': page_obj, 'page_numbers': page_numbers})
         return HttpResponse(html)
 
-    return render(request, 'searchAdvance.html', {'formset': formset, 'page_obj': page_obj, 'page_numbers': page_numbers})
+    # Truyền danh sách topics vào template
+    return render(request, 'searchAdvance.html', {
+        'formset': formset, 
+        'category_form': category_form,
+        'page_obj': page_obj, 
+        'page_numbers': page_numbers,
+        'countRates': countRates,
+        'averRates': averRates,
+        'topics': list(topics)  # Chuyển QuerySet thành list để có thể serialize trong template
+    })
 
 
 def test(request):

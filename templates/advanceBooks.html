@@ -1,4 +1,5 @@
-    <div id="book-list">
+{% load custom_filters %}
+<div id="book-list">
         <ul id="book-form">
             {% for book in page_obj %}
                 <div class="book-found">
@@ -11,11 +12,13 @@
                             <div class="middle-content col-md-7">
                                 <a class="book-name" href="/book/detail/id={{book.book_id|add:'-3000'}}">{{ book.book_title }}</a> 
                                 <p class="book-author">by {{book.book_author}}</p>
-                                <p class="book-published">First published in {{ book.book_publish }}</p>
+                                <p class="book-published">Xuất bản: {{ book.book_publish }}</p>
                                 
-                                {% comment %} <div class="aveRating">
-                                    <span class="product-rating">{{ averRates|get_item:book.book_id }}</span><span>/5 <span class="fa fa-star aveRating-start"></span> ({{ countRates|get_item:book.book_id }} - {{ book.book_view }} lượt xem)</span>
-                                </div> {% endcomment %}
+                                <div class="aveRating">
+                                    <span class="product-rating">{{ averRates|get_raw_number:book.book_id }}</span><span>/5 
+                                    <span class="fa fa-star aveRating-start"></span> 
+                                    ({{ countRates|get_raw_number:book.book_id }} - {{ book.book_view }} lượt xem)</span>
+                                </div>
                             </div>
 
                             <div class="right-content col-md-3">

@@ -132,9 +132,9 @@
                                 <p class="book-published">Xuất bản: {{ book.book_publish }}</p>
                                 
                                 <div class="aveRating">
-                                    <span class="product-rating">{{ averRates|get_number:book.book_id }}</span><span>/5 
+                                    <span class="product-rating">{{ averRates|get_raw_number:book.book_id }}</span><span>/5 
                                     <span class="fa fa-star aveRating-start"></span> 
-                                    ({{ countRates|get_number:book.book_id }} - {{ book.book_view }} lượt xem)</span>
+                                    ({{ countRates|get_raw_number:book.book_id }} - {{ book.book_view }} lượt xem)</span>
                                 </div>
                             </div>
 

@@ -1,105 +1,257 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
 
-
-
-{% block pack %}
+{% block styles %}
+{{ block.super }}
 <style>
-    /* Empty state styling */
-    .empty-state {
-        min-height: 60vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 2rem 0;
-    }
-    
-    .empty-state-container {
-        background: white;
-        padding: 3rem;
-        border-radius: 12px;
-        box-shadow: 0 5px 20px rgba(25, 118, 210, 0.1);
-        max-width: 600px;
-        width: 90%;
-        border: 1px solid rgba(25, 118, 210, 0.1);
-        animation: fadeIn 0.6s ease;
-    }
-    
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .btn-primary {
-        background-color: #1976d2;
-        border: none;
-        padding: 0.8rem 2rem;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-        color: white;
-        text-decoration: none;
-        display: inline-block;
-    }
-    
-    .btn-primary:hover {
-        background-color: #1565c0;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(25, 118, 210, 0.15);
-    }
-    
-    .mb-3 {
-        margin-bottom: 1rem;
-    }
-    
-    .mb-4 {
-        margin-bottom: 1.5rem;
-    }
-    
-    .py-5 {
-        padding-top: 3rem;
-        padding-bottom: 3rem;
-    }
-    
-    .text-center {
-        text-align: center;
-    }
-    
-    .text-muted {
-        color: #6c757d;
-    }
-</style>
-{% endblock pack %}
+  /* Đảm bảo modal hiển thị đúng vị trí */
+  .modal-dialog-centered {
+    display: flex;
+    align-items: center;
+    min-height: calc(100% - 1rem);
+    margin: 1.75rem auto; /* Đảm bảo có margin trên dưới */
+  }
 
+  /* Giới hạn chiều cao của modal */
+  .modal-dialog-scrollable {
+    max-height: 85vh; /* Giảm chiều cao xuống để không bị lấn lên trên */
+  }
+
+  .modal-dialog-scrollable .modal-content {
+    max-height: 85vh;
+  }
+
+  /* Grid thể loại */
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 10px 0;
+  }
+
+  /* Đảm bảo danh sách đã chọn cũng có thể cuộn */
+  .selected-categories-list {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 10px 0;
+  }
+
+  /* Item thể loại */
+  .category-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    transition: all 0.2s;
+  }
+
+  .category-item:hover {
+    background-color: #e9ecef;
+  }
+
+  .category-item input {
+    margin-right: 10px;
+  }
+
+  /* Badge thể loại đã chọn */
+  .selected-category-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    background-color: #e3f2fd;
+    color: #0d6efd;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    border: 1px solid #d0e7fb;
+  }
+
+  .selected-category-badge .remove-badge {
+    margin-left: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+  }
+
+  .selected-category-badge .remove-badge:hover {
+    background-color: rgba(13, 110, 253, 0.2);
+  }
+
+  /* Hiệu ứng khi thêm/xóa trường */
+  .search-condition-row {
+    transition: all 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .fade-in {
+    animation: fadeIn 0.3s ease forwards;
+  }
+
+  /* Card thể loại đã chọn */
+  .card {
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+  }
+
+  .card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    padding: 12px 15px;
+  }
+
+  .card-body {
+    padding: 15px;
+  }
+
+  /* Đảm bảo modal hiển thị đúng */
+  .modal {
+    z-index: 1050;
+    padding-top: 60px; /* Thêm padding-top để tránh bị che bởi header */
+  }
+
+  .modal-content {
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    margin-top: 20px; /* Thêm margin-top để đẩy modal xuống dưới */
+  }
+
+  /* Đảm bảo modal không bị lệch */
+  .modal-open {
+    padding-right: 0 !important;
+    overflow: auto !important;
+  }
+
+  /* Điều chỉnh cho màn hình nhỏ */
+  @media (max-width: 768px) {
+    .modal-dialog {
+      margin: 0.5rem;
+    }
+    
+    .category-grid {
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      max-height: 250px;
+    }
+    
+    .selected-categories-list {
+      max-height: 250px;
+    }
+  }
+</style>
+{% endblock %}
 
 {% block bonusContent %}
 <div class="body">
     <div class="overall container-fluid justify-content-center">
-        <form method="post" action="{% url 'searchAdvance' %}">
+        <!-- Modal chọn thể loại -->
+        <div class="modal fade" id="categoryModal" tabindex="-1" aria-labelledby="categoryModalLabel">
+            <div class="modal-dialog modal-dialog-scrollable modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="categoryModalLabel">Chọn thể loại</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row mb-3">
+                            <div class="col">
+                                <input type="text" class="form-control" id="categorySearchInput" placeholder="Tìm kiếm thể loại...">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h6>Tất cả thể loại</h6>
+                                <div class="category-grid">
+                                    <!-- Danh sách thể loại sẽ được render bằng JavaScript -->
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <h6>Đã chọn</h6>
+                                <div id="selectedCategoriesList" class="selected-categories-list">
+                                    <!-- Danh sách thể loại đã chọn sẽ được render bằng JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="button" class="btn btn-primary" id="confirmCategories">Xác nhận</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Form tìm kiếm nâng cao -->
+        <form method="post" action="{% url 'searchAdvance' %}" id="advanceSearchForm">
             {% csrf_token %}
             {{ formset.management_form }}
-            <table>
+            
+            <!-- Hiển thị thể loại đã chọn -->
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Thể loại đã chọn</h5>
+                    <button type="button" id="openCategoryModal" class="btn btn-sm btn-primary">
+                        <i class="fas fa-tags me-1"></i> Chọn thể loại
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="selectedCategoriesDisplay" class="d-flex flex-wrap">
+                        <span class="text-muted fst-italic">Chưa chọn thể loại nào</span>
+                    </div>
+                    
+                    <!-- Sử dụng trường selected_categories từ category_form -->
+                    {% render_field category_form.selected_categories id="selectedCategoriesInput" %}
+                </div>
+            </div>
+            
+            <table class="table">
                 <thead>
                     <tr>
-                        <th>Field</th>
-                        <th>Condition</th>
-                        <th>Value</th>
-                        <th>Action</th>
+                        <th>Trường</th>
+                        <th>Điều Kiện</th>
+                        <th>Giá Trị</th>
+                        <th>Xóa Trường</th>
                     </tr>
                 </thead>
-
-                <tbody>
+                <tbody id="search-conditions">
                     {% for form in formset %}
-                    <tr>
-                        <td>{% render_field form.field_name %}</td>
-                        <td>{% render_field form.search_type %}</td>
-                        <td>{% render_field form.value %}</td>
-                        <td><button type="button" class="remove-field">Remove</button></td> 
+                    <tr class="search-condition-row">
+                        <td>
+                            <select name="{{ form.field_name.html_name }}" id="{{ form.field_name.id_for_label }}" class="form-select field-select">
+                                {% for value, text in form.field_name.field.choices %}
+                                <option value="{{ value }}" {% if form.field_name.value == value %}selected{% endif %}>{{ text }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td>{% render_field form.search_type class="form-select" %}</td>
+                        <td>{% render_field form.value class="form-control value-input" placeholder="Nhập từ khóa..." %}</td>
+                        <td><button type="button" class="btn btn-sm btn-outline-danger remove-field">Xóa</button></td> 
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
-            <button type="submit" >Tìm Kiếm</button>
-            <button type="button" id="add-field">Thêm trường</button>
+            
+            <div class="d-flex justify-content-between mb-4">
+                <button type="button" class="btn btn-outline-primary" id="add-field">
+                    <i class="fas fa-plus-circle"></i> Thêm điều kiện
+                </button>
+                <button type="submit" class="btn btn-primary" id="submitSearch">
+                    <i class="fas fa-search"></i> Tìm kiếm
+                </button>
+            </div>
         </form>
     </div>
 </div>
@@ -109,7 +261,7 @@
 <div class="search-result">
     {% if page_obj %}
     <div class="search-book-content container-fluid justify-content-center">
-        {% include 'advanceBooks.html' %}
+      {% include 'advanceBooks.html' %}
     </div>
     {% else %}
     <div class="empty-state text-center py-5">
@@ -130,73 +282,291 @@
 {% endblock content %}
 
 {% block scripts %}
+{{ block.super }}
 <script>
-    // Hàm để thêm trường mới
-    document.getElementById('add-field').addEventListener('click', function(e) {
-        e.preventDefault();
-        // Đếm số lượng dòng hiện tại
-        var form_idx = document.querySelectorAll('tbody tr').length;
-        // Clone dòng đầu tiên
-        var new_form = document.querySelector('tbody tr:first-child').cloneNode(true);
-
-        // Reset các giá trị của input và select
-        new_form.querySelectorAll('input, select').forEach(function(input) {
-            input.name = input.name.replace(/\d+/, form_idx);
-            input.id = input.id.replace(/\d+/, form_idx);
-            input.value = '';  // Reset giá trị
-        });
-        var totalForms = document.getElementById('id_form-TOTAL_FORMS');
-        totalForms.value = form_idx + 1;
-        // Đặt giá trị mặc định cho 'field_name' và 'search_type'
-        var fieldNameSelect = new_form.querySelector('select[name$="field_name"]');
-        var searchTypeSelect = new_form.querySelector('select[name$="search_type"]');
-
-        if (fieldNameSelect) {
-            fieldNameSelect.value = 'book_title'; // Giá trị mặc định cho 'field_name'
-        }
-        if (searchTypeSelect) {
-            searchTypeSelect.value = 'icontains'; // Giá trị mặc định cho 'search_type'
-        }
-
-        // Thêm sự kiện xóa cho nút remove
-        var remove_button = new_form.querySelector('.remove-field');
-        remove_button.addEventListener('click', removeField);
-        
-        // Thêm dòng mới vào tbody
-        document.querySelector('tbody').appendChild(new_form);
-       
-    });
-
-    // Hàm để xóa trường
-    function removeField(e) {
-        e.preventDefault();
-        var totalRows = document.querySelectorAll('tbody tr').length;
-
-        // Chỉ xóa nếu có hơn 1 dòng
-        if (totalRows > 1) {
-            this.closest('tr').remove();
-            var form_idx = document.getElementById('id_form-TOTAL_FORMS');
-            form_idx.value = totalRows -1;
-            // cập nhật lại số hiêu của các form sau khi xóa
-            document.querySelectorAll('tbody tr').forEach(function(tr, index) {
-                tr.querySelectorAll('input, select').forEach(function(input) {
-                    // Thay thế chỉ số hiện tại bằng chỉ số mới dựa trên index
-                    input.name = input.name.replace(/form-\d+-/, `form-${index}-`);  
-                    input.id = input.id.replace(/form-\d+-/, `form-${index}-`);
-                });
-            });
-        } else {
-            alert('Phải có ít nhất một trường!');
-        }
+  document.addEventListener('DOMContentLoaded', function() {
+    // Lấy danh sách thể loại từ backend
+    const categories = {{ topics|safe }};
+    
+    const categoryModal = new bootstrap.Modal(document.getElementById('categoryModal'));
+    const categoryGrid = document.querySelector('.category-grid');
+    const selectedList = document.getElementById('selectedCategoriesList');
+    const searchInput = document.getElementById('categorySearchInput');
+    const selectedCategoriesDisplay = document.getElementById('selectedCategoriesDisplay');
+    const selectedCategoriesInput = document.getElementById('selectedCategoriesInput');
+    let selectedCategories = [];
+    
+    // Khởi tạo: kiểm tra nếu đã có thể loại được chọn
+    try {
+      if (selectedCategoriesInput.value && selectedCategoriesInput.value.trim() !== '') {
+        selectedCategories = JSON.parse(selectedCategoriesInput.value);
+        console.log("Loaded selected categories:", selectedCategories);
+      }
+      updateSelectedCategoriesDisplay();
+    } catch (e) {
+      console.error("Error parsing selected categories:", e);
+      selectedCategories = [];
     }
-
-    // Thêm sự kiện cho nút "Remove" mặc định
-    document.querySelectorAll('.remove-field').forEach(function(button) {
-        button.addEventListener('click', removeField);
+    
+    // Render danh sách thể loại trong modal
+    function renderCategories(filter = '') {
+      categoryGrid.innerHTML = '';
+      
+      if (!categories || categories.length === 0) {
+        const noCategories = document.createElement('div');
+        noCategories.className = 'text-center text-muted py-3';
+        noCategories.innerHTML = 'Không có thể loại nào';
+        categoryGrid.appendChild(noCategories);
+        return;
+      }
+      
+      const filteredCategories = filter 
+        ? categories.filter(cat => cat.topic_name.toLowerCase().includes(filter.toLowerCase()))
+        : categories;
+      
+      filteredCategories.forEach(category => {
+        const item = document.createElement('div');
+        item.className = 'category-item';
+        item.innerHTML = `
+          <input class="form-check-input" type="checkbox" value="${category.topic_id}" id="cat-${category.topic_id}" 
+            ${selectedCategories.includes(category.topic_id) ? 'checked' : ''}>
+          <label class="form-check-label" for="cat-${category.topic_id}">${category.topic_name}</label>
+        `;
+        categoryGrid.appendChild(item);
+      });
+      
+      if (filteredCategories.length === 0) {
+        const noResults = document.createElement('div');
+        noResults.className = 'text-center text-muted py-3';
+        noResults.innerHTML = 'Không tìm thấy thể loại phù hợp';
+        categoryGrid.appendChild(noResults);
+      }
+    }
+    
+    // Hiển thị thể loại đã chọn trong modal và card
+    function updateSelectedCategoriesDisplay() {
+      // Cập nhật trong modal
+      selectedList.innerHTML = '';
+      
+      if (selectedCategories.length === 0) {
+        const emptyState = document.createElement('div');
+        emptyState.className = 'text-muted fst-italic';
+        emptyState.textContent = 'Chưa chọn thể loại nào';
+        selectedList.appendChild(emptyState);
+      } else {
+        selectedCategories.forEach(catId => {
+          const category = categories.find(c => c.topic_id === catId);
+          if (category) {
+            const badge = document.createElement('div');
+            badge.className = 'selected-category-badge';
+            badge.innerHTML = `
+              ${category.topic_name}
+              <span class="remove-badge" data-id="${catId}">×</span>
+            `;
+            selectedList.appendChild(badge);
+          }
+        });
+      }
+      
+      // Cập nhật trong card
+      selectedCategoriesDisplay.innerHTML = '';
+      
+      if (selectedCategories.length === 0) {
+        const emptyState = document.createElement('span');
+        emptyState.className = 'text-muted fst-italic';
+        emptyState.textContent = 'Chưa chọn thể loại nào';
+        selectedCategoriesDisplay.appendChild(emptyState);
+      } else {
+        selectedCategories.forEach(catId => {
+          const category = categories.find(c => c.topic_id === catId);
+          if (category) {
+            const badge = document.createElement('div');
+            badge.className = 'selected-category-badge';
+            badge.innerHTML = `
+              ${category.topic_name}
+              <span class="remove-badge" data-id="${catId}">×</span>
+            `;
+            selectedCategoriesDisplay.appendChild(badge);
+          }
+        });
+      }
+      
+      // Cập nhật input hidden
+      try {
+        selectedCategoriesInput.value = JSON.stringify(selectedCategories);
+        console.log("Updated selected categories input:", selectedCategoriesInput.value);
+      } catch (e) {
+        console.error("Error stringifying selected categories:", e);
+      }
+    }
+    
+    // Mở modal khi click vào nút chọn thể loại
+    document.getElementById('openCategoryModal').addEventListener('click', function() {
+      renderCategories();
+      updateSelectedCategoriesDisplay();
+      categoryModal.show();
     });
+    
+    // Tìm kiếm thể loại
+    searchInput.addEventListener('input', function() {
+      renderCategories(this.value);
+    });
+    
+    // Xử lý khi người dùng chọn thể loại trong modal
+    categoryGrid.addEventListener('change', function(e) {
+      if (e.target.type === 'checkbox') {
+        const categoryId = parseInt(e.target.value);
+        console.log("Category checkbox changed:", categoryId, e.target.checked);
+        
+        if (e.target.checked) {
+          if (!selectedCategories.includes(categoryId)) {
+            selectedCategories.push(categoryId);
+          }
+        } else {
+          selectedCategories = selectedCategories.filter(id => id !== categoryId);
+        }
+        updateSelectedCategoriesDisplay();
+      }
+    });
+    
+    // Xóa thể loại đã chọn khi click vào badge (trong modal và card)
+    document.addEventListener('click', function(e) {
+      if (e.target.classList.contains('remove-badge')) {
+        const categoryId = parseInt(e.target.dataset.id);
+        console.log("Removing category:", categoryId);
+        selectedCategories = selectedCategories.filter(id => id !== categoryId);
+        updateSelectedCategoriesDisplay();
+        renderCategories(searchInput.value);
+      }
+    });
+    
+    // Xác nhận chọn thể loại
+    document.getElementById('confirmCategories').addEventListener('click', function() {
+      updateSelectedCategoriesDisplay();
+      categoryModal.hide();
+    });
+    
+    // Xử lý focus khi modal đóng
+    const modalElement = document.getElementById('categoryModal');
+    modalElement.addEventListener('hidden.bs.modal', function() {
+      // Đảm bảo không có phần tử nào trong modal giữ focus
+      document.getElementById('openCategoryModal').focus();
+    });
+    
+    // Xử lý focus khi modal mở
+    modalElement.addEventListener('shown.bs.modal', function() {
+      // Focus vào ô tìm kiếm khi modal mở
+      searchInput.focus();
+    });
+    
+    // Xử lý thêm trường tìm kiếm mới
+    document.getElementById('add-field').addEventListener('click', function() {
+      const totalFormsInput = document.querySelector('input[name="form-TOTAL_FORMS"]');
+      const currentFormCount = parseInt(totalFormsInput.value);
+      
+      // Tạo row mới
+      const newRow = document.createElement('tr');
+      newRow.className = 'search-condition-row fade-in';
+      
+      // Lấy mẫu options từ select đầu tiên
+      const firstFieldSelect = document.querySelector('.field-select');
+      const fieldOptions = firstFieldSelect ? firstFieldSelect.innerHTML : '';
+      
+      // Tạo HTML cho row mới
+      newRow.innerHTML = `
+        <td>
+          <select name="form-${currentFormCount}-field_name" id="id_form-${currentFormCount}-field_name" class="form-select field-select">
+            ${fieldOptions}
+          </select>
+        </td>
+        <td>
+          <select name="form-${currentFormCount}-search_type" id="id_form-${currentFormCount}-search_type" class="form-select">
+            <option value="icontains">Có chứa từ</option>
+            <option value="not_icontains">Không chứa từ</option>
+            <option value="iexact">Chính xác</option>
+          </select>
+        </td>
+        <td>
+          <input type="text" name="form-${currentFormCount}-value" id="id_form-${currentFormCount}-value" class="form-control value-input" placeholder="Nhập từ khóa...">
+        </td>
+        <td>
+          <button type="button" class="btn btn-sm btn-outline-danger remove-field">Xóa</button>
+        </td>
+      `;
+      
+      // Thêm row vào bảng
+      document.getElementById('search-conditions').appendChild(newRow);
+      
+      // Cập nhật số lượng form
+      totalFormsInput.value = currentFormCount + 1;
+      
+      console.log(`Đã thêm trường mới, tổng số trường: ${totalFormsInput.value}`);
+    });
+    
+    // Xử lý xóa trường tìm kiếm
+    document.getElementById('search-conditions').addEventListener('click', function(e) {
+      if (e.target.classList.contains('remove-field')) {
+        const row = e.target.closest('.search-condition-row');
+        const totalFormsInput = document.querySelector('input[name="form-TOTAL_FORMS"]');
+        const currentFormCount = parseInt(totalFormsInput.value);
+        
+        // Chỉ xóa nếu còn ít nhất 1 trường
+        if (currentFormCount > 1) {
+          row.remove();
+          
+          // Cập nhật lại index của các trường còn lại
+          const rows = document.querySelectorAll('.search-condition-row');
+          rows.forEach((row, index) => {
+            row.querySelectorAll('select, input').forEach(input => {
+              const name = input.name;
+              const newName = name.replace(/form-\d+/, `form-${index}`);
+              input.name = newName;
+              
+              const id = input.id;
+              const newId = id.replace(/id_form-\d+/, `id_form-${index}`);
+              input.id = newId;
+            });
+          });
+          
+          // Cập nhật số lượng form
+          totalFormsInput.value = rows.length;
+          
+          console.log(`Đã xóa trường, tổng số trường còn lại: ${totalFormsInput.value}`);
+        } else {
+          alert('Phải giữ lại ít nhất một trường tìm kiếm');
+        }
+      }
+    });
+    
+    // Kiểm tra form trước khi submit
+    document.getElementById('advanceSearchForm').addEventListener('submit', function(e) {
+      // Kiểm tra xem có ít nhất một điều kiện tìm kiếm hợp lệ
+      let hasValidSearch = false;
+      
+      // Nếu có thể loại được chọn, coi như có điều kiện tìm kiếm hợp lệ
+      if (selectedCategories.length > 0) {
+        hasValidSearch = true;
+        console.log("Form is valid: has selected categories");
+      } else {
+        // Kiểm tra xem có ít nhất một trường value có giá trị
+        const valueInputs = document.querySelectorAll('.value-input');
+        for (let input of valueInputs) {
+          if (input.value.trim()) {
+            hasValidSearch = true;
+            console.log("Form is valid: has search value");
+            break;
+          }
+        }
+      }
+      
+      if (!hasValidSearch) {
+        e.preventDefault();
+        alert('Vui lòng nhập ít nhất một giá trị tìm kiếm hoặc chọn ít nhất một thể loại');
+      } else {
+        console.log("Submitting form with selected categories:", selectedCategoriesInput.value);
+      }
+    });
+  });
 </script>
-
 {% endblock scripts %}
-    
-    
     

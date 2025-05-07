@@ -990,7 +990,7 @@
                         <form action="">
                             <div class="rating">
                                 <span class="star-rating">
-                                    {% for i in "54321" %}
+                                    {% for i in "12345" %}
                                         {% if i == rating %}
                                             <label for="rate-{{i}}" title="{{i}} sao"><i class="fa fa-star"></i></label>
                                             <input type="radio" name="rating" id="rate-{{i}}" hx-vals='{"rate": {{i}}, "book_id": {{detail.book_id}}}' hx-post="/rating_post/" hx-trigger="click delay:0.25s" hx-target="#clear-rating" hx-swap="outerHTML" checked>
