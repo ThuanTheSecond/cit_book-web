@@ -582,16 +582,21 @@ def searchAdvance(request):
                     logger.info(f"Đã parse selected_categories: {selected_categories}")
                     
                     if selected_categories:
-                        # Lấy danh sách book_id từ Book_Topic dựa trên topic_id
-                        book_ids = Book_Topic.objects.filter(topic_id__in=selected_categories).values_list('book_id', flat=True)
-                        print(f"Số lượng book_ids tìm thấy: {len(list(book_ids))}")
+                        # Tạo query AND cho tất cả các thể loại đã chọn
+                        # Lấy danh sách book_id cho từng thể loại
+                        category_queries = []
+                        for topic_id in selected_categories:
+                            # Lấy danh sách book_id cho thể loại này
+                            book_ids = Book_Topic.objects.filter(topic_id=topic_id).values_list('book_id', flat=True)
+                            category_queries.append(Q(book_id__in=book_ids))
                         
-                        # Tạo query cho thể loại
-                        if book_ids:
-                            category_query = Q(book_id__in=book_ids)
-                            logger.info(f"Đã tạo điều kiện tìm kiếm theo topic")
-                except json.JSONDecodeError as e:
-                    logger.error(f"Lỗi khi parse selected_categories: {str(e)}")
+                        # Kết hợp các query bằng phép AND
+                        if category_queries:
+                            category_query = category_queries[0]
+                            for query in category_queries[1:]:
+                                category_query &= query
+                except json.JSONDecodeError:
+                    pass
             
             # Tạo query cho từ khóa
             keyword_queries = []

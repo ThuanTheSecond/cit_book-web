@@ -57,34 +57,43 @@
     margin-right: 10px;
   }
 
-  /* Badge thể loại đã chọn */
+  /* Badge thể loại đã chọn - kiểu mới */
   .selected-category-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 6px 12px;
-    background-color: #e3f2fd;
-    color: #0d6efd;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    margin-right: 8px;
-    margin-bottom: 8px;
-    border: 1px solid #d0e7fb;
+    display: inline-flex !important;
+    align-items: center !important;
+    padding: 8px 16px !important;
+    background-color: #0d6efd !important;
+    color: white !important;
+    border-radius: 30px !important;
+    font-size: 0.9rem !important;
+    margin-right: 10px !important;
+    margin-bottom: 10px !important;
+    border: none !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .selected-category-badge:hover {
+    background-color: #0b5ed7 !important;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15) !important;
   }
 
   .selected-category-badge .remove-badge {
-    margin-left: 6px;
-    cursor: pointer;
-    font-size: 1rem;
-    width: 18px;
-    height: 18px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
+    margin-left: 8px !important;
+    cursor: pointer !important;
+    font-size: 0.9rem !important;
+    width: 20px !important;
+    height: 20px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    transition: all 0.2s ease !important;
   }
 
   .selected-category-badge .remove-badge:hover {
-    background-color: rgba(13, 110, 253, 0.2);
+    background-color: rgba(255, 255, 255, 0.4) !important;
   }
 
   /* Hiệu ứng khi thêm/xóa trường */
@@ -203,9 +212,14 @@
             <div class="card mb-3">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Thể loại đã chọn</h5>
-                    <button type="button" id="openCategoryModal" class="btn btn-sm btn-primary">
-                        <i class="fas fa-tags me-1"></i> Chọn thể loại
-                    </button>
+                    <div>
+                        <button type="button" id="clearCategories" class="btn btn-sm btn-outline-secondary me-2">
+                            <i class="fas fa-eraser me-2"></i> Xóa thể loại
+                        </button>
+                        <button type="button" id="openCategoryModal" class="btn btn-sm btn-primary">
+                            <i class="fas fa-tags me-1"></i> Chọn thể loại
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div id="selectedCategoriesDisplay" class="d-flex flex-wrap">
@@ -223,7 +237,7 @@
                         <th>Trường</th>
                         <th>Điều Kiện</th>
                         <th>Giá Trị</th>
-                        <th>Xóa Trường</th>
+                        <th>Thao tác</th>
                     </tr>
                 </thead>
                 <tbody id="search-conditions">
@@ -237,14 +251,19 @@
                             </select>
                         </td>
                         <td>{% render_field form.search_type class="form-select" %}</td>
-                        <td>{% render_field form.value class="form-control value-input" placeholder="Nhập từ khóa..." %}</td>
+                        <td class="position-relative">
+                            {% render_field form.value class="form-control value-input" placeholder="Nhập từ khóa..." %}
+                            <button type="button" class="btn btn-sm btn-outline-secondary clear-value position-absolute" style="right: 10px; top: 50%; transform: translateY(-50%);">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </td>
                         <td><button type="button" class="btn btn-sm btn-outline-danger remove-field">Xóa</button></td> 
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
             
-            <div class="d-flex justify-content-between mb-4">
+            <div class="d-flex flex-column align-items-start gap-3 mb-4">
                 <button type="button" class="btn btn-outline-primary" id="add-field">
                     <i class="fas fa-plus-circle"></i> Thêm điều kiện
                 </button>
@@ -296,51 +315,48 @@
     const selectedCategoriesInput = document.getElementById('selectedCategoriesInput');
     let selectedCategories = [];
     
+    // Hàm áp dụng style cho các thẻ thể loại
+    function applyBadgeStyles() {
+      document.querySelectorAll('.selected-category-badge').forEach(badge => {
+        badge.style.display = 'inline-flex';
+        badge.style.alignItems = 'center';
+        badge.style.padding = '8px 16px';
+        badge.style.backgroundColor = '#0d6efd';
+        badge.style.color = 'white';
+        badge.style.borderRadius = '30px';
+        badge.style.fontSize = '0.9rem';
+        badge.style.marginRight = '10px';
+        badge.style.marginBottom = '10px';
+        badge.style.border = 'none';
+        badge.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.1)';
+        badge.style.transition = 'all 0.2s ease';
+        
+        const removeBtn = badge.querySelector('.remove-badge');
+        if (removeBtn) {
+          removeBtn.style.marginLeft = '8px';
+          removeBtn.style.cursor = 'pointer';
+          removeBtn.style.fontSize = '0.9rem';
+          removeBtn.style.width = '20px';
+          removeBtn.style.height = '20px';
+          removeBtn.style.display = 'inline-flex';
+          removeBtn.style.alignItems = 'center';
+          removeBtn.style.justifyContent = 'center';
+          removeBtn.style.borderRadius = '50%';
+          removeBtn.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+          removeBtn.style.transition = 'all 0.2s ease';
+        }
+      });
+    }
+    
     // Khởi tạo: kiểm tra nếu đã có thể loại được chọn
     try {
       if (selectedCategoriesInput.value && selectedCategoriesInput.value.trim() !== '') {
         selectedCategories = JSON.parse(selectedCategoriesInput.value);
         console.log("Loaded selected categories:", selectedCategories);
       }
-      updateSelectedCategoriesDisplay();
     } catch (e) {
       console.error("Error parsing selected categories:", e);
       selectedCategories = [];
-    }
-    
-    // Render danh sách thể loại trong modal
-    function renderCategories(filter = '') {
-      categoryGrid.innerHTML = '';
-      
-      if (!categories || categories.length === 0) {
-        const noCategories = document.createElement('div');
-        noCategories.className = 'text-center text-muted py-3';
-        noCategories.innerHTML = 'Không có thể loại nào';
-        categoryGrid.appendChild(noCategories);
-        return;
-      }
-      
-      const filteredCategories = filter 
-        ? categories.filter(cat => cat.topic_name.toLowerCase().includes(filter.toLowerCase()))
-        : categories;
-      
-      filteredCategories.forEach(category => {
-        const item = document.createElement('div');
-        item.className = 'category-item';
-        item.innerHTML = `
-          <input class="form-check-input" type="checkbox" value="${category.topic_id}" id="cat-${category.topic_id}" 
-            ${selectedCategories.includes(category.topic_id) ? 'checked' : ''}>
-          <label class="form-check-label" for="cat-${category.topic_id}">${category.topic_name}</label>
-        `;
-        categoryGrid.appendChild(item);
-      });
-      
-      if (filteredCategories.length === 0) {
-        const noResults = document.createElement('div');
-        noResults.className = 'text-center text-muted py-3';
-        noResults.innerHTML = 'Không tìm thấy thể loại phù hợp';
-        categoryGrid.appendChild(noResults);
-      }
     }
     
     // Hiển thị thể loại đã chọn trong modal và card
@@ -397,6 +413,110 @@
         console.log("Updated selected categories input:", selectedCategoriesInput.value);
       } catch (e) {
         console.error("Error stringifying selected categories:", e);
+      }
+      
+      // Áp dụng style cho các thẻ thể loại
+      applyBadgeStyles();
+    }
+    
+    // Gọi hàm hiển thị ban đầu
+    updateSelectedCategoriesDisplay();
+    
+    // Xử lý nút xóa tất cả thể loại
+    document.getElementById('clearCategories').addEventListener('click', function() {
+      selectedCategories = [];
+      updateSelectedCategoriesDisplay();
+      console.log("Cleared all categories");
+    });
+    
+    // Xử lý nút xóa giá trị trong ô tìm kiếm
+    document.querySelectorAll('.clear-value').forEach(button => {
+      // Ẩn nút xóa ban đầu nếu không có giá trị
+      const input = button.closest('td').querySelector('.value-input');
+      button.style.display = input && input.value.trim() ? 'block' : 'none';
+      
+      // Thêm sự kiện click
+      button.addEventListener('click', function() {
+        const input = this.closest('td').querySelector('.value-input');
+        if (input) {
+          input.value = '';
+          input.focus();
+          this.style.display = 'none';
+        }
+      });
+    });
+    
+    // Theo dõi sự thay đổi của các ô input để hiển thị/ẩn nút xóa
+    document.querySelectorAll('.value-input').forEach(input => {
+      input.addEventListener('input', function() {
+        const clearButton = this.closest('td').querySelector('.clear-value');
+        if (clearButton) {
+          clearButton.style.display = this.value.trim() ? 'block' : 'none';
+        }
+      });
+    });
+    
+    // Thêm sự kiện cho các nút xóa mới được thêm vào
+    document.getElementById('add-field').addEventListener('click', function() {
+      // Đợi một chút để DOM cập nhật
+      setTimeout(() => {
+        const newRow = document.querySelector('.search-condition-row:last-child');
+        if (newRow) {
+          const clearButton = newRow.querySelector('.clear-value');
+          const input = newRow.querySelector('.value-input');
+          
+          if (clearButton && input) {
+            // Ẩn nút xóa ban đầu
+            clearButton.style.display = 'none';
+            
+            // Thêm sự kiện click
+            clearButton.addEventListener('click', function() {
+              input.value = '';
+              input.focus();
+              this.style.display = 'none';
+            });
+            
+            // Thêm sự kiện input
+            input.addEventListener('input', function() {
+              clearButton.style.display = this.value.trim() ? 'block' : 'none';
+            });
+          }
+        }
+      }, 100);
+    });
+    
+    // Render danh sách thể loại trong modal
+    function renderCategories(filter = '') {
+      categoryGrid.innerHTML = '';
+      
+      if (!categories || categories.length === 0) {
+        const noCategories = document.createElement('div');
+        noCategories.className = 'text-center text-muted py-3';
+        noCategories.innerHTML = 'Không có thể loại nào';
+        categoryGrid.appendChild(noCategories);
+        return;
+      }
+      
+      const filteredCategories = filter 
+        ? categories.filter(cat => cat.topic_name.toLowerCase().includes(filter.toLowerCase()))
+        : categories;
+      
+      filteredCategories.forEach(category => {
+        const item = document.createElement('div');
+        item.className = 'category-item';
+        item.innerHTML = `
+          <input class="form-check-input" type="checkbox" value="${category.topic_id}" id="cat-${category.topic_id}" 
+            ${selectedCategories.includes(category.topic_id) ? 'checked' : ''}>
+          <label class="form-check-label" for="cat-${category.topic_id}">${category.topic_name}</label>
+        `;
+        categoryGrid.appendChild(item);
+      });
+      
+      if (filteredCategories.length === 0) {
+        const noResults = document.createElement('div');
+        noResults.className = 'text-center text-muted py-3';
+        noResults.innerHTML = 'Không tìm thấy thể loại phù hợp';
+        categoryGrid.appendChild(noResults);
       }
     }
     
@@ -486,8 +606,11 @@
             <option value="iexact">Chính xác</option>
           </select>
         </td>
-        <td>
+        <td class="position-relative">
           <input type="text" name="form-${currentFormCount}-value" id="id_form-${currentFormCount}-value" class="form-control value-input" placeholder="Nhập từ khóa...">
+          <button type="button" class="btn btn-sm btn-outline-secondary clear-value position-absolute" style="right: 10px; top: 50%; transform: translateY(-50%); display: none;">
+            <i class="fas fa-times"></i>
+          </button>
         </td>
         <td>
           <button type="button" class="btn btn-sm btn-outline-danger remove-field">Xóa</button>
@@ -499,6 +622,24 @@
       
       // Cập nhật số lượng form
       totalFormsInput.value = currentFormCount + 1;
+      
+      // Thêm sự kiện cho nút xóa giá trị
+      const clearButton = newRow.querySelector('.clear-value');
+      const input = newRow.querySelector('.value-input');
+      
+      if (clearButton && input) {
+        // Thêm sự kiện click cho nút xóa
+        clearButton.addEventListener('click', function() {
+          input.value = '';
+          input.focus();
+          this.style.display = 'none';
+        });
+        
+        // Thêm sự kiện input để hiển thị/ẩn nút xóa
+        input.addEventListener('input', function() {
+          clearButton.style.display = this.value.trim() ? 'block' : 'none';
+        });
+      }
       
       console.log(`Đã thêm trường mới, tổng số trường: ${totalFormsInput.value}`);
     });
@@ -569,4 +710,3 @@
   });
 </script>
 {% endblock scripts %}
-    
