@@ -269,21 +269,22 @@
       padding: 0 2%;
     }
     
-    /* Category Sections */
+  /* Category Sections */
     .section-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 2%;
+      margin-bottom: -1%;
+      margin-left: 2%;
     }
     
     .section-title {
-      font-size: 1.5rem;
+      font-size: 2rem;
       font-weight: 600;
       color: #333;
-      display: flex;
+      {% comment %} display: flex; {% endcomment %}
       align-items: center;
-      gap: 1%;
+      gap: 10%;
     }
     
     .section-icon {
@@ -328,24 +329,27 @@
       overflow: hidden;
       transition: all 0.3s ease;
       position: relative;
+      border: 1px solid rgba(37, 117, 252, 0.1); /* Thêm border */
     }
     
     .book-card:hover {
       transform: translateY(-10px);
       box-shadow: 0 15px 30px rgba(37, 117, 252, 0.1);
+      border-color: rgba(37, 117, 252, 0.3); /* Border đậm hơn khi hover */
     }
     
     .book-cover {
       height: 0;
-      padding-bottom: 130%;
+      padding-bottom: 140%; /* Tăng tỷ lệ cao/rộng */
       overflow: hidden;
       position: relative;
+      background: #f5f7fa; /* Màu nền nhẹ */
     }
     
     .book-image {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: cover; /* Đảm bảo hình ảnh lấp đầy không gian */
       transition: transform 0.5s ease;
       position: absolute;
       top: 0;
@@ -362,7 +366,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.5);
+      background: rgba(0, 0, 0, 0.6); /* Tối hơn một chút */
       display: flex;
       align-items: center;
       justify-content: center;
@@ -377,33 +381,38 @@
     .view-details {
       background: white;
       color: #2575fc;
-      padding: 4% 10%;
+      padding: 8px 15px;
       border-radius: 20px;
       font-weight: 500;
       transform: translateY(20px);
       opacity: 0;
       transition: all 0.3s ease 0.1s;
+      border: 1px solid white; /* Thêm border */
     }
     
-    .book-card:hover .view-details {
-      transform: translateY(0);
-      opacity: 1;
+    .view-details:hover {
+      background: #2575fc;
+      color: white;
+      border-color: #2575fc;
     }
     
     .book-info {
-      padding: 7%;
+      padding: 10px 15px; /* Tăng padding bên trong */
+      background: white;
+      border-top: 1px solid rgba(0, 0, 0, 0.05); /* Thêm đường viền phân cách nhẹ */
     }
     
     .book-title {
-      font-size: 1rem;
+      font-size: 0.95rem;
       font-weight: 600;
       color: #333;
-      margin-bottom: 3%;
+      margin: 5px 0;
       line-height: 1.4;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
+      text-align: center; /* Căn giữa tiêu đề */
     }
     
     /* Collection Boxes */
@@ -672,6 +681,115 @@
         height: 12vw;
       }
     }
+    
+    /* Style cho container của book-slider */
+    .books-slider-container {
+      margin-bottom: 4%;
+      position: relative;
+      padding: 0 2%;
+    }
+    
+    /* Điều chỉnh slick slider để phù hợp với thiết kế hiện tại */
+    .book-slider {
+      margin: 0 -10px;
+    }
+    
+    .book-slider .slick-list {
+      padding: 20px 0;
+    }
+    
+    .book-slider .slick-slide {
+      padding: 0px;
+      margin-left: 3rem;
+       /* Tăng padding để tạo khoảng cách giữa các sách */
+    }
+    
+    /* Giữ nguyên kích thước và style của book-card */
+     .book-slider .book-card {
+      min-width: 73%;
+      width: 88%;
+      margin: 0;
+    }
+    
+    .book-slider img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    /* Style cho nút prev/next */
+    .book-slider .slick-prev,
+    .book-slider .slick-next {
+      width: 40px;
+      height: 40px;
+      background: #2575fc;
+      border-radius: 50%;
+      z-index: 1;
+      transition: all 0.3s ease;
+      box-shadow: 0 3px 10px rgba(37, 117, 252, 0.2); /* Thêm shadow cho nút */
+    }
+    
+    .book-slider .slick-prev:before,
+    .book-slider .slick-next:before {
+      font-size: 20px;
+      opacity: 1;
+    }
+    
+    .book-slider .slick-prev:hover,
+    .book-slider .slick-next:hover {
+      background: #1a67e0;
+      transform: scale(1.1);
+    }
+    
+    .book-slider .slick-prev {
+      left: -5px;
+    }
+    
+    .book-slider .slick-next {
+      right: -5px;
+    }
+    
+    /* Style cho dots */
+    .book-slider .slick-dots {
+      bottom: -25px;
+    }
+    
+    .book-slider .slick-dots li button:before {
+      font-size: 10px;
+      color: #2575fc;
+    }
+    
+    .book-slider .slick-dots li.slick-active button:before {
+      color: #1a67e0;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .book-slider .slick-prev,
+      .book-slider .slick-next {
+        width: 35px;
+        height: 35px;
+      }
+      
+      .book-slider .slick-prev:before,
+      .book-slider .slick-next:before {
+        font-size: 16px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .book-slider .slick-prev,
+      .book-slider .slick-next {
+        width: 30px;
+        height: 30px;
+      }
+      
+      .book-slider .slick-prev:before,
+      .book-slider .slick-next:before {
+        font-size: 14px;
+      }
+    }
   </style>
 {% endblock pack %}
 
@@ -764,21 +882,26 @@
             </h2>
             <a href="/categoryFilter/Recommended/1" class="view-all">Xem tất cả</a>
           </div>
-          
-          <div class="books-row">
-            {% for book in recommended_books %}
-              <div class="book-card">
-                <div class="book-cover">
-                  <img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}">
-                  <div class="book-overlay" onclick="window.location.href='/book/detail/id={{ book.book_id|subtract:3000 }}'">
-                    <span class="view-details">Xem chi tiết</span>
+   
+          <div class="books-slider-container">
+            <div class="book-slider">
+              {% for book in recommended_books %}
+                <div>
+                  
+                  <div class="book-card">
+                    <div class="book-cover">
+                      <img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}">
+                      <div class="book-overlay" onclick="window.location.href='/book/detail/id={{ book.book_id|subtract:3000 }}'">
+                        <span class="view-details">Xem chi tiết</span>
+                      </div>
+                    </div>
+                    <div class="book-info">
+                      <h3 class="book-title">{{ book.book_title }}</h3>
+                    </div>
                   </div>
                 </div>
-                <div class="book-info">
-                  <h3 class="book-title">{{ book.book_title }}</h3>
-                </div>
-              </div>
-            {% endfor %}
+              {% endfor %}
+            </div>
           </div>
         </section>
       {% else %}
@@ -818,20 +941,24 @@
         <a href="/categoryFilter/Trending/1" class="view-all">Xem tất cả</a>
       </div>
       
-      <div class="books-row">
-        {% for book in bookList.popular %}
-          <div class="book-card">
-            <div class="book-cover">
-              <img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}">
-              <div class="book-overlay" onclick="window.location.href='/book/detail/id={{ book.book_id|subtract:3000 }}'">
-                <span class="view-details">Xem chi tiết</span>
+      <div class="books-slider-container">
+        <div class="book-slider">
+          {% for book in bookList.popular %}
+            <div>
+              <div class="book-card">
+                <div class="book-cover">
+                  <img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}">
+                  <div class="book-overlay" onclick="window.location.href='/book/detail/id={{ book.book_id|subtract:3000 }}'">
+                    <span class="view-details">Xem chi tiết</span>
+                  </div>
+                </div>
+                <div class="book-info">
+                  <h3 class="book-title">{{ book.book_title }}</h3>
+                </div>
               </div>
             </div>
-            <div class="book-info">
-              <h3 class="book-title">{{ book.book_title }}</h3>
-            </div>
-          </div>
-        {% endfor %}
+          {% endfor %}
+        </div>
       </div>
     </section>
 
@@ -845,20 +972,24 @@
         <a href="/categoryFilter/Ngoại Văn/1" class="view-all">Xem tất cả</a>
       </div>
       
-      <div class="books-row">
-        {% for book in bookList.topFl %}
-          <div class="book-card">
-            <div class="book-cover">
-              <img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}">
-              <div class="book-overlay" onclick="window.location.href='/book/detail/id={{ book.book_id|subtract:3000 }}'">
-                <span class="view-details">Xem chi tiết</span>
+      <div class="books-slider-container">
+        <div class="book-slider">
+          {% for book in bookList.topFl %}
+            <div>
+              <div class="book-card">
+                <div class="book-cover">
+                  <img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}">
+                  <div class="book-overlay" onclick="window.location.href='/book/detail/id={{ book.book_id|subtract:3000 }}'">
+                    <span class="view-details">Xem chi tiết</span>
+                  </div>
+                </div>
+                <div class="book-info">
+                  <h3 class="book-title">{{ book.book_title }}</h3>
+                </div>
               </div>
             </div>
-            <div class="book-info">
-              <h3 class="book-title">{{ book.book_title }}</h3>
-            </div>
-          </div>
-        {% endfor %}
+          {% endfor %}
+        </div>
       </div>
     </section>
 
@@ -872,20 +1003,24 @@
         <a href="/categoryFilter/Tiếng Việt/1" class="view-all">Xem tất cả</a>
       </div>
       
-      <div class="books-row">
-        {% for book in bookList.topVn %}
-          <div class="book-card">
-            <div class="book-cover">
-              <img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}">
-              <div class="book-overlay" onclick="window.location.href='/book/detail/id={{ book.book_id|subtract:3000 }}'">
-                <span class="view-details">Xem chi tiết</span>
+      <div class="books-slider-container">
+        <div class="book-slider">
+          {% for book in bookList.topVn %}
+            <div>
+              <div class="book-card">
+                <div class="book-cover">
+                  <img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}">
+                  <div class="book-overlay" onclick="window.location.href='/book/detail/id={{ book.book_id|subtract:3000 }}'">
+                    <span class="view-details">Xem chi tiết</span>
+                  </div>
+                </div>
+                <div class="book-info">
+                  <h3 class="book-title">{{ book.book_title }}</h3>
+                </div>
               </div>
             </div>
-            <div class="book-info">
-              <h3 class="book-title">{{ book.book_title }}</h3>
-            </div>
-          </div>
-        {% endfor %}
+          {% endfor %}
+        </div>
       </div>
     </section>
   </div>
@@ -900,7 +1035,72 @@
 
 {% block scripts %}
 <script>
-  // Smooth scroll for book rows
+  // Khởi tạo book-slider
+  $(document).ready(function(){
+    $('.book-slider').slick({
+      dots: true,
+      infinite: true,
+      speed: 500,
+      slidesToShow: 5,
+      slidesToScroll: 1,
+      autoplay: true,
+      autoplaySpeed: 3000,
+      pauseOnHover: true,
+      arrows: true,
+      centerMode: false,
+      centerPadding: '0',
+      responsive: [
+        {
+          breakpoint: 1200,
+          settings: {
+            slidesToShow: 4,
+            slidesToScroll: 1
+          }
+        },
+        {
+          breakpoint: 1024,
+          settings: {
+            slidesToShow: 3,
+            slidesToScroll: 1
+          }
+        },
+        {
+          breakpoint: 768,
+          settings: {
+            slidesToShow: 2,
+            slidesToScroll: 1
+          }
+        },
+        {
+          breakpoint: 480,
+          settings: {
+            slidesToShow: 1,
+            slidesToScroll: 1
+          }
+        }
+      ]
+    });
+    
+    // Đảm bảo hiệu ứng hover hoạt động đúng
+    $('.book-card').hover(
+      function() {
+        $(this).find('.book-overlay').css('opacity', '1');
+        $(this).find('.view-details').css({
+          'opacity': '1',
+          'transform': 'translateY(0)'
+        });
+      },
+      function() {
+        $(this).find('.book-overlay').css('opacity', '0');
+        $(this).find('.view-details').css({
+          'opacity': '0',
+          'transform': 'translateY(20px)'
+        });
+      }
+    );
+  });
+  
+  // Giữ nguyên script smooth scroll cho books-row
   document.addEventListener('DOMContentLoaded', function() {
     const booksRows = document.querySelectorAll('.books-row');
     

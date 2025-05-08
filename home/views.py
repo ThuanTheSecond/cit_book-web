@@ -819,7 +819,7 @@ def test(request):
 def categoryFilter(request, cid, type=1):
     from home.utils import filterBasedType
     books = Book.objects.all()
-    
+    cateName = 'Sách Thịnh Hành'
     # Phân loại dựa vào category
     if cid == 'Recommended':
         if not request.user.is_authenticated:
@@ -829,10 +829,13 @@ def categoryFilter(request, cid, type=1):
             messages.info(request, "Bạn cần đánh giá ít nhất 5 cuốn sách để nhận được gợi ý")
             return redirect('home')
         books = get_recommendations(request.user.id, num_recommendations=20)
+        cateName = 'Sách Gợi Ý Cho Bạn'
     elif cid != 'Trending':
         lang = 'Foreign'
+        cateName='Sách Ngoại Văn'
         if cid == 'Tiếng Việt':
             lang = 'Vietnamese'
+            cateName = 'Sách Tiếng Việt'
         books = books.filter(book_lang=lang)
     
     # Phân loại dựa vào filter type
@@ -862,6 +865,7 @@ def categoryFilter(request, cid, type=1):
 
     context = {
         'cid': cid,
+        'cateName': cateName,
         'page_obj': page_obj,
         'page_numbers': page_numbers,
         'countRates': countRates,
