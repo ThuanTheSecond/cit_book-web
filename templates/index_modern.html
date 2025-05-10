@@ -386,6 +386,8 @@
       font-size: 1.2rem;
       font-weight: 600;
       margin-bottom: 4%;
+      color: black;
+      font-weight: bold;
     }
     
     .collection-desc {
@@ -786,7 +788,11 @@
         </div>
         <h3 class="collection-title">Sách Gợi ý</h3>
         <p class="collection-desc">Khám phá ngay những cuốn sách tuyệt vời được đề xuất cho riêng bạn.</p>
-        <a href="/categoryFilter/Recommended/1" class="collection-link">Khám Phá</a>
+        {% if user.is_authenticated and show_recommendations %}
+          <a href="/categoryFilter/Recommended/1" class="collection-link">Khám Phá</a>
+        {% else %}
+          <a href="#recommendation-section" class="collection-link scroll-to">Khám Phá</a>
+        {% endif %}
       </div>
       
       <div class="collection-box">
@@ -811,7 +817,7 @@
     <!-- Recommendations Section -->
     {% if user.is_authenticated %}
       {% if show_recommendations %}
-        <section>
+        <section id="recommendation-section">
           <div class="section-header">
             <h2 class="section-title">
               <span class="section-icon"><i class="fas fa-lightbulb"></i></span>
@@ -842,7 +848,7 @@
           </div>
         </section>
       {% else %}
-        <section class="recommendation-message">
+        <section id="recommendation-section" class="recommendation-message">
           <div class="recommendation-icon">
             <i class="fas fa-star-half-alt"></i>
           </div>
@@ -855,7 +861,7 @@
         </section>
       {% endif %}
     {% else %}
-      <section class="recommendation-message">
+      <section id="recommendation-section" class="recommendation-message">
         <div class="recommendation-icon">
           <i class="fas fa-user-lock"></i>
         </div>
@@ -1049,6 +1055,16 @@
       ]
     });
     
+    // Xử lý cuộn mượt khi nhấp vào liên kết có class scroll-to
+    $('.scroll-to').on('click', function(e) {
+      e.preventDefault();
+      
+      var target = $(this).attr('href');
+      $('html, body').animate({
+        scrollTop: $(target).offset().top - 100 // Trừ 100px để có khoảng cách từ đầu phần tử
+      }, 200, 'linear'); // Giảm xuống 300ms để cuộn nhanh hơn
+    });
+    
     // Đảm bảo hiệu ứng hover hoạt động đúng
     $('.book-card').hover(
       function() {
@@ -1066,42 +1082,6 @@
         });
       }
     );
-  });
-  
-  // Giữ nguyên script smooth scroll cho books-row
-  document.addEventListener('DOMContentLoaded', function() {
-    const booksRows = document.querySelectorAll('.books-row');
-    
-    booksRows.forEach(row => {
-      let isDown = false;
-      let startX;
-      let scrollLeft;
-      
-      row.addEventListener('mousedown', (e) => {
-        isDown = true;
-        row.style.cursor = 'grabbing';
-        startX = e.pageX - row.offsetLeft;
-        scrollLeft = row.scrollLeft;
-      });
-      
-      row.addEventListener('mouseleave', () => {
-        isDown = false;
-        row.style.cursor = 'grab';
-      });
-      
-      row.addEventListener('mouseup', () => {
-        isDown = false;
-        row.style.cursor = 'grab';
-      });
-      
-      row.addEventListener('mousemove', (e) => {
-        if(!isDown) return;
-        e.preventDefault();
-        const x = e.pageX - row.offsetLeft;
-        const walk = (x - startX) * 2;
-        row.scrollLeft = scrollLeft - walk;
-      });
-    });
   });
 </script>
 {% endblock scripts %} 

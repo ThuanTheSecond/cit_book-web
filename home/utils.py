@@ -183,6 +183,7 @@ def getRecommend_content(book_id):
     return books_index_real
     
 def filterBasedType(books, type):
+    
     if type == 1:
         # Thay đổi từ sắp xếp theo lượt xem sang sắp xếp theo độ phổ biến
         from django.db.models import Avg, Count, F, ExpressionWrapper, FloatField, Value

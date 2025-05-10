@@ -913,7 +913,7 @@ def categoryFilter(request, cid, type=1):
         cateName = 'Sách Phổ Biến Nhất'
         # Sử dụng filterBasedType với type=1 (phổ biến nhất)
         books = filterBasedType(books=books, type=1)
-    else:
+    else: #săp xe
         lang = 'Foreign'
         cateName='Sách Ngoại Văn'
         if cid == 'Tiếng Việt':
