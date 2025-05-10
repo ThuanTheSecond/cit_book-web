@@ -275,34 +275,71 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 2%;
+      border-bottom: 2px solid rgba(37, 117, 252, 0.1);
+      padding-bottom: 1%;
     }
     
     .section-title {
-      font-size: 1.5rem;
-      font-weight: 600;
+      font-size: 1.8rem;
+      font-weight: 700;
       color: #333;
       display: flex;
       align-items: center;
-      gap: 1%;
+      gap: 12px;
+      position: relative;
+      padding-left: 5px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .section-title::after {
+      content: "";
+      position: absolute;
+      bottom: -12px;
+      left: 0;
+      width: 100px;
+      height: 4px;
+      background: linear-gradient(90deg, #2575fc, #6a11cb);
+      border-radius: 2px;
     }
     
     .section-icon {
-      color: #2575fc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #2575fc, #6a11cb);
+      border-radius: 50%;
+      color: white;
       font-size: 1.3rem;
+      box-shadow: 0 4px 10px rgba(37, 117, 252, 0.3);
     }
     
     .view-all {
       color: #2575fc;
       text-decoration: none;
-      font-weight: 500;
-      padding: 0.5% 1.5%;
+      font-weight: 600;
+      padding: 0.6% 2%;
       border-radius: 20px;
       background: rgba(37, 117, 252, 0.1);
       transition: all 0.3s ease;
+      box-shadow: 0 2px 5px rgba(37, 117, 252, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .view-all::after {
+      content: "\f054";
+      font-family: "Font Awesome 5 Free";
+      font-weight: 900;
+      font-size: 0.8rem;
     }
     
     .view-all:hover {
       background: rgba(37, 117, 252, 0.2);
+      transform: translateX(5px);
     }
     
     .books-row {
@@ -639,6 +676,16 @@
         width: 8vw;
         height: 8vw;
       }
+      
+      .section-title {
+        font-size: 1.5rem;
+      }
+      
+      .section-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 1.1rem;
+      }
     }
     
     @media (max-width: 480px) {
@@ -670,6 +717,71 @@
       .theme-btn {
         width: 12vw;
         height: 12vw;
+      }
+      
+      .section-title {
+        font-size: 1.2rem;
+        gap: 8px;
+      }
+      
+      .section-icon {
+        width: 30px;
+        height: 30px;
+        font-size: 1rem;
+      }
+    }
+    
+    /* Books Row Navigation Arrows */
+    .books-navigation {
+      position: relative;
+      width: 100%;
+    }
+    
+    .nav-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #2575fc;
+      font-size: 1.2rem;
+      cursor: pointer;
+      z-index: 10;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .nav-arrow:hover {
+      background: #fff;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      color: #1a67e0;
+    }
+    
+    .nav-arrow.prev {
+      left: -15px;
+    }
+    
+    .nav-arrow.next {
+      right: -15px;
+    }
+    
+    @media (max-width: 768px) {
+      .nav-arrow {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .nav-arrow {
+        width: 30px;
+        height: 30px;
       }
     }
   </style>
@@ -818,20 +930,24 @@
         <a href="/categoryFilter/Trending/1" class="view-all">Xem tất cả</a>
       </div>
       
-      <div class="books-row">
-        {% for book in bookList.popular %}
-          <div class="book-card">
-            <div class="book-cover">
-              <img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}">
-              <div class="book-overlay" onclick="window.location.href='/book/detail/id={{ book.book_id|subtract:3000 }}'">
-                <span class="view-details">Xem chi tiết</span>
+      <div class="books-navigation">
+        <div class="nav-arrow prev"><i class="fas fa-chevron-left"></i></div>
+        <div class="books-row">
+          {% for book in bookList.popular %}
+            <div class="book-card">
+              <div class="book-cover">
+                <img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}">
+                <div class="book-overlay" onclick="window.location.href='/book/detail/id={{ book.book_id|subtract:3000 }}'">
+                  <span class="view-details">Xem chi tiết</span>
+                </div>
+              </div>
+              <div class="book-info">
+                <h3 class="book-title">{{ book.book_title }}</h3>
               </div>
             </div>
-            <div class="book-info">
-              <h3 class="book-title">{{ book.book_title }}</h3>
-            </div>
-          </div>
-        {% endfor %}
+          {% endfor %}
+        </div>
+        <div class="nav-arrow next"><i class="fas fa-chevron-right"></i></div>
       </div>
     </section>
 
@@ -845,20 +961,24 @@
         <a href="/categoryFilter/Ngoại Văn/1" class="view-all">Xem tất cả</a>
       </div>
       
-      <div class="books-row">
-        {% for book in bookList.topFl %}
-          <div class="book-card">
-            <div class="book-cover">
-              <img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}">
-              <div class="book-overlay" onclick="window.location.href='/book/detail/id={{ book.book_id|subtract:3000 }}'">
-                <span class="view-details">Xem chi tiết</span>
+      <div class="books-navigation">
+        <div class="nav-arrow prev"><i class="fas fa-chevron-left"></i></div>
+        <div class="books-row">
+          {% for book in bookList.topFl %}
+            <div class="book-card">
+              <div class="book-cover">
+                <img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}">
+                <div class="book-overlay" onclick="window.location.href='/book/detail/id={{ book.book_id|subtract:3000 }}'">
+                  <span class="view-details">Xem chi tiết</span>
+                </div>
+              </div>
+              <div class="book-info">
+                <h3 class="book-title">{{ book.book_title }}</h3>
               </div>
             </div>
-            <div class="book-info">
-              <h3 class="book-title">{{ book.book_title }}</h3>
-            </div>
-          </div>
-        {% endfor %}
+          {% endfor %}
+        </div>
+        <div class="nav-arrow next"><i class="fas fa-chevron-right"></i></div>
       </div>
     </section>
 
@@ -872,20 +992,24 @@
         <a href="/categoryFilter/Tiếng Việt/1" class="view-all">Xem tất cả</a>
       </div>
       
-      <div class="books-row">
-        {% for book in bookList.topVn %}
-          <div class="book-card">
-            <div class="book-cover">
-              <img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}">
-              <div class="book-overlay" onclick="window.location.href='/book/detail/id={{ book.book_id|subtract:3000 }}'">
-                <span class="view-details">Xem chi tiết</span>
+      <div class="books-navigation">
+        <div class="nav-arrow prev"><i class="fas fa-chevron-left"></i></div>
+        <div class="books-row">
+          {% for book in bookList.topVn %}
+            <div class="book-card">
+              <div class="book-cover">
+                <img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}">
+                <div class="book-overlay" onclick="window.location.href='/book/detail/id={{ book.book_id|subtract:3000 }}'">
+                  <span class="view-details">Xem chi tiết</span>
+                </div>
+              </div>
+              <div class="book-info">
+                <h3 class="book-title">{{ book.book_title }}</h3>
               </div>
             </div>
-            <div class="book-info">
-              <h3 class="book-title">{{ book.book_title }}</h3>
-            </div>
-          </div>
-        {% endfor %}
+          {% endfor %}
+        </div>
+        <div class="nav-arrow next"><i class="fas fa-chevron-right"></i></div>
       </div>
     </section>
   </div>
@@ -932,6 +1056,32 @@
         const x = e.pageX - row.offsetLeft;
         const walk = (x - startX) * 2;
         row.scrollLeft = scrollLeft - walk;
+      });
+    });
+
+    // Handle navigation arrows
+    const prevButtons = document.querySelectorAll('.nav-arrow.prev');
+    const nextButtons = document.querySelectorAll('.nav-arrow.next');
+    
+    prevButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const booksRow = this.nextElementSibling;
+        const scrollAmount = booksRow.offsetWidth * 0.75;
+        booksRow.scrollBy({
+          left: -scrollAmount,
+          behavior: 'smooth'
+        });
+      });
+    });
+    
+    nextButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const booksRow = this.previousElementSibling;
+        const scrollAmount = booksRow.offsetWidth * 0.75;
+        booksRow.scrollBy({
+          left: scrollAmount,
+          behavior: 'smooth'
+        });
       });
     });
   });
