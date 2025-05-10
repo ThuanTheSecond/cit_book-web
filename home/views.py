@@ -6,10 +6,11 @@ from .utils import normalize_vietnamese, get_content_based_recommendations,pageP
 from django.shortcuts import redirect
 import json
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q, Avg, Count, F
+from django.db.models import Q, Avg, Count, F, Sum, Value
+from django.db.models.functions import Coalesce
 import re
 from functools import reduce
-from operator import and_, or_
+from operator import and_
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
@@ -56,8 +57,6 @@ def searchPost(request):
     query = normalize_vietnamese(query)
     if len(query)>=3:
         # sử dùng hàm __unaccent để có thể truy xuất băng tiếng việt không dấu
-        # books = Book.objects.filter(book_title__unaccent__icontains=skey)[:5]
-        # chinh sua o day
         keywords = re.split(r'[ ,]+', query)
         if search_type == 'all':
             query = Q()
@@ -73,15 +72,41 @@ def searchPost(request):
             for word in keywords[1:]:
                 query &= Q(**{f"{search_type}__unaccent__icontains": word})
             books = Book.objects.filter(query)
-        books = books[:7]
+        
+        # Lấy tổng số kết quả trước khi giới hạn
+        total_results = books.count()
+        # Giới hạn xuống 6 cuốn
+        books = books[:6]
+        
         if books:
-            context = ""
-            # Chỉnh sửa phần context để hiển thị ra đúng
+            context = '<div class="search-suggestions-header"><i class="fas fa-search"></i> Gợi ý sách</div>'
+            # Hiển thị cải tiến cho các gợi ý sách
             for book in books:
-                # chỉnh sủa để hiển thị suggest dựa theo từ khóa
-                context+= f'''
-                <li><img class="search-book-image" src="{ book.bookImage.url }" alt="{ book.book_title }">
-                <a href="/book/detail/id={book.book_id -3000}">{ book.book_title }</a></li>
+                context += f'''
+                <div class="suggestion-item" onclick="window.location.href='/book/detail/id={book.book_id -3000}'">
+                    <div class="suggestion-image">
+                        <img src="{ book.bookImage.url }" alt="{ book.book_title }">
+                    </div>
+                    <div class="suggestion-info">
+                        <div class="suggestion-title">{ book.book_title }</div>
+                        <div class="suggestion-author"><i class="fas fa-pen-fancy"></i> { book.book_author }</div>
+                    </div>
+                    <div class="view-hint">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                </div>
+                '''
+            
+            # Thêm nút "Xem tất cả kết quả" nếu có nhiều hơn 6 kết quả
+            if total_results > 6:
+                search_url = f"/searchSlug?search_type={search_type}&query={' '.join(keywords)}"
+                context += f'''
+                <div class="more-results">
+                    <a href="{search_url}">
+                        <span class="more-results-text">Xem tất cả {total_results} kết quả</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
                 '''
             return HttpResponse(context)
     return HttpResponse('')
@@ -282,13 +307,51 @@ def searchSlug(request):
     return redirect('search',search_type = search_type ,query = query, ftype = 5)
                    
 # Các view để trả về trang HTML theo url.
-
+from django.contrib.auth.models import User
 def index(request):
     bookList = {}
-    books_query = Book.objects.order_by('book_view')
-    bookList['popular'] = books_query[:10]  
-    bookList['topVn'] = books_query.filter(book_lang='Vietnamese')[:10]
-    bookList['topFl'] = books_query.filter(book_lang='Foreign')[:10]
+    
+    # Lấy sách thịnh hành dựa trên kết hợp lượt xem và đánh giá
+    # 1. Lấy sách có rating trung bình cao (≥ 4.0) và có ít nhất 5 lượt đánh giá
+    from django.db.models import Count, Avg, F, ExpressionWrapper, FloatField, Q, Case, When, Value
+    
+    # Tính toán điểm phổ biến dựa trên công thức kết hợp lượt xem và đánh giá
+    popular_books = Book.objects.annotate(
+        avg_rating=Avg('rating__rating'),
+        rating_count=Count('rating'),
+        # Tính điểm phổ biến: (lượt xem * 0.7) + (đánh giá trung bình * số lượt đánh giá * 10 * 0.3)
+        popularity_score=ExpressionWrapper(
+            (F('book_view') * 0.7) + 
+            (Coalesce(F('avg_rating'), Value(0)) * F('rating_count') * 10 * 0.3),
+            output_field=FloatField()
+        )
+    ).order_by('-popularity_score')
+    
+    bookList['popular'] = popular_books[:10]
+    bookList['topVn'] = Book.objects.filter(book_lang='Vietnamese').annotate(
+        avg_rating=Avg('rating__rating'),
+        rating_count=Count('rating'),
+        popularity_score=ExpressionWrapper(
+            (F('book_view') * 0.7) + 
+            (Coalesce(F('avg_rating'), Value(0)) * F('rating_count') * 10 * 0.3),
+            output_field=FloatField()
+        )
+    ).order_by('-popularity_score')[:10]
+    
+    bookList['topFl'] = Book.objects.filter(book_lang='Foreign').annotate(
+        avg_rating=Avg('rating__rating'),
+        rating_count=Count('rating'),
+        popularity_score=ExpressionWrapper(
+            (F('book_view') * 0.7) + 
+            (Coalesce(F('avg_rating'), Value(0)) * F('rating_count') * 10 * 0.3),
+            output_field=FloatField()
+        )
+    ).order_by('-popularity_score')[:10]
+
+    # Truy xuất các giá trị thống kê
+    total_books = Book.objects.count()
+    total_users = User.objects.count()
+    total_views = Book.objects.aggregate(Sum('book_view'))['book_view__sum'] or 0
 
     # Kiểm tra gợi ý cho người dùng đã đăng nhập
     recommended_books = []
@@ -305,9 +368,11 @@ def index(request):
         'bookList': bookList,
         'recommended_books': recommended_books,
         'show_recommendations': show_recommendations,
+        'total_books': total_books,
+        'total_users': total_users,
+        'total_views': total_views,
     }
-    return render(request, 'index_modern.html', context)
- 
+    return render(request, 'index_modern.html', context) 
  
 def myBook(request):
     bookList = {}
@@ -463,7 +528,8 @@ def search(request, search_type, query, ftype):
     if ftype !=5:
         from home.utils import filterBasedType
         books = filterBasedType(books, ftype)  
-        
+    
+    print(ftype)
     countRates = {}
     averRates = {}
     for book in books:
@@ -494,6 +560,7 @@ def search(request, search_type, query, ftype):
         'countRates': countRates,
         'averRates': averRates,
         'page_numbers': page_numbers,
+        'type': ftype,
     }
     return render(request, 'searchBook.html', context)
 

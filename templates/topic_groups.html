@@ -1,11 +1,14 @@
 <div class="dropdown-menu-content">
+    <div class="search-container mb-2">
+        <input type="text" id="topicSearchInput" class="form-control" placeholder="Tìm kiếm thể loại...">
+    </div>
     <div class="topics-columns">
         {% for letter, topics in grouped_topics.items %}
-            <div class="topic-column">
+            <div class="topic-column letter-group" data-letter="{{ letter }}">
                 <div class="letter-header">{{ letter }}</div>
                 <div class="topic-list">
                     {% for topic in topics %}
-                    <a href="/topicFilter/{{topic.topic_id}}/1" class="topic-link">
+                    <a href="/topicFilter/{{topic.topic_id}}/1" class="topic-link topic-item" data-name="{{ topic.topic_name }}">
                         {{ topic.topic_name }}
                     </a>
                     {% endfor %}
@@ -18,4 +21,37 @@
     </div>
 </div>
 
+<style>
+/* Styles cho ô tìm kiếm trong dropdown */
+.dropdown-menu-content .search-container {
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 1;
+}
+
+.dropdown-menu-content #topicSearchInput {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.dropdown-menu-content #topicSearchInput:focus {
+    outline: none;
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Đảm bảo dropdown đủ rộng */
+.dropdown-menu.alphabet-menu {
+    width: auto;
+    min-width: 600px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+</style>
 

@@ -1,171 +1,255 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
 
-{% block styles %}
+{% block pack %}
 {{ block.super }}
 <style>
-  /* Đảm bảo modal hiển thị đúng vị trí */
-  .modal-dialog-centered {
-    display: flex;
-    align-items: center;
-    min-height: calc(100% - 1rem);
-    margin: 1.75rem auto; /* Đảm bảo có margin trên dưới */
+  /* Đảm bảo CSS có độ ưu tiên cao hơn */
+  body {
+    background: linear-gradient(to bottom, #f0f5fa, #e5eef7) !important;
+    background-attachment: fixed !important;
+    border-color: #e0e6ed !important; /* Xám nhạt - tinh tế và hiện đại */
   }
-
-  /* Giới hạn chiều cao của modal */
-  .modal-dialog-scrollable {
-    max-height: 85vh; /* Giảm chiều cao xuống để không bị lấn lên trên */
+    .body {
+    background-color: #c3d9e2;
+    }
+    /* Điều chỉnh container chính để khớp với search-book-content */
+    .body .overall.container-fluid {
+        width: 80% !important; /* Giảm xuống 80% */
+        max-width: 80%; /* Giảm xuống 80% */
+        margin: 0 auto;
+        padding-left: 0;
+        padding-right: 0;
+        box-shadow: none;
+        background-color: transparent;
+        border: none;
+    }
+  .search-result {
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgb(0 0 0 / 64%);
+    margin: 20px auto;
+    max-width: 80%;
+    width: 80%;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #e0e6ed;
   }
-
-  .modal-dialog-scrollable .modal-content {
-    max-height: 85vh;
+  
+  .search-book-content.container-fluid {
+    width: 100% !important; /* Ghi đè width 70% từ style.css */
+    max-width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+    box-shadow: none;
   }
-
-  .modal-content{
-    margin-top : 10rem;
-    max-height: 30rem;
+  
+  /* Form styling */
+  #advanceSearchForm {
+    background-color: white !important;
+    padding: 25px !important;
+    border-radius: 10px !important;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05) !important;
+    margin-bottom: 20px !important;
+    border: 1px solid #e0e6ed !important;
   }
-  /* Grid thể loại */
-  .category-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 10px;
-    max-height: 300px;
-    overflow-y: auto;
-    padding: 10px 0;
+  
+  .table {
+    margin-bottom: 1.5rem !important;
   }
-
-  /* Đảm bảo danh sách đã chọn cũng có thể cuộn */
-  .selected-categories-list {
-    max-height: 300px;
-    overflow-y: auto;
-    padding: 10px 0;
+  
+  .table thead th {
+    background-color: #f8f9fa !important;
+    color: #495057 !important;
+    font-weight: 600 !important;
+    border-bottom: 2px solid #dee2e6 !important;
   }
-
-  /* Item thể loại */
-  .category-item {
-    display: flex;
-    align-items: center;
-    padding: 8px 12px;
-    border-radius: 4px;
-    background-color: #f8f9fa;
-    border: 1px solid #e9ecef;
-    transition: all 0.2s;
+  
+  .form-select, .form-control {
+    border-radius: 6px !important;
+    border: 1px solid #ced4da !important;
+    padding: 0.5rem 0.75rem !important;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
   }
-
-  .category-item:hover {
-    background-color: #e9ecef;
+  
+  .form-select:focus, .form-control:focus {
+    border-color: #80bdff !important;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
   }
-
-  .category-item input {
-    margin-right: 10px;
+  
+  /* Button styling */
+  .btn-outline-primary {
+    color: #1976d2 !important;
+    border-color: #1976d2 !important;
   }
-
-  /* Badge thể loại đã chọn - kiểu mới */
-  .selected-category-badge {
-    display: inline-flex !important;
-    align-items: center !important;
-    padding: 8px 16px !important;
-    background-color: #0d6efd !important;
+  
+  .btn-outline-primary:hover {
+    background-color: #1976d2 !important;
     color: white !important;
-    border-radius: 30px !important;
-    font-size: 0.9rem !important;
-    margin-right: 10px !important;
-    margin-bottom: 10px !important;
-    border: none !important;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important;
-    transition: all 0.2s ease !important;
   }
-
-  .selected-category-badge:hover {
-    background-color: #0b5ed7 !important;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15) !important;
+  
+  .btn-primary {
+    background-color: #1976d2 !important;
+    border-color: #1976d2 !important;
   }
-
-  .selected-category-badge .remove-badge {
-    margin-left: 8px !important;
-    cursor: pointer !important;
-    font-size: 0.9rem !important;
-    width: 20px !important;
-    height: 20px !important;
-    display: inline-flex !important;
+  
+  .btn-primary:hover {
+    background-color: #1565c0 !important;
+    border-color: #1565c0 !important;
+  }
+  
+  .btn-outline-secondary, .btn-outline-danger {
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.875rem !important;
+  }
+  
+  /* Empty state styling */
+  .empty-state {
+    text-align: center !important;
+    padding: 3rem !important;
+    background: white !important;
+    border-radius: 10px !important;
+    box-shadow: 0 5px 20px rgba(25, 118, 210, 0.1) !important;
+    margin: 2rem auto !important;
+    max-width: 600px !important;
+    border: 1px solid #e0e6ed !important;
+  }
+  
+  .empty-state i {
+    font-size: 2rem !important;
+    color: #1a237e !important;
+    margin-bottom: 1.5rem !important;
+  }
+  
+  .empty-state h3 {
+    color: #1a237e !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .empty-state p {
+    color: #555 !important;
+    margin-bottom: 1.5rem !important;
+    max-width: 500px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  
+  /* Filter styling */
+  .filter {
+    background: #fff !important;
+    padding: 12px 20px !important;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
+    margin: 15px 0 !important;
+    border: 1px solid #e0e0e0 !important;
+    display: flex !important;
     align-items: center !important;
-    justify-content: center !important;
-    border-radius: 50% !important;
-    background-color: rgba(255, 255, 255, 0.2) !important;
-    transition: all 0.2s ease !important;
+    gap: 10px !important;
   }
-
-  .selected-category-badge .remove-badge:hover {
-    background-color: rgba(255, 255, 255, 0.4) !important;
+  
+  .filter span {
+    color: #333 !important;
+    font-weight: 500 !important;
   }
-
-  /* Hiệu ứng khi thêm/xóa trường */
-  .search-condition-row {
-    transition: all 0.3s ease;
+  
+  .filter-options {
+    display: flex !important;
+    align-items: center !important;
   }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+  
+  .filter a {
+    color: #666 !important;
+    text-decoration: none !important;
+    padding: 6px 16px !important;
+    transition: all 0.3s ease !important;
   }
-
-  .fade-in {
-    animation: fadeIn 0.3s ease forwards;
+  
+  .filter a:hover {
+    color: #1976d2 !important;
   }
-
-  /* Card thể loại đã chọn */
-  .card {
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
+  
+  .filter a.active {
+    color: #fff !important;
+    background-color: #0d6efd !important;
+    border-radius: 4px !important;
+    box-shadow: 0 2px 4px rgba(13, 110, 253, 0.25) !important;
   }
-
-  .card-header {
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #e9ecef;
-    padding: 12px 15px;
+  
+  .separator {
+    color: #ccc !important;
+    margin: 0 5px !important;
   }
-
-  .card-body {
-    padding: 15px;
-  }
-
-  /* Đảm bảo modal hiển thị đúng */
-  .modal {
-    z-index: 1050;
-    padding-top: 60px; /* Thêm padding-top để tránh bị che bởi header */
-  }
-
-  .modal-content {
-    border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    margin-top: 20px; /* Thêm margin-top để đẩy modal xuống dưới */
-  }
-
-  /* Đảm bảo modal không bị lệch */
-  .modal-open {
-    padding-right: 0 !important;
-    overflow: auto !important;
-  }
-
-  /* Điều chỉnh cho màn hình nhỏ */
+  
+  /* Responsive styles */
   @media (max-width: 768px) {
-    .modal-dialog {
-      margin: 0.5rem;
+    .search-result {
+      max-width: 95% !important;
+      width: 95% !important;
+      margin: 10px auto !important;
+      padding: 15px !important;
     }
     
-    .category-grid {
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      max-height: 250px;
+    #advanceSearchForm {
+      padding: 15px !important;
     }
     
-    .selected-categories-list {
-      max-height: 250px;
+    .table thead {
+      display: none !important;
+    }
+    
+    .table, .table tbody, .table tr, .table td {
+      display: block !important;
+      width: 100% !important;
+    }
+    
+    .table tr {
+      margin-bottom: 15px !important;
+      border: 1px solid #dee2e6 !important;
+      border-radius: 8px !important;
+      padding: 10px !important;
+    }
+    
+    .table td {
+      text-align: right !important;
+      padding-left: 50% !important;
+      position: relative !important;
+      border-bottom: 1px solid #eee !important;
+      padding-bottom: 10px !important;
+      margin-bottom: 10px !important;
+    }
+    
+    .table td:before {
+      content: attr(data-label) !important;
+      position: absolute !important;
+      left: 0 !important;
+      width: 45% !important;
+      padding-right: 10px !important;
+      text-align: left !important;
+      font-weight: 600 !important;
+    }
+    
+    .table td:last-child {
+      border-bottom: 0 !important;
+      margin-bottom: 0 !important;
+    }
+    
+    .filter {
+      flex-direction: column !important;
+      align-items: flex-start !important;
+    }
+    
+    .filter-options {
+      flex-wrap: wrap !important;
+      gap: 8px !important;
+    }
+    
+    .separator {
+      display: none !important;
     }
   }
 </style>
-{% endblock %}
+{% endblock pack %}
 
 {% block bonusContent %}
 <div class="body">
@@ -303,6 +387,10 @@
     {% endif %}
 </div>
 {% endblock content %}
+
+{% block navBot %} 
+{% include 'pagePagnition.html' %}
+{% endblock navBot %}
 
 {% block scripts %}
 {{ block.super }}

@@ -8,7 +8,7 @@
             <form class="search-form" action="{% url 'search_slug' %}", method='GET'>
                 <span>
                 {% render_field formSearch.search_type class='search-selector' hx-post="/searchType_post/" hx-trigger="change" %}
-                {% render_field formSearch.query class='search-bar' hx-post="/search_post/" hx-trigger="keyup changed delay:500ms" hx-target='#ssuggest' placeholder="Search"%} 
+                {% render_field formSearch.query class='search-bar' hx-post="/search_post/" hx-trigger="keyup changed delay:500ms" hx-target='#ssuggest' placeholder="Nhập từ khóa tìm kiếm..."%} 
                 <button class="search-btn"><i class="fas fa-search"></i></button>
                 </span>
                 <div id="ssuggest" class="search-suggestions-container"></div>
@@ -29,7 +29,7 @@
                         </a>
                         <div class="dropdown-menu alphabet-menu" id="topicList" aria-labelledby="navbarDropdownMenuLink">
                             <div class="menu-header">
-                                <input type="text" class="topic-search" placeholder="Tìm thể loại..." oninput="filterTopics(this.value)">
+                                <input type="text" id="topic-search-input" class="topic-search" placeholder="Tìm thể loại...">
                             </div>
                             <div class="menu-content">
                                 <!-- Sẽ được điền bởi HTMX -->
@@ -114,45 +114,29 @@
         background: #0056b3;
     }
     
-    /* Search Suggestions */
-    .search-suggestions-container {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        z-index: 1000;
-        margin-top: 10px;
+    /* Search Suggestions Container */
+    #ssuggest {
         background: #fff;
-        border-radius: 15px;
+        border-radius: 12px;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
         overflow: hidden;
-        max-height: 0;
-        opacity: 0;
-        transition: max-height 0.4s cubic-bezier(0.19, 1, 0.22, 1), 
-                    opacity 0.4s cubic-bezier(0.19, 1, 0.22, 1);
-        transform-origin: top center;
-    }
-    
-    .search-suggestions-container:not(:empty) {
-        max-height: 500px;
-        opacity: 1;
-        padding: 0 0 15px 0;
-        animation: suggestionsAppear 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+        margin-top: 10px;
+        max-width: 100%;
+        width: 100%;
+        z-index: 1000;
+        position: absolute;
+        animation: suggestionsAppear 0.3s ease-out;
     }
     
     @keyframes suggestionsAppear {
         from {
-            transform: translateY(-10px) scale(0.97);
             opacity: 0;
+            transform: translateY(-10px);
         }
         to {
-            transform: translateY(0) scale(1);
             opacity: 1;
+            transform: translateY(0);
         }
-    }
-    
-    .search-suggestions {
-        width: 100%;
     }
     
     /* Header của section gợi ý */
@@ -163,7 +147,6 @@
         font-weight: 600;
         color: #1565c0;
         border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        margin-bottom: 5px;
     }
     
     .search-suggestions-header i {
@@ -171,6 +154,7 @@
         opacity: 0.7;
     }
     
+    /* Item gợi ý */
     .suggestion-item {
         display: flex;
         padding: 12px 15px;
@@ -178,17 +162,6 @@
         transition: all 0.3s;
         border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         position: relative;
-        overflow: hidden;
-        animation: fadeInUp 0.5s forwards;
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    
-    @keyframes fadeInUp {
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
     }
     
     .suggestion-item::before {
@@ -212,28 +185,7 @@
         opacity: 1;
     }
     
-    .suggestion-item:last-child {
-        border-bottom: none;
-    }
-    
-    /* Icon hiển thị khi hover */
-    .view-hint {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #1976d2;
-        font-size: 16px;
-        opacity: 0;
-        transform: translateX(10px);
-        transition: all 0.3s;
-        margin-left: 10px;
-    }
-    
-    .suggestion-item:hover .view-hint {
-        opacity: 1;
-        transform: translateX(0);
-    }
-    
+    /* Hình ảnh sách */
     .suggestion-image {
         width: 50px;
         height: 70px;
@@ -261,6 +213,7 @@
         transform: scale(1.1);
     }
     
+    /* Thông tin sách */
     .suggestion-info {
         flex: 1;
         display: flex;
@@ -276,6 +229,10 @@
         line-height: 1.4;
         margin-bottom: 5px;
         transition: color 0.3s;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 250px;
     }
     
     .suggestion-item:hover .suggestion-title {
@@ -286,7 +243,10 @@
         color: #7f8c8d;
         font-size: 12px;
         font-style: italic;
-        margin-bottom: 7px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 250px;
     }
     
     .suggestion-author i {
@@ -295,119 +255,76 @@
         margin-right: 4px;
     }
     
-    .suggestion-rating {
+    /* Icon xem chi tiết */
+    .view-hint {
         display: flex;
         align-items: center;
-        font-size: 12px;
-        background: rgba(0, 0, 0, 0.02);
-        padding: 3px 8px;
-        border-radius: 20px;
-        width: fit-content;
-    }
-    
-    .rating-value {
-        font-weight: bold;
+        justify-content: center;
         color: #1976d2;
-        margin-right: 3px;
+        font-size: 16px;
+        opacity: 0;
+        transform: translateX(10px);
+        transition: all 0.3s;
+        margin-left: 10px;
     }
     
-    .fa-star {
-        color: #f1c40f;
-        margin-right: 3px;
-        filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.2));
+    .suggestion-item:hover .view-hint {
+        opacity: 1;
+        transform: translateX(0);
     }
     
-    .rating-count {
-        color: #7f8c8d;
-    }
-    
+    /* Nút xem thêm kết quả - cải tiến */
     .more-results {
         text-align: center;
-        padding: 14px;
-        background: linear-gradient(to right, #f7f9fc, #eef2f7);
+        padding: 12px;
+        background: linear-gradient(to right, #f0f7ff, #e6f0fb);
         border-top: 1px solid rgba(0, 0, 0, 0.05);
-        font-size: 14px;
-        position: relative;
-        overflow: hidden;
+        transition: all 0.3s;
     }
     
-    .more-results::after {
-        content: '';
-        position: absolute;
-        left: 0;
-        bottom: 0;
-        width: 100%;
-        height: 2px;
-        background: linear-gradient(to right, #007bff, transparent);
-        transform: scaleX(0);
-        transform-origin: left;
-        transition: transform 0.3s ease;
-    }
-    
-    .more-results:hover::after {
-        transform: scaleX(1);
+    .more-results:hover {
+        background: linear-gradient(to right, #e6f0fb, #d9e8f7);
     }
     
     .more-results a {
-        color: #007bff;
-        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #1976d2;
+        font-size: 14px;
         font-weight: 500;
+        text-decoration: none;
         transition: all 0.3s;
-        display: block;
+        padding: 5px 0;
     }
     
     .more-results a:hover {
-        color: #0056b3;
-        transform: translateX(5px);
+        color: #0d47a1;
     }
     
-    .more-results a .fa-arrow-right {
+    .more-results-text {
+        margin-right: 8px;
+    }
+    
+    .more-results i {
+        font-size: 12px;
         transition: transform 0.3s;
     }
     
-    .more-results a:hover .fa-arrow-right {
-        transform: translateX(3px);
+    .more-results a:hover i {
+        transform: translateX(5px);
     }
     
-    .no-suggestions {
-        padding: 25px;
-        text-align: center;
-        color: #7f8c8d;
-        font-size: 14px;
-        background: #f9f9f9;
-        border-radius: 10px;
-        margin: 10px;
-    }
-    
-    .no-suggestions i {
-        font-size: 24px;
-        color: #95a5a6;
-        margin-bottom: 10px;
-        display: block;
-    }
-    
-    .no-suggestions p {
-        margin: 0;
-        position: relative;
-        display: inline-block;
-    }
-    
-    .no-suggestions p::before,
-    .no-suggestions p::after {
-        content: '';
-        height: 1px;
-        width: 40px;
-        background: rgba(0, 0, 0, 0.1);
-        position: absolute;
-        top: 50%;
-    }
-    
-    .no-suggestions p::before {
-        left: -50px;
-    }
-    
-    .no-suggestions p::after {
-        right: -50px;
+    /* Responsive */
+    @media (max-width: 768px) {
+        .suggestion-title, .suggestion-author {
+            max-width: 180px;
+        }
+        
+        .suggestion-image {
+            width: 40px;
+            height: 60px;
+        }
     }
     
     /* Menu navigation */
@@ -571,35 +488,269 @@
             width: 100%;
         }
     }
+    /* Styles cho dropdown thể loại */
+    .menu-header {
+        padding: 10px 15px;
+        border-bottom: 1px solid #eee;
+        position: sticky;
+        top: 0;
+        background-color: white;
+        z-index: 1;
+    }
+
+    .topic-search {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+
+    .topic-search:focus {
+        outline: none;
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    .menu-content {
+        max-height: 400px;
+        overflow-y: auto;
+        padding: 10px;
+    }
+
+    .dropdown-menu.alphabet-menu {
+        width: auto;
+        min-width: 600px;
+        max-height: 500px;
+        overflow-y: auto;
+    }
+
+    .no-results-message {
+        text-align: center;
+        padding: 20px;
+        color: #6c757d;
+        font-style: italic;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .dropdown-menu.alphabet-menu {
+            min-width: 300px;
+        }
+    }
+
+    /* Styles cho các nhóm chữ cái và topic */
+    .letter-group {
+        margin-bottom: 15px;
+    }
+
+    .letter-header {
+        font-weight: bold;
+        color: #1a237e;
+        margin-bottom: 5px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .topic-item {
+        display: flex;
+        padding: 4px 8px;
+        text-decoration: none;
+        color: #333;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+    }
+
+    .topic-item:hover {
+        background-color: #f0f7ff;
+        color: #0056b3;
+    }
 </style>
 
 <script>
-// Đảm bảo dropdown vẫn mở khi click vào trường tìm kiếm
-document.querySelector('.topic-search').addEventListener('click', function(e) {
-    e.stopPropagation();
-});
-
 // Hàm lọc các topics
 function filterTopics(query) {
+    console.log("Filtering topics with query:", query);
     query = query.toLowerCase();
-    const groups = document.querySelectorAll('.topic-group');
     
-    groups.forEach(group => {
-        const topicItems = group.querySelectorAll('.topic-list li');
-        let visibleCount = 0;
+    // Đảm bảo rằng nội dung đã được tải
+    const menuContent = document.querySelector('.menu-content');
+    if (!menuContent || !menuContent.children.length) {
+        console.log("Menu content not loaded yet");
+        return;
+    }
+    
+    const topics = document.querySelectorAll('.topic-item');
+    const letterGroups = document.querySelectorAll('.letter-group');
+    
+    console.log("Found topics:", topics.length);
+    console.log("Found letter groups:", letterGroups.length);
+    
+    let hasResults = false;
+    
+    // Lọc các topic
+    topics.forEach(topic => {
+        const text = topic.textContent.toLowerCase();
+        if (text.includes(query)) {
+            topic.style.display = 'flex';
+            hasResults = true;
+        } else {
+            topic.style.display = 'none';
+        }
+    });
+    
+    // Ẩn/hiện các nhóm chữ cái
+    letterGroups.forEach(group => {
+        const visibleTopics = Array.from(group.querySelectorAll('.topic-item')).some(
+            item => item.style.display !== 'none'
+        );
+        group.style.display = visibleTopics ? 'block' : 'none';
+    });
+    
+    // Hiển thị thông báo nếu không có kết quả
+    let noResultsMsg = document.getElementById('no-results-message');
+    
+    if (!hasResults && query !== '') {
+        if (!noResultsMsg) {
+            noResultsMsg = document.createElement('div');
+            noResultsMsg.id = 'no-results-message';
+            noResultsMsg.className = 'no-results-message';
+            noResultsMsg.textContent = 'Không tìm thấy thể loại phù hợp';
+            menuContent.appendChild(noResultsMsg);
+        }
+    } else if (noResultsMsg) {
+        noResultsMsg.remove();
+    }
+}
+
+// Đảm bảo dropdown vẫn mở khi click vào trường tìm kiếm
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('topic-search')) {
+        e.stopPropagation();
+    }
+});
+
+// Thêm sự kiện cho HTMX sau khi nội dung được tải
+document.addEventListener('htmx:afterSwap', function(event) {
+    if (event.detail.target.id === 'topicList') {
+        console.log("Topic list loaded via HTMX");
         
-        topicItems.forEach(item => {
-            const text = item.textContent.toLowerCase();
-            if (text.includes(query)) {
-                item.style.display = '';
-                visibleCount++;
-            } else {
-                item.style.display = 'none';
+        // Đảm bảo rằng ô tìm kiếm hoạt động
+        const searchInput = document.querySelector('.topic-search');
+        if (searchInput) {
+            console.log("Found search input, adding event listener");
+            searchInput.addEventListener('input', function() {
+                console.log("Input event triggered with value:", this.value);
+                filterTopics(this.value);
+            });
+            
+            // Ngăn dropdown đóng khi click vào ô tìm kiếm
+            searchInput.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        } else {
+            console.log("Search input not found after HTMX swap");
+        }
+    }
+});
+
+// Thêm sự kiện khi DOM đã tải xong
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM fully loaded");
+    
+    // Thêm sự kiện trực tiếp cho ô tìm kiếm nếu đã tồn tại
+    const searchInput = document.getElementById('topic-search-input');
+    if (searchInput) {
+        console.log("Found search input on DOMContentLoaded");
+        searchInput.addEventListener('keyup', function() {
+            console.log("typing");
+            console.log("Input event triggered with value:", this.value);
+            filterTopics(this.value);
+        });
+    } else {
+        console.log("Search input not found on DOMContentLoaded");
+    }
+    
+    // Reset tìm kiếm khi đóng dropdown
+    const topicDropdown = document.getElementById('topic-dropdown');
+    if (topicDropdown) {
+        topicDropdown.addEventListener('hidden.bs.dropdown', function() {
+            const searchInput = document.querySelector('.topic-search');
+            if (searchInput) {
+                searchInput.value = '';
+                filterTopics('');
             }
         });
+    }
+});
+
+// Thêm sự kiện trực tiếp cho ô tìm kiếm (không phụ thuộc vào DOMContentLoaded)
+window.addEventListener('load', function() {
+    console.log("Window fully loaded");
+    
+    // Thêm sự kiện click cho dropdown để đảm bảo nó mở
+    const dropdownToggle = document.getElementById('navbarDropdownMenuLink');
+    if (dropdownToggle) {
+        dropdownToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log("Dropdown toggle clicked");
+        });
+    }
+    
+    // Thêm sự kiện trực tiếp cho ô tìm kiếm
+    document.querySelectorAll('.topic-search').forEach(function(input) {
+        console.log("Adding event listener to search input");
+        input.addEventListener('input', function() {
+            console.log("Input event triggered with value:", this.value);
+            filterTopics(this.value);
+        });
         
-        // Ẩn/hiện cả nhóm dựa trên kết quả lọc
-        group.style.display = visibleCount > 0 ? '' : 'none';
+        // Ngăn dropdown đóng khi click vào ô tìm kiếm
+        input.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
     });
-}
+});
+
+// Thêm sự kiện để đóng suggestion khi click ra ngoài
+document.addEventListener('click', function(event) {
+    const searchForm = document.querySelector('.search-form');
+    const ssuggest = document.getElementById('ssuggest');
+    
+    // Kiểm tra xem ssuggest có tồn tại và có nội dung không
+    if (ssuggest && ssuggest.innerHTML.trim() !== '') {
+        // Kiểm tra xem click có nằm ngoài form tìm kiếm không
+        if (!searchForm.contains(event.target)) {
+            // Xóa nội dung của ssuggest
+            ssuggest.innerHTML = '';
+        }
+    }
+});
+
+// Ngăn sự kiện click trên suggestion lan truyền đến document
+document.addEventListener('DOMContentLoaded', function() {
+    const ssuggest = document.getElementById('ssuggest');
+    if (ssuggest) {
+        ssuggest.addEventListener('click', function(event) {
+            // Ngăn sự kiện lan truyền nếu click vào suggestion item
+            if (event.target.closest('.suggestion-item')) {
+                event.stopPropagation();
+            }
+        });
+    }
+});
+
+// Thêm sự kiện cho HTMX sau khi nội dung được tải
+document.body.addEventListener('htmx:afterSwap', function(event) {
+    if (event.detail.target.id === 'ssuggest') {
+        // Thêm sự kiện click cho các suggestion items
+        const suggestionItems = document.querySelectorAll('.suggestion-item');
+        suggestionItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                // Ngăn sự kiện lan truyền để tránh đóng suggestion
+                e.stopPropagation();
+            });
+        });
+    }
+});
 </script>
+

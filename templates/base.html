@@ -130,6 +130,73 @@ document.body.addEventListener('htmx:configRequest', function(evt) {
 });
 </script>
 
+<!-- Thêm nút Back to Top trước đóng thẻ body -->
+<button id="back-to-top" class="back-to-top-btn" title="Về đầu trang">
+  <i class="fas fa-arrow-up"></i>
+</button>
+
+<!-- Thêm script để điều khiển nút Back to Top -->
+<script>
+  // Nút Back to Top
+  const backToTopButton = document.getElementById("back-to-top");
+  
+  // Hiển thị nút khi người dùng cuộn xuống 300px
+  window.onscroll = function() {
+    if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+      backToTopButton.style.display = "flex";
+    } else {
+      backToTopButton.style.display = "none";
+    }
+  };
+  
+  // Khi người dùng nhấp vào nút, cuộn lên đầu trang
+  backToTopButton.addEventListener("click", function() {
+    // Cho Safari
+    document.body.scrollTop = 0;
+    // Cho Chrome, Firefox, IE và Opera
+    document.documentElement.scrollTop = 0;
+  });
+</script>
+
+<!-- Thêm style cho nút Back to Top -->
+<style>
+  .back-to-top-btn {
+    display: none;
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+  }
+  
+  .back-to-top-btn:hover {
+    background-color: #1565c0;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+  }
+  
+  @media (max-width: 768px) {
+    .back-to-top-btn {
+      width: 40px;
+      height: 40px;
+      font-size: 16px;
+      bottom: 20px;
+      right: 20px;
+    }
+  }
+</style>
+
 </body>
 
 </html>

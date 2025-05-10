@@ -5,7 +5,268 @@
 {% load custom_filters %}
 
 {% block pack %}
+<style>
+    /* Background styling consistent with searchBook.html */
+    body {
+        background: linear-gradient(to bottom, #f0f5fa, #e5eef7);
+        background-attachment: fixed;
+        border-color: #e0e6ed; /* Xám nhạt - tinh tế và hiện đại */
+    }
+    .body {
+    background-color: #c3d9e2;
+    }
+    /* Điều chỉnh container chính để khớp với search-book-content */
+    .body .overall.container-fluid {
+        width: 80% !important; /* Giảm xuống 80% */
+        max-width: 80%; /* Giảm xuống 80% */
+        margin: 0 auto;
+        padding-left: 0;
+        padding-right: 0;
+        box-shadow: none;
+        background-color: transparent;
+        border: none;
+    }
     
+    .filter {
+        background: #fff;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        margin: 15px 0;
+        border: 1px solid #e0e0e0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .filter span {
+        color: #333;
+        font-weight: 500;
+    }
+    
+    .filter-options {
+        display: flex;
+        align-items: center;
+    }
+    
+    .filter a {
+        color: #666;
+        text-decoration: none;
+        padding: 6px 16px;
+        transition: all 0.3s ease;
+    }
+    
+    .filter a:hover {
+        color: #1976d2;
+    }
+    
+    .filter a.active {
+        color: #fff;
+        background-color: #1976d2;
+        border-radius: 4px;
+    }
+    
+    .separator {
+        color: #ccc;
+        margin: 0 5px;
+    }
+    
+    /* Điều chỉnh container để kéo dài ra hai bên */
+    .search-result {
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgb(0 0 0 / 64%);
+    margin: 20px auto;
+    max-width: 80%;
+    width: 80%;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #e0e6ed;
+}
+    
+/* Điều chỉnh container-fluid để kéo dài ra hai bên */
+.search-book-content.container-fluid {
+    width: 100% !important; /* Ghi đè width 70% từ style.css */
+    max-width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+    box-shadow: none;
+}
+
+    /* Book styling */
+    .book-found {
+        position: relative;
+        margin-bottom: 20px;
+        padding: 20px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
+        border: 1px solid rgba(25, 118, 210, 0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .book-found:hover {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        transform: translateY(-2px);
+    }
+    
+    .book-image {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .book-image:hover {
+        transform: scale(1.03);
+    }
+    
+    .book-name {
+        color: #1a237e;
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+        display: block;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+    
+    .book-name:hover {
+        color: #1976d2;
+        text-decoration: none;
+    }
+    
+    .book-author {
+        color: #555;
+        margin: 5px 0;
+        font-size: 0.95rem;
+    }
+    
+    .book-published {
+        color: #777;
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+    }
+    
+    .aveRating {
+        margin-top: 10px;
+        font-size: 0.9rem;
+        color: #666;
+    }
+    
+    .product-rating {
+        font-weight: 600;
+        color: #1976d2;
+    }
+    
+    .aveRating-start {
+        color: #1976d2; /* Xanh dương đậm thay vì màu vàng */
+    }
+    
+    /* No results styling */
+    .no-results {
+        text-align: center;
+        padding: 3rem;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(25, 118, 210, 0.1);
+        margin: 2rem auto;
+        max-width: 600px;
+        border: 1px solid #e0e6ed;
+    }
+    
+    .no-results h4 {
+        color: #1a237e;
+        margin-bottom: 1rem;
+    }
+    
+    .no-results p {
+        color: #555;
+        margin-bottom: 1rem;
+    }
+    
+    .no-results a {
+        color: #1976d2;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    
+    .no-results a:hover {
+        text-decoration: underline;
+    }
+    
+    /* Wishlist button styling */
+    .right-content button {
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.4rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.right-content button:hover {
+    background-color: #1565c0;
+    box-shadow: 0 4px 8px rgba(25, 118, 210, 0.2);
+}
+
+.right-content button.saved {
+    background-color: #4caf50;
+}
+
+.right-content button.saved:hover {
+    background-color: #43a047;
+}
+    
+    /* Responsive styles */
+    @media (max-width: 768px) {
+        .body .overall.container-fluid,
+        .search-result {
+            max-width: 95%;
+            width: 95%;
+            margin: 10px auto;
+            padding: 15px;
+        }
+        
+        .filter {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .filter-options {
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .separator {
+            display: none;
+        }
+        
+        .filter a {
+            padding: 4px 12px;
+        }
+        
+        .book-name {
+            font-size: 1.1rem;
+        }
+        
+        .left-content {
+            margin-bottom: 15px;
+        }
+        
+        #wishlist button {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+    }
+</style>
 {% endblock pack %}
 
 
@@ -114,11 +375,8 @@
 <div class="search-result">
     {% if page_obj %}
     <div class="search-book-content container-fluid justify-content-center">
-        <ul id="book-form">
-            {% comment %} thông tin sách {% endcomment %}
+        <ul id="book-form" class="p-0 list-unstyled">
             {% for book in page_obj %}
-                {% comment %} chỉnh sửa câu lệnh dưới để hiển thị từng cuốn sách {% endcomment %}
-                {% comment %} Cần chỉnh sửa lại wishlist post {% endcomment %}
                 <div class="book-found">
                     <li>
                         <div class="row">
@@ -129,21 +387,23 @@
                             <div class="middle-content col-md-7">
                                 <a class="book-name" href="/book/detail/id={{book.book_id|add:'-3000'}}">{{ book.book_title }}</a> 
                                 <p class="book-author">by {{book.book_author}}</p>
-                                <p class="book-published">Xuất bản: {{ book.book_publish }}</p>
+                                <p class="book-published">Xuất Bản: {{ book.book_publish }}</p>
                                 
                                 <div class="aveRating">
-                                    <span class="product-rating">{{ averRates|get_raw_number:book.book_id }}</span><span>/5 
-                                    <span class="fa fa-star aveRating-start"></span> 
-                                    ({{ countRates|get_raw_number:book.book_id }} - {{ book.book_view }} lượt xem)</span>
+                                    <span class="product-rating">{{ averRates|get_item:book.book_id }}</span><span>/5 <span class="fa fa-star aveRating-start"></span> ({{ countRates|get_item:book.book_id }} - {{ book.book_view }} lượt xem)</span>
                                 </div>
                             </div>
 
-                            <div class="right-content col-md-3">
-                                <div id='wishlist{{book.book_id}}' hx-post = "/wishCheck_post/"  hx-vals = '{"book_id": {{book.book_id}}}' hx-trigger="load" hx-target="#wishlist{{book.book_id}}">
-                                    <button hx-post = "/wishList_post/" hx-vals = '{"book_id": {{book.book_id}}}' hx-trigger="click delay:0.25s">...</button>
+                            <div class="right-content col-md-3 d-flex align-items-center justify-content-center">
+                                <div id='wishlist{{book.book_id}}' hx-post="/wishCheck_post/" hx-vals='{"book_id": {{book.book_id}}}' hx-trigger="load" hx-target="#wishlist{{book.book_id}}">
+                                    <button class="d-flex align-items-center" hx-post="/wishList_post/" hx-vals='{"book_id": {{book.book_id}}}' hx-trigger="click delay:0.25s">
+                                        <i class="far fa-bookmark mr-2"></i> Lưu sách
+                                    </button>
                                 </div>
+    
                             </div>
-                    </li><br>
+                        </div>
+                    </li>
                 </div>
             {% endfor %}
         </ul>

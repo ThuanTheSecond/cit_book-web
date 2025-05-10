@@ -21,9 +21,20 @@
       border-radius: 15px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
       margin: 20px auto;
-      max-width: 1200px;
+      max-width: 95%; /* Tăng chiều rộng tối đa từ 1200px lên 95% */
       position: relative;
       overflow: hidden;
+    }
+    
+    /* Điều chỉnh container-fluid để kéo dài ra hai bên */
+     .search-book-content.container-fluid {
+      width: 80% !important; /* Ghi đè width 70% từ style.css */
+      max-width: 100%;
+      border-radius: 15px;
+      padding-left: 10px;
+      padding-right: 0;
+      box-shadow: 0 10px 30px rgb(0 0 0 / 64%);
+      padding-top: 10px;
     }
     
     /* Overlay pattern for texture */
@@ -51,8 +62,13 @@
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
       border: 1px solid rgba(25, 118, 210, 0.1);
       transition: all 0.3s ease;
+      width: 100%; /* Đảm bảo chiều rộng 100% */
     }
     
+    .mb-4 {
+    margin-bottom: 0.5rem !important;
+    font-size: 2rem;
+    }
     .book-found:hover {
       transform: translateY(-5px);
       box-shadow: 0 15px 30px rgba(25, 118, 210, 0.12);
@@ -93,15 +109,35 @@
       font-size: 0.95rem;
     }
     
+      .middle-content .book-name {
+        font-weight: 600;
+        font-size: 21px;
+         &:hover {
+         color: #0376b7;
+          }
+        }
+
+      .middle-content .book-author {
+        font-weight: 500;
+        font-size: 21px;
+        margin-bottom: 5px;
+      }
+
+      .middle-content .book-published {
+        color: #807e83;
+        font-size: 18px;
+      }
+
     /* Rating styling */
     .aveRating {
       margin-top: 10px;
+      font-size:21px;
     }
     
-    .product-rating {
+   .product-rating {
       font-weight: bold;
       color: #1976d2;
-      font-size: 1.1rem;
+      font-size: 21px;
     }
     
     .fa-star {
@@ -144,12 +180,13 @@
       display: flex;
       align-items: center;
       padding-bottom: 8px;
+      padding-left: 2rem;
       border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     }
     
     .category-header .header-icon {
       color: #1a237e;
-      font-size: 1.2rem;
+      font-size: 2.2rem;
       margin-right: 8px;
       animation: pulse 2s infinite;
     }
@@ -186,7 +223,7 @@
         box-shadow: 0 5px 20px rgba(25, 118, 210, 0.1);
         max-width: 600px;
         width: 90%;
-        border: 1px solid rgba(25, 118, 210, 0.1);
+        border: 3px solid rgb(0, 86, 171);
     }
     .btn-primary {
         background-color: #1976d2;
@@ -212,7 +249,7 @@
     <div class="search-book-content container-fluid justify-content-center">
         <div class="category-header">
             <span class="header-icon"><i class="fas fa-bookmark"></i></span>
-            <h5 class="mb-4">Sách Đã Lưu</h5>
+            <h5 class="mb-4">Sách Xem Sau</h5>
         </div>
         <ul id="book-form">
             {% comment %} thông tin sách {% endcomment %}
@@ -249,9 +286,9 @@
     {% elif not page_obj %}
     <div class="empty-state text-center py-5">
         <div class="empty-state-container">
-            <i class="fas fa-book-open mb-4" style="font-size: 4rem; color: #1a237e;"></i>
-            <h3 class="mb-3" style="color: #1a237e;">Chưa có sách đã lưu</h3>
-            <p class="text-muted mb-4" style="max-width: 500px; margin: 0 auto;">
+            <i class="fas fa-book-open mb-4" style="font-size: 3rem; color: #1a237e;"></i>
+            <h3 class="mb-3" style="color: #1a237e; font-size:30px;">Chưa có sách đã lưu</h3>
+            <p class="text-muted mb-4" style="max-width: 500px; margin: 0 auto; font-size:1.5rem;">
                 Bạn chưa lưu cuốn sách nào vào danh sách yêu thích.
                 Hãy khám phá thư viện và lưu những cuốn sách bạn quan tâm!
             </p>

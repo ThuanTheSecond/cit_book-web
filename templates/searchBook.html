@@ -3,51 +3,29 @@
 {% load filters %}
 
 {% block bonusContent %}
-<div class="body">
-    <div class="overall container-fluid justify-content-center">
-        <div class="search-results-header">
-            <h3 class="search-header-title">
-                {% if query %}
-                    Kết quả tìm kiếm cho từ khóa: "<span class="search-keyword">{{ query }}</span>"
-                {% else %}
-                    Tất cả sách
-                {% endif %}
-            </h3>
-            {% if search_type != 'all' %}
-                <div class="search-type-label">
-                    <i class="fas fa-filter"></i>
-                    Lọc theo: 
-                    {% if search_type == 'book_title' %}Tên sách
-                    {% elif search_type == 'book_author' %}Tác giả
-                    {% elif search_type == 'book_publish' %}Nhà xuất bản
-                    {% endif %}
-                </div>
-            {% endif %}
-        </div>
-
-        <div class="filter">
-            <span>Sắp xếp theo: </span>
-            <div class="filter-options">
-                <a href="{% url 'search' ftype=5 query=query search_type=search_type %}" 
-                   class="{% if ftype == 5 %}active{% endif %}">Liên quan nhất</a>
-                <span class="separator">|</span>
-                <a href="{% url 'search' ftype=1 query=query search_type=search_type %}" 
-                   class="{% if ftype == 1 %}active{% endif %}">Lượt xem</a>
-                <span class="separator">|</span>
-                <a href="{% url 'search' ftype=2 query=query search_type=search_type %}" 
-                   class="{% if ftype == 2 %}active{% endif %}">Xuất bản gần đây</a>
-                <span class="separator">|</span>
-                <a href="{% url 'search' ftype=3 query=query search_type=search_type %}" 
-                   class="{% if ftype == 3 %}active{% endif %}">Đánh giá nhiều</a>
-                <span class="separator">|</span>
-                <a href="{% url 'search' ftype=4 query=query search_type=search_type %}" 
-                   class="{% if ftype == 4 %}active{% endif %}">Đánh giá tốt nhất</a>
-            </div>
-        </div>
-    </div>
-</div>
-
 <style>
+body {
+    background: linear-gradient(to bottom, #f0f5fa, #e5eef7);
+    background-attachment: fixed;
+    /* Nếu có border màu vàng, hãy thay thế bằng một trong các màu sau */
+    border-color: #e0e6ed; /* Xám nhạt - tinh tế và hiện đại */
+}
+
+.body{
+    background-color: #c3d9e2;
+}
+/* Điều chỉnh container chính để khớp với search-book-content */
+.body .overall.container-fluid {
+    width: 80% !important; /* Giảm xuống 80% */
+    max-width: 80%; /* Giảm xuống 80% */
+    margin: 0 auto;
+    padding-left: 0;
+    padding-right: 0;
+    box-shadow: none;
+    background-color: transparent;
+    border: none;
+}
+
 .search-results-header {
     margin-bottom: 20px;
 }
@@ -56,6 +34,7 @@
     color: #1a237e;
     margin-bottom: 10px;
     font-size: 1.5rem;
+    font-weight: 600;
 }
 
 .search-keyword {
@@ -110,8 +89,8 @@
 
 .filter a.active {
     color: #fff;
-    background-color: #1976d2;
-    box-shadow: 0 2px 4px rgba(25, 118, 210, 0.2);
+    background-color: #0d6efd;
+    border-radius: 4px;
 }
 
 .filter .separator {
@@ -126,27 +105,7 @@
     display: flex;
     align-items: center;
     gap: 5px;
-}
-
-.filter a {
-    position: relative;
-    overflow: hidden;
-}
-
-.filter a:after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background-color: #1976d2;
-    transform: scaleX(0);
-    transition: transform 0.3s ease;
-}
-
-.filter a:hover:after {
-    transform: scaleX(1);
+    flex-wrap: wrap;
 }
 
 .empty-state {
@@ -159,7 +118,7 @@
 }
 
 .empty-state i {
-    font-size: 4rem;
+    font-size: 2rem;
     color: #1a237e;
     margin-bottom: 1rem;
 }
@@ -179,8 +138,140 @@
     font-size: 1rem;
 }
 
+/* Điều chỉnh container để kéo dài ra hai bên */
+
+.search-result {
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgb(0 0 0 / 64%);
+    margin: 20px auto;
+    max-width: 80%;
+    width: 80%;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #e0e6ed;
+}
+/* Điều chỉnh container-fluid để kéo dài ra hai bên */
+.search-book-content.container-fluid {
+    width: 100% !important; /* Ghi đè width 70% từ style.css */
+    max-width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+    box-shadow: none;
+}
+
+/* Book styling */
+.book-found {
+    position: relative;
+    margin-bottom: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(25, 118, 210, 0.1);
+    transition: all 0.3s ease;
+    width: 100%; /* Đảm bảo chiều rộng 100% */
+}
+
+.book-found:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+.book-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.book-image:hover {
+    transform: scale(1.03);
+}
+
+.book-name {
+    color: #1a237e;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: block;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.book-name:hover {
+    color: #1976d2;
+    text-decoration: none;
+}
+
+.book-author {
+    color: #555;
+    font-size: 0.95rem;
+    margin-bottom: 5px;
+}
+
+.book-published {
+    color: #777;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+}
+
+.aveRating {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.product-rating {
+    font-weight: 600;
+    color: #1976d2;
+}
+
+.aveRating-start {
+    color: #ffc107;
+}
+
+.right-content button {
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.4rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.right-content button:hover {
+    background-color: #1565c0;
+    box-shadow: 0 4px 8px rgba(25, 118, 210, 0.2);
+}
+
+.right-content button.saved {
+    background-color: #4caf50;
+}
+
+.right-content button.saved:hover {
+    background-color: #43a047;
+}
+
 /* Responsive styles */
 @media (max-width: 768px) {
+    .body .overall.container-fluid,
+    .search-result {
+        max-width: 95%;
+        width: 95%;
+        margin: 10px auto;
+        padding: 15px;
+    }
+    
     .filter {
         flex-direction: column;
         align-items: flex-start;
@@ -188,8 +279,7 @@
     }
 
     .filter-options {
-        flex-wrap: wrap;
-        justify-content: center;
+        justify-content: flex-start;
         width: 100%;
     }
 
@@ -205,15 +295,77 @@
     .search-type-label {
         font-size: 0.8rem;
     }
+    
+    .book-found {
+        padding: 15px;
+    }
+    
+    .book-name {
+        font-size: 1.1rem;
+    }
+    
+    .left-content {
+        margin-bottom: 15px;
+    }
+    
+    .right-content {
+        margin-top: 15px;
+        text-align: center;
+    }
 }
 </style>
+
+<div class="body">
+    <div class="overall container-fluid justify-content-center">
+        <div class="search-results-header">
+            <h3 class="search-header-title">
+                {% if query %}
+                    Kết quả tìm kiếm cho từ khóa: "<span class="search-keyword">{{ query }}</span>"
+                {% else %}
+                    Tất cả sách
+                {% endif %}
+            </h3>
+            {% if search_type != 'all' %}
+                <div class="search-type-label">
+                    <i class="fas fa-filter"></i>
+                    Lọc theo: 
+                    {% if search_type == 'book_title' %}Tên sách
+                    {% elif search_type == 'book_author' %}Tác giả
+                    {% elif search_type == 'book_publish' %}Nhà xuất bản
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="filter">
+            <span>Sắp xếp theo: </span>
+            <div class="filter-options">
+                <a href="{% url 'search' ftype=5 query=query search_type=search_type %}" 
+                   class="{% if type == 5 %}active{% endif %}">Liên quan nhất</a>
+                
+                <span class="separator">|</span>
+                <a href="{% url 'search' ftype=1 query=query search_type=search_type %}" 
+                   class="{% if type == 1 %}active{% endif %}">Lượt xem</a>
+                <span class="separator">|</span>
+                <a href="{% url 'search' ftype=2 query=query search_type=search_type %}" 
+                   class="{% if type == 2 %}active{% endif %}">Xuất bản gần đây</a>
+                <span class="separator">|</span>
+                <a href="{% url 'search' ftype=3 query=query search_type=search_type %}" 
+                   class="{% if type == 3 %}active{% endif %}">Đánh giá nhiều</a>
+                <span class="separator">|</span>
+                <a href="{% url 'search' ftype=4 query=query search_type=search_type %}" 
+                   class="{% if type == 4 %}active{% endif %}">Đánh giá tốt nhất</a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock bonusContent %}
 
 {% block content %}
 <div class="search-result">
     {% if page_obj %}
     <div class="search-book-content container-fluid justify-content-center">
-        <ul id="book-form">
+        <ul id="book-form" class="p-0 list-unstyled">
             {% for book in page_obj %}
                 <div class="book-found">
                     <li>
@@ -232,13 +384,16 @@
                                 </div>
                             </div>
 
-                            <div class="right-content col-md-3">
+                            <div class="right-content col-md-3 d-flex align-items-center justify-content-center">
                                 <div id='wishlist{{book.book_id}}' hx-post="/wishCheck_post/" hx-vals='{"book_id": {{book.book_id}}}' hx-trigger="load" hx-target="#wishlist{{book.book_id}}">
-                                    <button hx-post="/wishList_post/" hx-vals='{"book_id": {{book.book_id}}}' hx-trigger="click delay:0.25s">...</button>
+                                    <button class="d-flex align-items-center" hx-post="/wishList_post/" hx-vals='{"book_id": {{book.book_id}}}' hx-trigger="click delay:0.25s">
+                                        <i class="far fa-bookmark mr-2"></i> Lưu sách
+                                    </button>
                                 </div>
+    
                             </div>
                         </div>
-                    </li><br>
+                    </li>
                 </div>
             {% endfor %}
         </ul>
@@ -246,9 +401,9 @@
     {% else %}
     <div class="empty-state text-center py-5">
         <div class="empty-state-container">
-            <i class="fas fa-search mb-4" style="font-size: 4rem; color: #1a237e;"></i>
-            <h3 class="mb-3" style="color: #1a237e;">Không tìm thấy sách</h3>
-            <p class="text-muted mb-4" style="max-width: 500px; margin: 0 auto;">
+            <i class="fas fa-search mb-4"></i>
+            <h3 class="mb-3">Không tìm thấy sách</h3>
+            <p class="text-muted mb-4">
                 {% if query %}
                     Không tìm thấy sách phù hợp với từ khóa "<span class="search-keyword">{{ query }}</span>".
                 {% else %}
