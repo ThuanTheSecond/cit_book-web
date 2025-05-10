@@ -32,7 +32,12 @@
                                 <input type="text" id="topic-search-input" class="topic-search" placeholder="Tìm thể loại...">
                             </div>
                             <div class="menu-content">
-                                <!-- Sẽ được điền bởi HTMX -->
+                                <div class="loading-indicator">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Đang tải...</span>
+                                    </div>
+                                    <p>Đang tải danh sách thể loại...</p>
+                                </div>
                             </div>
                         </div>
                     </li>
@@ -756,18 +761,34 @@
             font-size: 14px;
         }
     }
+    .loading-indicator {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        color: #6c757d;
+    }
+
+    .loading-indicator p {
+        margin-top: 10px;
+        font-size: 14px;
+    }
 </style>
 
-<script>
+{% block scripts %}
+    <script>
 // Hàm lọc các topics
 function filterTopics(query) {
     console.log("Filtering topics with query:", query);
     query = query.toLowerCase();
     
     // Đảm bảo rằng nội dung đã được tải
-    const menuContent = document.querySelector('.menu-content');
+    const menuContent = document.querySelector('.topics-columns');
     if (!menuContent || !menuContent.children.length) {
         console.log("Menu content not loaded yet");
+        // Thêm đoạn này để đợi nội dung tải xong
+        setTimeout(() => filterTopics(query), 100);
         return;
     }
     
@@ -775,7 +796,6 @@ function filterTopics(query) {
     const letterGroups = document.querySelectorAll('.letter-group');
     
     console.log("Found topics:", topics.length);
-    console.log("Found letter groups:", letterGroups.length);
     
     let hasResults = false;
     
@@ -827,20 +847,27 @@ document.addEventListener('htmx:afterSwap', function(event) {
         console.log("Topic list loaded via HTMX");
         
         // Đảm bảo rằng ô tìm kiếm hoạt động
-        const searchInput = document.querySelector('.topic-search');
+        const searchInput = document.querySelector('#topicSearchInput');
         if (searchInput) {
             console.log("Found search input, adding event listener");
-            searchInput.addEventListener('input', function() {
+            
+            // Xóa event listener cũ nếu có
+            const newSearchInput = searchInput.cloneNode(true);
+            searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+            
+            // Thêm event listener mới
+            newSearchInput.addEventListener('input', function() {
                 console.log("Input event triggered with value:", this.value);
                 filterTopics(this.value);
             });
             
             // Ngăn dropdown đóng khi click vào ô tìm kiếm
-            searchInput.addEventListener('click', function(e) {
+            newSearchInput.addEventListener('click', function(e) {
                 e.stopPropagation();
             });
-        } else {
-            console.log("Search input not found after HTMX swap");
+            
+            // Focus vào ô tìm kiếm
+            setTimeout(() => newSearchInput.focus(), 100);
         }
     }
 });
@@ -946,3 +973,6 @@ document.body.addEventListener('htmx:afterSwap', function(event) {
 });
 </script>
 
+
+{% endblock scripts %}
+    
