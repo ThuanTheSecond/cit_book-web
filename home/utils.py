@@ -184,8 +184,21 @@ def getRecommend_content(book_id):
     
 def filterBasedType(books, type):
     if type == 1:
-        books = books.order_by('-book_view')
-    if type == 2:
+        # Thay đổi từ sắp xếp theo lượt xem sang sắp xếp theo độ phổ biến
+        from django.db.models import Avg, Count, F, ExpressionWrapper, FloatField, Value
+        from django.db.models.functions import Coalesce
+        
+        books = books.annotate(
+            avg_rating=Avg('rating__rating'),
+            rating_count=Count('rating'),
+            # Tính điểm phổ biến: (lượt xem * 0.7) + (đánh giá trung bình * số lượt đánh giá * 10 * 0.3)
+            popularity_score=ExpressionWrapper(
+                (F('book_view') * 0.7) + 
+                (Coalesce(F('avg_rating'), Value(0)) * F('rating_count') * 10 * 0.3),
+                output_field=FloatField()
+            )
+        ).order_by('-popularity_score')
+    elif type == 2:
         from django.db.models import IntegerField, Value
         from django.db.models.functions import Cast, Substr, Length, Coalesce
         from django.db.models import F
@@ -209,20 +222,27 @@ def filterBasedType(books, type):
                 Value(0)  # Giá trị mặc định nếu không tìm thấy năm
             )
         ).order_by("-year")
-    if type == 3:
+    elif type == 3:
         from django.db.models import Avg, Count, Value
         from django.db.models.functions import Coalesce
         books = books.annotate(
             rateavg = Coalesce(Avg('rating__rating'),Value(0.0)),
             ratecount = Count('rating')
         ).order_by('-ratecount', '-rateavg')
-    if type == 4:
+    elif type == 4:
         from django.db.models import Avg, Count, Value
         from django.db.models.functions import Coalesce
         books = books.annotate(
             rateavg = Coalesce(Avg('rating__rating'),Value(0.0)),
             ratecount = Count('rating')
         ).order_by('-rateavg', '-ratecount')
+    elif type == 6:
+        # Sắp xếp theo thời gian tạo mới nhất
+        books = books.order_by('-created_at')
+    elif type == 7:
+        # Sắp xếp theo thịnh hành (7 ngày gần đây)
+        books = get_trending_books(days=7, limit=100)
+    
     return books
     
 import pickle
@@ -298,3 +318,57 @@ def update_recommendation_model():
     except Exception as e:
         logger.error(f"Error updating model: {str(e)}")
         return False
+
+def get_trending_books(days=7, limit=10):
+    """Lấy sách thịnh hành dựa trên hoạt động trong 7 ngày gần đây"""
+    from django.db.models import Count, F, ExpressionWrapper, FloatField, Q, Case, When, Value
+    from django.db.models.functions import Coalesce
+    from django.utils import timezone
+    from .models import Book
+    import datetime
+    
+    # Xác định thời điểm bắt đầu tính "gần đây" (7 ngày)
+    recent_date = timezone.now() - datetime.timedelta(days=days)
+    
+    # Lấy danh sách sách và tính điểm thịnh hành
+    trending_books = Book.objects.annotate(
+        # Số lượng đánh giá gần đây
+        recent_ratings=Count(
+            'rating',
+            filter=Q(rating__created_at__gte=recent_date)
+        ),
+        
+        # Số lượng bình luận/đánh giá gần đây
+        recent_reviews=Count(
+            'reviews',
+            filter=Q(reviews__created_at__gte=recent_date)
+        ),
+        
+        # Số lượt xem gần đây (nếu có BookViewHistory)
+        recent_views=Count(
+            'bookviewhistory',
+            filter=Q(bookviewhistory__viewed_at__gte=recent_date)
+        ),
+        
+        # Tính điểm thịnh hành
+        trending_score=ExpressionWrapper(
+            # Lượt xem gần đây * 0.5
+            (F('recent_views') * 0.5) +
+            
+            # Số lượng đánh giá gần đây * 30
+            (F('recent_ratings') * 30) +
+            
+            # Số lượng bình luận gần đây * 20
+            (F('recent_reviews') * 20) +
+            
+            # Bonus cho sách được cập nhật gần đây
+            Case(
+                When(updated_at__gte=recent_date, then=Value(50)),
+                default=Value(0),
+                output_field=FloatField()
+            ),
+            output_field=FloatField()
+        )
+    ).order_by('-trending_score')[:limit]
+    
+    return trending_books

@@ -372,8 +372,8 @@
     }
     
     .collection-box:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 15px 30px rgba(37, 117, 252, 0.1);
+    transform: translateY(-10px);
+    box-shadow: 0px 9px 13px rgb(0 4 11 / 85%);
     }
     
     .collection-icon {
@@ -778,6 +778,36 @@
       </div>
     </section>
 
+     <!-- Collections Section -->
+    <section class="collections">
+      <div class="collection-box">
+        <div class="collection-icon">
+          <i class="fas fa-lightbulb"></i>
+        </div>
+        <h3 class="collection-title">Sách Gợi ý</h3>
+        <p class="collection-desc">Khám phá ngay những cuốn sách tuyệt vời được đề xuất cho riêng bạn.</p>
+        <a href="/categoryFilter/Recommended/1" class="collection-link">Khám Phá</a>
+      </div>
+      
+      <div class="collection-box">
+        <div class="collection-icon">
+          <i class="fas fa-star"></i>
+        </div>
+        <h3 class="collection-title">Phổ Biến</h3>
+        <p class="collection-desc">Đắm chìm trong thế giới tri thức với vô vàn những cuốn sách kinh điển và phổ biến nhất.</p>
+        <a href="/categoryFilter/Popular/1" class="collection-link">Khám Phá</a>
+      </div>
+      
+      <div class="collection-box">
+        <div class="collection-icon">
+          <i class="fas fa-fire"></i>
+        </div>
+        <h3 class="collection-title">Thịnh Hành</h3>
+        <p class="collection-desc">Cập nhật ngay kiến thức mới lạ và hữu ích với những đầu sách thịnh hành nhất gần đây .</p>
+        <a href="/categoryFilter/Trending/7" class="collection-link">Khám Phá</a>
+      </div>
+    </section>
+
     <!-- Recommendations Section -->
     {% if user.is_authenticated %}
       {% if show_recommendations %}
@@ -843,9 +873,40 @@
       <div class="section-header">
         <h2 class="section-title">
           <span class="section-icon"><i class="fas fa-fire"></i></span>
-          Sách Thịnh Hành
+          Sách Thịnh Hành Gần Đây
         </h2>
-        <a href="/categoryFilter/Trending/1" class="view-all">Xem tất cả</a>
+        <a href="/categoryFilter/Trending/7" class="view-all">Xem tất cả</a>
+      </div>
+      
+      <div class="books-slider-container">
+        <div class="book-slider">
+          {% for book in bookList.trending %}
+            <div>
+              <div class="book-card">
+                <div class="book-cover">
+                  <img class="book-image" src="{{ book.bookImage.url }}" alt="{{ book.book_title }}">
+                  <div class="book-overlay" onclick="window.location.href='/book/detail/id={{ book.book_id|subtract:3000 }}'">
+                    <span class="view-details">Xem chi tiết</span>
+                  </div>
+                </div>
+                <div class="book-info">
+                  <h3 class="book-title">{{ book.book_title }}</h3>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <!-- Popular Books Section -->
+    <section>
+      <div class="section-header">
+        <h2 class="section-title">
+          <span class="section-icon"><i class="fas fa-star"></i></span>
+          Sách Phổ Biến Nhất
+        </h2>
+        <a href="/categoryFilter/Popular/1" class="view-all">Xem tất cả</a>
       </div>
       
       <div class="books-slider-container">

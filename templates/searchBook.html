@@ -345,7 +345,7 @@ body {
                 
                 <span class="separator">|</span>
                 <a href="{% url 'search' ftype=1 query=query search_type=search_type %}" 
-                   class="{% if type == 1 %}active{% endif %}">Lượt xem</a>
+                   class="{% if type == 1 %}active{% endif %}">Phổ biến nhất</a>
                 <span class="separator">|</span>
                 <a href="{% url 'search' ftype=2 query=query search_type=search_type %}" 
                    class="{% if type == 2 %}active{% endif %}">Xuất bản gần đây</a>
@@ -355,6 +355,9 @@ body {
                 <span class="separator">|</span>
                 <a href="{% url 'search' ftype=4 query=query search_type=search_type %}" 
                    class="{% if type == 4 %}active{% endif %}">Đánh giá tốt nhất</a>
+                <span class="separator">|</span>
+                <a href="{% url 'search' ftype=6 query=query search_type=search_type %}" 
+                   class="{% if type == 6 %}active{% endif %}">Đăng mới nhất</a>
             </div>
         </div>
     </div>

@@ -312,8 +312,9 @@ def index(request):
     bookList = {}
     
     # Lấy sách thịnh hành dựa trên kết hợp lượt xem và đánh giá
-    # 1. Lấy sách có rating trung bình cao (≥ 4.0) và có ít nhất 5 lượt đánh giá
     from django.db.models import Count, Avg, F, ExpressionWrapper, FloatField, Q, Case, When, Value
+    from django.db.models.functions import Coalesce
+    from .utils import get_trending_books
     
     # Tính toán điểm phổ biến dựa trên công thức kết hợp lượt xem và đánh giá
     popular_books = Book.objects.annotate(
@@ -327,7 +328,11 @@ def index(request):
         )
     ).order_by('-popularity_score')
     
+    # Lấy sách thịnh hành trong 7 ngày gần đây
+    trending_books = get_trending_books(days=7, limit=10)
+    
     bookList['popular'] = popular_books[:10]
+    bookList['trending'] = trending_books  # Thêm sách thịnh hành vào bookList
     bookList['topVn'] = Book.objects.filter(book_lang='Vietnamese').annotate(
         avg_rating=Avg('rating__rating'),
         rating_count=Count('rating'),
@@ -884,9 +889,10 @@ def test(request):
     return render(request, 'test.html',context)
 
 def categoryFilter(request, cid, type=1):
-    from home.utils import filterBasedType
+    from home.utils import filterBasedType, get_trending_books
     books = Book.objects.all()
     cateName = 'Sách Thịnh Hành'
+    
     # Phân loại dựa vào category
     if cid == 'Recommended':
         if not request.user.is_authenticated:
@@ -896,17 +902,25 @@ def categoryFilter(request, cid, type=1):
             messages.info(request, "Bạn cần đánh giá ít nhất 5 cuốn sách để nhận được gợi ý")
             return redirect('home')
         books = get_recommendations(request.user.id, num_recommendations=20)
-        cateName = 'Sách Gợi Ý Cho Bạn'
-    elif cid != 'Trending':
+        cateName = 'Sách Gợi Ý Cho Bạn'\
+            
+    elif cid == 'Trending':
+        cateName = 'Sách Thịnh Hành Gần Đây'
+        # Nếu có type=7, sử dụng filterBasedType với type=7
+        books = filterBasedType(books=books, type=7)
+    elif cid == 'Popular':
+        # Lấy sách phổ biến nhất
+        cateName = 'Sách Phổ Biến Nhất'
+        # Sử dụng filterBasedType với type=1 (phổ biến nhất)
+        books = filterBasedType(books=books, type=1)
+    else:
         lang = 'Foreign'
         cateName='Sách Ngoại Văn'
         if cid == 'Tiếng Việt':
             lang = 'Vietnamese'
             cateName = 'Sách Tiếng Việt'
         books = books.filter(book_lang=lang)
-    
-    # Phân loại dựa vào filter type
-    if cid != 'Recommended':  # Không áp dụng filter cho sách gợi ý
+        # Áp dụng filter type cho sách ngoại văn và tiếng Việt
         books = filterBasedType(books=books, type=type)
     
     # Kiểm tra nếu không có sách

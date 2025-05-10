@@ -281,22 +281,38 @@
         <div class="filter">
             <span>Sắp xếp theo: </span>
             <div class="filter-options">
-                {% if cid %}
-                    <a href="/categoryFilter/{{cid}}/1" class="{% if filter_type == 1 %}active{% endif %}">Lượt xem</a>
+                {% if cid == 'Trending' %}
+                    <a href="/categoryFilter/{{cid}}/7" class="{% if filter_type == 7 %}active{% endif %}">Thịnh hành nhất</a>
+                    <span class="separator">|</span>
+                    <a href="/categoryFilter/{{cid}}/1" class="{% if filter_type == 1 %}active{% endif %}">Phổ biến nhất</a>
                     <span class="separator">|</span>
                     <a href="/categoryFilter/{{cid}}/2" class="{% if filter_type == 2 %}active{% endif %}">Xuất bản gần đây</a>
                     <span class="separator">|</span>
                     <a href="/categoryFilter/{{cid}}/3" class="{% if filter_type == 3 %}active{% endif %}">Đánh giá nhiều</a>
                     <span class="separator">|</span>
                     <a href="/categoryFilter/{{cid}}/4" class="{% if filter_type == 4 %}active{% endif %}">Đánh giá tốt nhất</a>
+                    <span class="separator">|</span>
+                    <a href="/categoryFilter/{{cid}}/6" class="{% if filter_type == 6 %}active{% endif %}">Đăng mới nhất</a>
+                {% elif cid %}
+                    <a href="/categoryFilter/{{cid}}/1" class="{% if filter_type == 1 %}active{% endif %}">Phổ biến nhất</a>
+                    <span class="separator">|</span>
+                    <a href="/categoryFilter/{{cid}}/2" class="{% if filter_type == 2 %}active{% endif %}">Xuất bản gần đây</a>
+                    <span class="separator">|</span>
+                    <a href="/categoryFilter/{{cid}}/3" class="{% if filter_type == 3 %}active{% endif %}">Đánh giá nhiều</a>
+                    <span class="separator">|</span>
+                    <a href="/categoryFilter/{{cid}}/4" class="{% if filter_type == 4 %}active{% endif %}">Đánh giá tốt nhất</a>
+                    <span class="separator">|</span>
+                    <a href="/categoryFilter/{{cid}}/6" class="{% if filter_type == 6 %}active{% endif %}">Đăng mới nhất</a>
                 {% elif tid %}
-                    <a href="/topicFilter/{{tid}}/1" class="{% if filter_type == 1 %}active{% endif %}">Lượt xem</a>
+                    <a href="/topicFilter/{{tid}}/1" class="{% if filter_type == 1 %}active{% endif %}">Phổ biến nhất</a>
                     <span class="separator">|</span>
                     <a href="/topicFilter/{{tid}}/2" class="{% if filter_type == 2 %}active{% endif %}">Xuất bản gần đây</a>
                     <span class="separator">|</span>
                     <a href="/topicFilter/{{tid}}/3" class="{% if filter_type == 3 %}active{% endif %}">Đánh giá nhiều</a>
                     <span class="separator">|</span>
                     <a href="/topicFilter/{{tid}}/4" class="{% if filter_type == 4 %}active{% endif %}">Đánh giá tốt nhất</a>
+                    <span class="separator">|</span>
+                    <a href="/topicFilter/{{tid}}/6" class="{% if filter_type == 6 %}active{% endif %}">Đăng mới nhất</a>
                 {% endif %}
             </div>
         </div>
