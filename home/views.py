@@ -892,6 +892,7 @@ def categoryFilter(request, cid, type=1):
     from home.utils import filterBasedType, get_trending_books
     books = Book.objects.all()
     cateName = 'Sách Thịnh Hành'
+    original_type = type  # Lưu lại type ban đầu để sử dụng sau
     
     # Phân loại dựa vào category
     if cid == 'Recommended':
@@ -902,26 +903,38 @@ def categoryFilter(request, cid, type=1):
             messages.info(request, "Bạn cần đánh giá ít nhất 5 cuốn sách để nhận được gợi ý")
             return redirect('home')
         books = get_recommendations(request.user.id, num_recommendations=20)
-        cateName = 'Sách Gợi Ý Cho Bạn'\
+        cateName = 'Sách Gợi Ý Cho Bạn'
+        
+        # Chuyển danh sách sách gợi ý thành QuerySet để có thể sắp xếp
+        if books:
+            book_ids = [book.book_id for book in books]
+            books = Book.objects.filter(book_id__in=book_ids)
             
     elif cid == 'Trending':
         cateName = 'Sách Thịnh Hành Gần Đây'
-        # Nếu có type=7, sử dụng filterBasedType với type=7
-        books = filterBasedType(books=books, type=7)
+        # Lấy tất cả sách thịnh hành (limit=1000 để đảm bảo lấy tất cả)
+        trending_books = get_trending_books(days=7, limit=100)
+        if trending_books:
+            book_ids = [book.book_id for book in trending_books]
+            books = Book.objects.filter(book_id__in=book_ids)
+        else:
+            books = Book.objects.none()
+            
     elif cid == 'Popular':
         # Lấy sách phổ biến nhất
         cateName = 'Sách Phổ Biến Nhất'
-        # Sử dụng filterBasedType với type=1 (phổ biến nhất)
-        books = filterBasedType(books=books, type=1)
-    else: #săp xe
+        # Không cần filter đặc biệt ở đây, sẽ sắp xếp theo type sau
+        
+    else: # Sắp xếp theo ngôn ngữ
         lang = 'Foreign'
-        cateName='Sách Ngoại Văn'
+        cateName = 'Sách Ngoại Văn'
         if cid == 'Tiếng Việt':
             lang = 'Vietnamese'
             cateName = 'Sách Tiếng Việt'
         books = books.filter(book_lang=lang)
-        # Áp dụng filter type cho sách ngoại văn và tiếng Việt
-        books = filterBasedType(books=books, type=type)
+    
+    # Áp dụng sắp xếp theo type cho tất cả các category
+    books = filterBasedType(books=books, type=original_type)
     
     # Kiểm tra nếu không có sách
     if not books:
@@ -951,7 +964,7 @@ def categoryFilter(request, cid, type=1):
         'page_numbers': page_numbers,
         'countRates': countRates,
         'averRates': averRates,
-        'filter_type': type
+        'filter_type': original_type
     }
     return render(request, 'filterBook.html', context)
 

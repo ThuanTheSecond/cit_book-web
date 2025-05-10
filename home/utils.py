@@ -241,8 +241,8 @@ def filterBasedType(books, type):
         # Sắp xếp theo thời gian tạo mới nhất
         books = books.order_by('-created_at')
     elif type == 7:
-        # Sắp xếp theo thịnh hành (7 ngày gần đây)
-        books = get_trending_books(days=7, limit=100)
+        # Sử dụng hàm get_trending_books đã sửa đổi, truyền vào books_queryset
+        books = get_trending_books(days=7, limit=100, books_queryset=books)
     
     return books
     
@@ -320,19 +320,24 @@ def update_recommendation_model():
         logger.error(f"Error updating model: {str(e)}")
         return False
 
-def get_trending_books(days=7, limit=10):
-    """Lấy sách thịnh hành dựa trên hoạt động trong 7 ngày gần đây"""
+def get_trending_books(days=7, limit=10, books_queryset=None):
     from django.db.models import Count, F, ExpressionWrapper, FloatField, Q, Case, When, Value
     from django.db.models.functions import Coalesce
     from django.utils import timezone
     from .models import Book
     import datetime
     
-    # Xác định thời điểm bắt đầu tính "gần đây" (7 ngày)
+    # Xác định thời điểm bắt đầu tính "gần đây"
     recent_date = timezone.now() - datetime.timedelta(days=days)
     
+    # Sử dụng books_queryset nếu được cung cấp, nếu không thì lấy tất cả sách
+    if books_queryset is None:
+        base_queryset = Book.objects.all()
+    else:
+        base_queryset = books_queryset
+    
     # Lấy danh sách sách và tính điểm thịnh hành
-    trending_books = Book.objects.annotate(
+    trending_books = base_queryset.annotate(
         # Số lượng đánh giá gần đây
         recent_ratings=Count(
             'rating',
