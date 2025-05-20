@@ -1,5 +1,5 @@
 {% comment %} Đây là thanh phân trang {% endcomment %}
-<nav aria-label="Page navigation example">
+<nav aria-label="Page navigation example" style="background: linear-gradient(to right, #f1e6ff, #c7d7e9);">
     <ul class="pagination justify-content-center">
         <!-- First and Previous buttons -->
         {% if page_obj.has_previous %}
@@ -59,3 +59,80 @@
         </div>
     </ul>
 </nav>
+<style>
+    /* Pagination styling */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        list-style: none;
+        padding: 0;
+        margin: 20px 0;
+    }
+    
+    .pagination .page-item {
+        margin: 0 3px;
+    }
+    
+    /* Normal page links */
+    .pagination .page-item .page-link {
+        display: inline-block;
+        padding: 8px 14px;
+        color: #0d6efd;
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        text-decoration: none;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+    }
+    
+    /* Hover effect for page links */
+    .pagination .page-item .page-link:hover {
+        background-color:rgb(0, 61, 154);
+        color: white;
+        border-color: rgb(0, 61, 154);
+        transform: translateY(-2px);
+        box-shadow: 0 3px 5px rgba(0,0,0,0.1);
+    }
+    
+    /* Active page */
+    .pagination .page-item.active .page-link {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        color: white;
+        font-weight: bold;
+        box-shadow: 0 2px 5px rgba(13, 110, 253, 0.3);
+    }
+    
+    /* Disabled page items */
+    .pagination .page-item.disabled .page-link {
+        color: #6c757d;
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+        pointer-events: none;
+        opacity: 0.6;
+    }
+    
+    /* Page info styling */
+    .page-info {
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        color: white;
+        background-color: #0d6efd;
+        padding: 5px 10px;
+        border-radius: 4px;
+        margin-left: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .page-info span {
+        font-weight: bold;
+    }
+    
+    /* First/Last buttons */
+    .pagination .page-item:first-child .page-link,
+    .pagination .page-item:last-child .page-link {
+        font-weight: bold;
+    }
+
+</style>

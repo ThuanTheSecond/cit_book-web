@@ -122,8 +122,14 @@ class BookAdmin(admin.ModelAdmin):
                 # Lưu các instance mới và cập nhật
                 for instance in instances:
                     if not instance.pk:  # Nếu là instance mới
-                        instance.book_id = form.instance
-                    instance.save()
+                        # Sử dụng update_or_create để tránh lỗi trùng lặp
+                        Book_Topic.objects.update_or_create(
+                            book_id=form.instance,
+                            topic_id=instance.topic_id,
+                            defaults={}
+                        )
+                    else:
+                        instance.save()
                 
                 # Đảm bảo tất cả các m2m relations được lưu
                 formset.save_m2m()

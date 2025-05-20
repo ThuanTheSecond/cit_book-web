@@ -16,16 +16,16 @@
         </div>
     </div>
 
-    <nav class= "navbar navbar-expand-lg navbar-light nav-fill">
+    <nav class= "navbar navbar-expand-lg navbar-light nav-fill" style="background: linear-gradient(to right, #f1e6ff, #c7d7e9);">
         <div class= "container-fluid">
             <div class="navbar-header">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'myBook' %}">Wishlist của tôi</a>
+                        <a class="nav-link" href="{% url 'myBook' %}" id="wishlist-link">Wishlist của tôi</a>
                     </li>
                     <li class="nav-item dropdown" id="topic-dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" aria-expanded="false" hx-post='/topicList_post/' hx-trigger='mouseenter once' hx-target='#topicList'>
-                            Thể loại sách
+                            Thể loại sách  <i class="fas fa-caret-down icondown"></i>
                         </a>
                         <div class="dropdown-menu alphabet-menu" id="topicList" aria-labelledby="navbarDropdownMenuLink">
                             <div class="menu-header">
@@ -55,14 +55,14 @@
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         position: relative;
         z-index: 900; /* Thấp hơn header (9999) */
-        margin-top: 50px; /* Chiều cao của header */
+        margin-top: 24px; /* Chiều cao của header */
         padding-top: 20px;
-        background: #f8f8f8;
+        background: linear-gradient(to right, #f1e6ff, #c7d7e9);
     }
     
     /* Search wrapper */
     .search-wrapper {
-        background: linear-gradient(to right, #f5f2e6, #c7d7e9);
+        background: linear-gradient(to right, #f1e6ff, #c7d7e9);
         padding: 15px 0;
     }
     
@@ -337,7 +337,7 @@
         width: 100%;
         display: flex;
         justify-content: center;
-        background-color: rgba(0, 0, 0, 0.05);
+        background: linear-gradient(to right, #f1e6ff, #c7d7e9);
     }
     
     .navbar-nav {
@@ -774,6 +774,49 @@
         margin-top: 10px;
         font-size: 14px;
     }
+    /* Common button styling for both buttons */
+    .navbar-nav .nav-item .nav-link {
+        background-color:rgb(13, 197, 253);
+        color: white !important;
+        padding: 10px 20px;
+        border-radius: 20px;
+        margin-right: 15px;
+        transition: all 0.2s ease;
+        text-align: center;
+        font-weight: 500;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid #0b5ed7;
+    }
+    
+    /* Specific styling for wishlist button */
+    #wishlist-link:hover {
+        background-color: #0b5ed7;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgb(0 0 0 / 64%);
+    }
+    
+    /* Specific styling for category dropdown button */
+    #navbarDropdownMenuLink:hover {
+        background-color: #0b5ed7;
+        box-shadow: inset 2px 5px 7px rgb(0 0 0 / 64%);
+    }
+    
+    /* Remove the existing hover effects that conflict */
+    .nav-link:after {
+        display: none;
+    }
+    
+    .nav-link:hover:after {
+        width: 0;
+    }
+    
+    .icondown{
+        margin-left: 5px;
+    }
+    
 </style>
 
 {% block scripts %}
