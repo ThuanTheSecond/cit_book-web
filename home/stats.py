@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import Count
+from django.db.models import Count, Avg
 from django.utils import timezone
 from django.http import JsonResponse
 from datetime import timedelta
@@ -8,7 +8,7 @@ import json
 import logging
 
 logger = logging.getLogger(__name__)
-from .models import Book, Topic, Book_Topic, BookViewHistory, AuthorViewHistory
+from .models import Book, Topic, Book_Topic, BookViewHistory, AuthorViewHistory, Rating
 
 @staff_member_required
 def admin_stats_view(request):
@@ -630,4 +630,4 @@ def get_most_read_books(request):
         'values': values,
         'authors': authors,
         'book_ids': book_ids
-    }) 
+    })

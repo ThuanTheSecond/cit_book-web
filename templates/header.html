@@ -9,10 +9,14 @@
                         CIT LIBRARY
                     </a>
                 </li>
-                {% comment %} <li><a href="#"><i class="fa fa-phone"></i> +91 911111113664</a></li> {% endcomment %}
             </ul>
             
-            <ul class="header-links pull-right">
+            <!-- Mobile menu toggle button -->
+            <button id="mobile-menu-toggle" class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <ul class="header-links pull-right" id="header-menu">
                 {% if user.is_authenticated %}
                   <li><a href="{% url 'profile' %}"><i class="fas fa-user"></i>Xin chào {{user.username}}</a></li>
                   <li class="active"><a href="{% url 'index' %}"><i class="fas fa-home"></i>Home</a></li>
@@ -31,12 +35,9 @@
 </header>
 
 <style>
-    /* Header fixed khi scroll */
+    /* Header styling - not fixed */
     #top-header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
+        position: relative;
         width: 100%;
         z-index: 9999;
         background-color: #2874f0;
@@ -50,9 +51,10 @@
         display: flex;
         justify-content: space-between;
         height: 50px;
+        position: relative;
     }
     
-    /* Logo style */
+    /* Logo style - keep on one line */
     .school-logo {
         display: flex !important;
         align-items: center !important;
@@ -62,10 +64,97 @@
         font-family: 'Roboto Slab', serif;
         font-weight: 500;
         transition: opacity 0.3s;
+        white-space: nowrap;
     }
     
     .school-logo:hover {
         opacity: 0.9;
+    }
+    
+    /* Mobile menu toggle button */
+    .mobile-menu-btn {
+        display: none;
+        background: transparent;
+        border: none;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 10px;
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 1001;
+    }
+    
+    .mobile-menu-btn:focus {
+        outline: none;
+    }
+    
+    /* Responsive header adjustments */
+    @media (max-width: 768px) {
+        #top-header .container {
+            height: auto;
+            min-height: 50px;
+            padding: 0 15px;
+            justify-content: flex-start;
+        }
+        
+        .header-links.pull-left {
+            width: auto;
+            margin-bottom: 0;
+        }
+        
+        .mobile-menu-btn {
+            display: block;
+        }
+        
+        .header-links.pull-right {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: #2874f0;
+            flex-direction: column;
+            width: 100%;
+            padding: 10px 0;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        
+        .header-links.pull-right.show {
+            display: flex;
+        }
+        
+        .header-links.pull-right li {
+            margin: 5px 0;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .header-links.pull-right li a {
+            padding: 10px 15px;
+            display: block;
+            width: 100%;
+        }
+    }
+    
+    /* Specific adjustments for 6.4-inch phones */
+    @media screen and (max-width: 412px) and (min-height: 915px), 
+           screen and (max-width: 450px) and (min-height: 950px) {
+        .header-links.pull-right li a {
+            font-size: 14px;
+            padding: 8px 15px;
+        }
+    }
+    
+    /* Very small screens */
+    @media (max-width: 375px) {
+        .header-links.pull-right li a {
+            font-size: 13px;
+            padding: 8px 10px;
+        }
     }
     
     .logo-img {
@@ -111,9 +200,36 @@
 </style>
 
 <script>
-// Thêm padding-top cho body để tránh bị che khi fixed header
 document.addEventListener('DOMContentLoaded', function() {
-    document.body.style.paddingTop = '50px';
+    // Mobile menu toggle functionality
+    const menuToggle = document.getElementById('mobile-menu-toggle');
+    const headerMenu = document.getElementById('header-menu');
+    
+    if (menuToggle && headerMenu) {
+        menuToggle.addEventListener('click', function() {
+            headerMenu.classList.toggle('show');
+            
+            // Change icon based on menu state
+            const icon = menuToggle.querySelector('i');
+            if (headerMenu.classList.contains('show')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        });
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!headerMenu.contains(event.target) && !menuToggle.contains(event.target) && headerMenu.classList.contains('show')) {
+                headerMenu.classList.remove('show');
+                const icon = menuToggle.querySelector('i');
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        });
+    }
 });
 </script>
 
