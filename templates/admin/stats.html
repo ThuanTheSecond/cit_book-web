@@ -548,6 +548,49 @@
   body.dark-mode .most-read-table .loading-text {
     color: #94a3b8;
   }
+  
+  /* Rating Overview Cards */
+  .rating-overview-section {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    margin: 20px 0;
+  }
+  
+  .rating-overview-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+  }
+  
+  .info-card-value {
+    font-size: 24px;
+    font-weight: 600;
+    color: #f59e0b;
+    margin-top: 5px;
+  }
+  
+  /* Dark mode for rating overview */
+  body.dark-mode .rating-overview-section {
+    background: #1e1e2d;
+  }
+  
+  body.dark-mode .info-card-value {
+    color: #fbbf24;
+  }
+  
+  @media (max-width: 1024px) {
+    .rating-overview-cards {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 640px) {
+    .rating-overview-cards {
+      grid-template-columns: 1fr;
+    }
+  }
 </style>
 {% endblock %}
 
@@ -638,6 +681,29 @@
       </div>
     </div>
 
+    <!-- Rating Overview Section (Add after summary cards) -->
+    <div class="rating-overview-section" style="margin: 20px 0;">
+      <h2 class="section-title">Tổng quan đánh giá</h2>
+      <div class="rating-overview-cards" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
+        <div class="info-card">
+          <div class="info-card-title">Điểm trung bình</div>
+          <div class="info-card-value" id="avg-rating">--</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-title">Tổng đánh giá</div>
+          <div class="info-card-value" id="total-ratings-overview">--</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-title">Sách có đánh giá</div>
+          <div class="info-card-value" id="books-with-ratings">--</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-title">Tỷ lệ phủ sóng</div>
+          <div class="info-card-value" id="rating-coverage">--%</div>
+        </div>
+      </div>
+    </div>
+
     <!-- Main Grid Layout -->
     <div class="stats-main-grid" style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-top: 30px;">
 
@@ -657,36 +723,43 @@
         </div>
       </div>
 
-      <!-- Right Column: Popular Genres, Top Books, New Users -->
+      <!-- Right Column: Add new rating charts -->
       <div class="stats-grid-right" style="display: flex; flex-direction: column; gap: 20px;">
+         <!-- Rating Distribution Chart (New) -->
+         <div class="chart-box">
+            <div class="chart-header"><h2 class="chart-title">Phân bố đánh giá</h2></div>
+            <div class="chart-container" style="height: 300px;"><canvas id="rating-distribution-chart"></canvas></div>
+          </div>
+          
          <!-- Popular Genres Chart -->
          <div class="chart-box">
             <div class="chart-header"><h2 class="chart-title">Thể loại phổ biến</h2></div>
             <div class="chart-container" style="height: 300px;"><canvas id="popular-genres-chart"></canvas></div>
           </div>
           
-          <!-- Top 10 Books Table (Moved Up) -->
+          <!-- Top Rated Books Table (New) -->
           <div class="most-read-books-section" style="flex-grow: 1; margin: 0; display: flex; flex-direction: column;">
-            <h2 class="section-title">Top 10 sách được đọc nhiều nhất</h2>
-            <div class="table-responsive" style="flex-grow: 1; max-height: 300px; overflow-y: auto;"> <!-- Adjusted max-height -->
+            <h2 class="section-title">Top 10 sách được đánh giá cao nhất</h2>
+            <div class="table-responsive" style="flex-grow: 1; max-height: 300px; overflow-y: auto;">
               <table class="most-read-table">
                 <thead>
                   <tr>
                     <th>STT</th>
                     <th>Tên sách</th>
                     <th>Tác giả</th>
-                    <th>Lượt đọc</th>
+                    <th>Điểm TB</th>
+                    <th>Số đánh giá</th>
                     <th>Hành động</th>
                   </tr>
                 </thead>
-                <tbody id="most-read-books-table">
-                  <tr><td colspan="5" class="loading-text">Đang tải dữ liệu...</td></tr>
+                <tbody id="top-rated-books-table">
+                  <tr><td colspan="6" class="loading-text">Đang tải dữ liệu...</td></tr>
                 </tbody>
               </table>
             </div>
           </div>
 
-          <!-- New Users Chart (Moved Down) -->
+          <!-- New Users Chart -->
           <div class="chart-box">
             <div class="chart-header"><h2 class="chart-title">Người dùng mới</h2></div>
             <div class="chart-container" style="height: 300px;"><canvas id="new-users-chart"></canvas></div>
@@ -734,8 +807,8 @@
     const minLoadInterval = 5000; // 5 giây
     let activeDays = 7; // Mặc định là 7 ngày
     
-    // Tạo các biến chart để lưu trữ instances
-    let newBooksChart, newUsersChart, bookViewsChart, popularGenresChart, activityTimelineChart;
+    // Tạo các biến chart để lưu trữ instances (remove dailyRatingsChart)
+    let newBooksChart, newUsersChart, bookViewsChart, popularGenresChart, activityTimelineChart, ratingDistributionChart;
     
     // Hàm hiển thị trạng thái loading
     function setLoadingState(isLoading) {
@@ -778,6 +851,11 @@
         
         // Tải dữ liệu hoạt động theo thời gian
         await loadActivityTimelineChart(days);
+        
+        // Thêm các hàm tải dữ liệu rating (remove get_daily_ratings)
+        await loadRatingDistributionChart(days);
+        await loadTopRatedBooksTable();
+        await loadRatingOverview();
         
         console.log('Đã tải tất cả dữ liệu thành công');
         return true;
@@ -1038,6 +1116,109 @@
         return true;
       } catch (error) {
         console.error('Lỗi khi tải dữ liệu hoạt động theo thời gian:', error);
+        return false;
+      }
+    }
+    
+    // Hàm tải dữ liệu phân bố đánh giá
+    async function loadRatingDistributionChart(days) {
+      try {
+        const response = await fetch(`/admin/api/stats/rating-distribution/?days=${days}`);
+        if (!response.ok) throw new Error('Lỗi khi tải dữ liệu phân bố đánh giá');
+        
+        const data = await response.json();
+        const ctx = document.getElementById('rating-distribution-chart').getContext('2d');
+        
+        // Hủy chart cũ nếu đã tồn tại
+        if (ratingDistributionChart) ratingDistributionChart.destroy();
+        
+        // Tạo chart mới
+        ratingDistributionChart = new Chart(ctx, {
+          type: 'pie',
+          data: {
+            labels: data.labels,
+            datasets: [{
+              data: data.values,
+              backgroundColor: [
+                'rgba(239, 68, 68, 0.7)',   // 1 sao - đỏ
+                'rgba(245, 158, 11, 0.7)',  // 2 sao - cam
+                'rgba(250, 204, 21, 0.7)',  // 3 sao - vàng
+                'rgba(34, 197, 94, 0.7)',   // 4 sao - xanh lá
+                'rgba(16, 185, 129, 0.7)'   // 5 sao - xanh ngọc
+              ],
+              borderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom'
+              }
+            }
+          }
+        });
+        
+        return true;
+      } catch (error) {
+        console.error('Lỗi khi tải dữ liệu phân bố đánh giá:', error);
+        return false;
+      }
+    }
+    
+    // Hàm tải dữ liệu top sách đánh giá cao
+    async function loadTopRatedBooksTable() {
+      try {
+        const response = await fetch('/admin/api/stats/top-rated-books/');
+        if (!response.ok) throw new Error('Lỗi khi tải top sách đánh giá cao');
+        
+        const data = await response.json();
+        const tableBody = document.getElementById('top-rated-books-table');
+        
+        tableBody.innerHTML = '';
+        
+        data.labels.forEach((title, index) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${title}</td>
+            <td>${data.authors[index]}</td>
+            <td><span style="color: #f59e0b; font-weight: bold;">${data.values[index].toFixed(2)}⭐</span></td>
+            <td>${data.rating_counts[index]}</td>
+            <td>
+              <a href="/book/detail/id=${index + 1}" class="action-btn" target="_blank">
+                <i class="fas fa-eye"></i> Xem
+              </a>
+            </td>
+          `;
+          tableBody.appendChild(row);
+        });
+        
+        return true;
+      } catch (error) {
+        console.error('Lỗi khi tải top sách đánh giá cao:', error);
+        return false;
+      }
+    }
+    
+    // Hàm tải tổng quan đánh giá
+    async function loadRatingOverview() {
+      try {
+        const response = await fetch('/admin/api/stats/rating-overview/');
+        if (!response.ok) throw new Error('Lỗi khi tải tổng quan đánh giá');
+        
+        const data = await response.json();
+        
+        // Display with more decimal places for double precision
+        document.getElementById('avg-rating').textContent = `${data.average_rating.toFixed(2)}⭐`;
+        document.getElementById('total-ratings-overview').textContent = formatNumber(data.total_ratings);
+        document.getElementById('books-with-ratings').textContent = formatNumber(data.books_with_ratings);
+        document.getElementById('rating-coverage').textContent = `${data.rating_coverage.toFixed(1)}%`;
+        
+        return true;
+      } catch (error) {
+        console.error('Lỗi khi tải tổng quan đánh giá:', error);
         return false;
       }
     }

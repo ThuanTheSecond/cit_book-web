@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from .admin import admin_site
+from . import stats  # Import the stats module
 
 urlpatterns = [
     path('', views.index, name='index'),

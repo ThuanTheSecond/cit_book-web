@@ -223,6 +223,11 @@ class CITLibraryAdminSite(admin.AdminSite):
             path('api/stats/activity-timeline/', self.admin_view(stats.get_activity_timeline), name='admin_activity_timeline'),
             path('api/stats/summary/', self.admin_view(stats.get_summary_stats), name='admin_summary_stats'),
             path('api/stats/most-read-books/', self.admin_view(stats.get_most_read_books), name='admin_most_read_books'),
+            
+            # Add the missing rating endpoints
+            path('api/stats/rating-distribution/', self.admin_view(stats.get_rating_distribution), name='admin_rating_distribution'),
+            path('api/stats/top-rated-books/', self.admin_view(stats.get_top_rated_books), name='admin_top_rated_books'),
+            path('api/stats/rating-overview/', self.admin_view(stats.get_rating_overview), name='admin_rating_overview'),
         ]
         return custom_urls + urls
 
