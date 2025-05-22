@@ -54,12 +54,20 @@ class Book_TopicInline(admin.TabularInline):
         """Tùy chỉnh formset để validate dữ liệu"""
         formset = super().get_formset(request, obj, **kwargs)
         
-        # Override clean method để thêm validation
+        # Simple validation
+        original_clean = formset.form.clean
+        
         def clean(self):
-            cleaned_data = super(formset.form, self).clean()
-            if not cleaned_data.get('DELETE', False):  # Chỉ validate nếu form không bị đánh dấu xóa
-                if not cleaned_data.get('topic_id'):
-                    raise forms.ValidationError('Vui lòng chọn chủ đề')
+            cleaned_data = original_clean(self)
+            
+            # Skip validation for forms marked for deletion
+            if cleaned_data.get('DELETE', False):
+                return cleaned_data
+                
+            # Check if topic is selected for non-deleted forms
+            if not cleaned_data.get('topic_id'):
+                raise forms.ValidationError('Vui lòng chọn chủ đề')
+                
             return cleaned_data
             
         formset.form.clean = clean
@@ -108,37 +116,6 @@ class BookAdmin(admin.ModelAdmin):
             obj.book_slug = slugify(obj.book_title)
             obj.save()
             
-    def save_related(self, request, form, formsets, change):
-        """Xử lý lưu các quan hệ many-to-many và inline formsets"""
-        for formset in formsets:
-            # Kiểm tra xem có phải là Book_TopicInline formset không
-            if isinstance(formset, Book_TopicInline):
-                instances = formset.save(commit=False)
-                
-                # Xử lý các instance bị xóa
-                for obj in formset.deleted_objects:
-                    obj.delete()
-                
-                # Lưu các instance mới và cập nhật
-                for instance in instances:
-                    if not instance.pk:  # Nếu là instance mới
-                        # Sử dụng update_or_create để tránh lỗi trùng lặp
-                        Book_Topic.objects.update_or_create(
-                            book_id=form.instance,
-                            topic_id=instance.topic_id,
-                            defaults={}
-                        )
-                    else:
-                        instance.save()
-                
-                # Đảm bảo tất cả các m2m relations được lưu
-                formset.save_m2m()
-            else:
-                formset.save()
-        
-        # Lưu các quan hệ many-to-many khác
-        form.save_m2m()
-
     def get_inline_instances(self, request, obj=None):
         """Đảm bảo inlines được load đúng cách"""
         if not obj:  # Nếu đang tạo mới object
@@ -157,6 +134,55 @@ class BookAdmin(admin.ModelAdmin):
             # Refresh lại object để đảm bảo dữ liệu mới nhất
             obj.refresh_from_db()
         return response
+
+    def save_related(self, request, form, formsets, change):
+        """Xử lý lưu các quan hệ many-to-many và inline formsets"""
+        print(f"=== SAVE_RELATED DEBUG ===")
+        print(f"Change: {change}, Book: {form.instance}")
+        
+        for formset in formsets:
+            print(f"Processing formset: {formset.model}")
+            
+            if formset.model == Book_Topic:
+                print("Found Book_Topic formset")
+                
+                # Get desired topic IDs from the formset
+                desired_topic_ids = []
+                for form_instance in formset.forms:
+                    if (hasattr(form_instance, 'cleaned_data') and 
+                        form_instance.cleaned_data and 
+                        not form_instance.cleaned_data.get('DELETE', False) and
+                        form_instance.cleaned_data.get('topic_id')):
+                        desired_topic_ids.append(form_instance.cleaned_data['topic_id'].pk)
+                
+                print(f"Desired topic IDs: {desired_topic_ids}")
+                
+                # Get current topic IDs for this book
+                current_topic_ids = set(Book_Topic.objects.filter(book_id=form.instance).values_list('topic_id', flat=True))
+                print(f"Current topic IDs: {current_topic_ids}")
+                
+                # Only proceed if there are changes
+                if set(desired_topic_ids) != current_topic_ids:
+                    print("Topic changes detected, updating...")
+                    
+                    # Clear existing relationships
+                    Book_Topic.objects.filter(book_id=form.instance).delete()
+                    
+                    # Create new relationships
+                    for topic_id in desired_topic_ids:
+                        topic = Topic.objects.get(pk=topic_id)
+                        Book_Topic.objects.create(book_id=form.instance, topic_id=topic)
+                        print(f"Created: {form.instance.book_title} - {topic.topic_name}")
+                else:
+                    print("No topic changes detected")
+            else:
+                # Handle other formsets normally
+                print(f"Saving other formset: {formset.model}")
+                formset.save()
+        
+        # Save any other m2m relations
+        form.save_m2m()
+        print("=== END SAVE_RELATED DEBUG ===")
 
 @admin.register(Book_Topic)
 class Book_TopicAdmin(admin.ModelAdmin):

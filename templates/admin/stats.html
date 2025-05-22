@@ -867,20 +867,21 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Kiểm soát việc gọi API
+    // Improved timing control
     let isLoading = false;
     let lastLoadTime = 0;
-    const minLoadInterval = 5000; // 5 giây
-    let activeDays = 7; // Mặc định là 7 ngày
+    const minLoadInterval = 1000;
+    let activeDays = 7;
+    let currentRequest = null;
     
-    // Tạo các biến chart để lưu trữ instances (remove dailyRatingsChart)
+    // Chart variables
     let newBooksChart, newUsersChart, bookViewsChart, popularGenresChart, activityTimelineChart, ratingDistributionChart;
     
-    // Hàm hiển thị trạng thái loading
-    function setLoadingState(isLoading) {
+    // Improved loading state management
+    function setLoadingState(loading) {
       const chartBoxes = document.querySelectorAll('.chart-box');
       chartBoxes.forEach(box => {
-        if (isLoading) {
+        if (loading) {
           box.classList.add('loading');
         } else {
           box.classList.remove('loading');
@@ -888,252 +889,40 @@
       });
     }
     
-    // Hàm chính để tải dữ liệu thống kê
-    async function loadStats(days) {
-      // Kiểm tra nếu đang loading hoặc chưa đủ thời gian để gọi API lại
-      const currentTime = Date.now();
-      if (isLoading || (currentTime - lastLoadTime < minLoadInterval)) {
-        console.log('Đang loading hoặc chưa đủ thời gian, bỏ qua request');
-        return false;
-      }
+    // Helper function for number formatting
+    function formatNumber(num) {
+      return new Intl.NumberFormat('vi-VN').format(num);
+    }
+    
+    // Update summary card helper function
+    function updateSummaryCard(totalId, totalValue, changeId, changeValue) {
+      const totalElement = document.getElementById(totalId);
+      const changeElement = document.getElementById(changeId);
       
-      // Cập nhật trạng thái và thời gian
-      isLoading = true;
-      lastLoadTime = currentTime;
-      setLoadingState(true);
-      
-      try {
-        // Tải dữ liệu sách mới
-        await loadNewBooksChart(days);
-        
-        // Tải dữ liệu người dùng mới
-        await loadNewUsersChart(days);
-        
-        // Tải dữ liệu lượt đọc sách
-        await loadBookViewsChart(days);
-        
-        // Tải dữ liệu thể loại phổ biến
-        await loadPopularGenresChart(days);
-        
-        // Tải dữ liệu hoạt động theo thời gian
-        await loadActivityTimelineChart(days);
-        
-        // Thêm các hàm tải dữ liệu rating (remove get_daily_ratings)
-        await loadRatingDistributionChart(days);
-        await loadTopRatedBooksTable();
-        await loadRatingOverview();
-        
-        console.log('Đã tải tất cả dữ liệu thành công');
-        return true;
-      } catch (error) {
-        console.error('Lỗi khi tải dữ liệu:', error);
-        return false;
-      } finally {
-        // Luôn cập nhật trạng thái khi hoàn thành
-        isLoading = false;
-        setLoadingState(false);
+      if (totalElement) totalElement.textContent = formatNumber(totalValue);
+      if (changeElement) {
+        changeElement.textContent = `${changeValue}%`;
+        const changeContainer = changeElement.closest('.summary-change');
+        if (changeContainer) {
+          changeContainer.className = 'summary-change ' + (changeValue >= 0 ? 'positive' : 'negative');
+        }
       }
     }
     
-    // Hàm tải dữ liệu sách mới
-    async function loadNewBooksChart(days) {
+    // MISSING FUNCTION 1: loadActivityTimelineChart
+    async function loadActivityTimelineChart(days, signal) {
       try {
-        const response = await fetch(`/admin/api/stats/new-books/?days=${days}`);
-        if (!response.ok) throw new Error('Lỗi khi tải dữ liệu sách mới');
+        const response = await fetch(`/admin/api/stats/activity-timeline/?days=${days}`, { signal });
+        if (!response.ok) throw new Error('Error loading activity timeline data');
         
         const data = await response.json();
-        const ctx = document.getElementById('new-books-chart').getContext('2d');
         
-        // Hủy chart cũ nếu đã tồn tại
-        if (newBooksChart) newBooksChart.destroy();
+        if (signal && signal.aborted) return;
         
-        // Tạo chart mới
-        newBooksChart = new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: data.labels,
-            datasets: [{
-              label: 'Sách mới',
-              data: data.values,
-              backgroundColor: 'rgba(59, 130, 246, 0.7)',
-              borderColor: 'rgba(59, 130, 246, 1)',
-              borderWidth: 1
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              y: {
-                beginAtZero: true,
-                ticks: {
-                  precision: 0
-                }
-              }
-            }
-          }
-        });
-        
-        return true;
-      } catch (error) {
-        console.error('Lỗi khi tải dữ liệu sách mới:', error);
-        return false;
-      }
-    }
-    
-    // Hàm tải dữ liệu người dùng mới
-    async function loadNewUsersChart(days) {
-      try {
-        const response = await fetch(`/admin/api/stats/new-users/?days=${days}`);
-        if (!response.ok) throw new Error('Lỗi khi tải dữ liệu người dùng mới');
-        
-        const data = await response.json();
-        const ctx = document.getElementById('new-users-chart').getContext('2d');
-        
-        // Hủy chart cũ nếu đã tồn tại
-        if (newUsersChart) newUsersChart.destroy();
-        
-        // Tạo chart mới
-        newUsersChart = new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: data.labels,
-            datasets: [{
-              label: 'Người dùng mới',
-              data: data.values,
-              backgroundColor: 'rgba(16, 185, 129, 0.7)',
-              borderColor: 'rgba(16, 185, 129, 1)',
-              borderWidth: 1
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              y: {
-                beginAtZero: true,
-                ticks: {
-                  precision: 0
-                }
-              }
-            }
-          }
-        });
-        
-        return true;
-      } catch (error) {
-        console.error('Lỗi khi tải dữ liệu người dùng mới:', error);
-        return false;
-      }
-    }
-    
-    // Hàm tải dữ liệu lượt đọc sách
-    async function loadBookViewsChart(days) {
-      try {
-        const response = await fetch(`/admin/api/stats/book-views/?days=${days}`);
-        if (!response.ok) throw new Error('Lỗi khi tải dữ liệu lượt đọc sách');
-        
-        const data = await response.json();
-        const ctx = document.getElementById('book-views-chart').getContext('2d');
-        
-        // Hủy chart cũ nếu đã tồn tại
-        if (bookViewsChart) bookViewsChart.destroy();
-        
-        // Tạo chart mới
-        bookViewsChart = new Chart(ctx, {
-          type: 'line',
-          data: {
-            labels: data.labels,
-            datasets: [{
-              label: 'Lượt đọc',
-              data: data.values,
-              backgroundColor: 'rgba(245, 158, 11, 0.2)',
-              borderColor: 'rgba(245, 158, 11, 1)',
-              borderWidth: 2,
-              tension: 0.1,
-              fill: true
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              y: {
-                beginAtZero: true
-              }
-            }
-          }
-        });
-        
-        return true;
-      } catch (error) {
-        console.error('Lỗi khi tải dữ liệu lượt đọc sách:', error);
-        return false;
-      }
-    }
-    
-    // Hàm tải dữ liệu thể loại phổ biến
-    async function loadPopularGenresChart(days) {
-      try {
-        const response = await fetch(`/admin/api/stats/popular-genres/?days=${days}`);
-        if (!response.ok) throw new Error('Lỗi khi tải dữ liệu thể loại phổ biến');
-        
-        const data = await response.json();
-        const ctx = document.getElementById('popular-genres-chart').getContext('2d');
-        
-        // Hủy chart cũ nếu đã tồn tại
-        if (popularGenresChart) popularGenresChart.destroy();
-        
-        // Tạo chart mới
-        popularGenresChart = new Chart(ctx, {
-          type: 'doughnut',
-          data: {
-            labels: data.labels,
-            datasets: [{
-              data: data.values,
-              backgroundColor: [
-                'rgba(59, 130, 246, 0.7)',
-                'rgba(16, 185, 129, 0.7)',
-                'rgba(245, 158, 11, 0.7)',
-                'rgba(239, 68, 68, 0.7)',
-                'rgba(139, 92, 246, 0.7)',
-                'rgba(236, 72, 153, 0.7)',
-                'rgba(75, 85, 99, 0.7)'
-              ],
-              borderWidth: 1
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: {
-                position: 'right'
-              }
-            }
-          }
-        });
-        
-        return true;
-      } catch (error) {
-        console.error('Lỗi khi tải dữ liệu thể loại phổ biến:', error);
-        return false;
-      }
-    }
-    
-    // Hàm tải dữ liệu hoạt động theo thời gian
-    async function loadActivityTimelineChart(days) {
-      try {
-        const response = await fetch(`/admin/api/stats/activity-timeline/?days=${days}`);
-        if (!response.ok) throw new Error('Lỗi khi tải dữ liệu hoạt động theo thời gian');
-        
-        const data = await response.json();
         const ctx = document.getElementById('activity-timeline-chart').getContext('2d');
         
-        // Hủy chart cũ nếu đã tồn tại
         if (activityTimelineChart) activityTimelineChart.destroy();
         
-        // Tạo chart mới
         activityTimelineChart = new Chart(ctx, {
           type: 'line',
           data: {
@@ -1172,8 +961,14 @@
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-              y: {
-                beginAtZero: true
+              y: { 
+                beginAtZero: true,
+                ticks: { precision: 0 }
+              }
+            },
+            plugins: {
+              legend: {
+                position: 'top'
               }
             }
           }
@@ -1181,36 +976,289 @@
         
         return true;
       } catch (error) {
-        console.error('Lỗi khi tải dữ liệu hoạt động theo thời gian:', error);
+        if (error.name !== 'AbortError') {
+          console.error('Error loading activity timeline chart:', error);
+        }
+        throw error;
+      }
+    }
+    
+    // MISSING FUNCTION 2: loadSummaryStats
+    async function loadSummaryStats() {
+      try {
+        const response = await fetch('/admin/api/stats/summary/');
+        if (!response.ok) throw new Error('Error loading summary stats');
+        
+        const data = await response.json();
+        
+        // Update summary cards
+        updateSummaryCard('total-books', data.books.total, 'books-change', data.books.change);
+        updateSummaryCard('total-users', data.users.total, 'users-change', data.users.change);
+        updateSummaryCard('total-views', data.views.total, 'views-change', data.views.change);
+        updateSummaryCard('total-ratings', data.ratings.total, 'ratings-change', data.ratings.change);
+        
+        console.log('✅ Summary stats loaded');
+        return true;
+      } catch (error) {
+        console.error('❌ Error loading summary stats:', error);
         return false;
       }
     }
     
-    // Hàm tải dữ liệu phân bố đánh giá
-    async function loadRatingDistributionChart(days) {
+    // MISSING FUNCTION 3: loadMostReadBooks
+    async function loadMostReadBooks() {
       try {
-        const response = await fetch(`/admin/api/stats/rating-distribution/?days=${days}`);
-        if (!response.ok) throw new Error('Lỗi khi tải dữ liệu phân bố đánh giá');
+        const response = await fetch('/admin/api/stats/most-read-books/');
+        if (!response.ok) throw new Error('Error loading most read books');
         
         const data = await response.json();
-        const ctx = document.getElementById('rating-distribution-chart').getContext('2d');
         
-        // Hủy chart cũ nếu đã tồn tại
-        if (ratingDistributionChart) ratingDistributionChart.destroy();
+        // Update most read books table if it exists
+        const tableBody = document.getElementById('most-read-books-table');
+        if (tableBody) {
+          tableBody.innerHTML = '';
+          
+          data.labels.forEach((title, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${index + 1}</td>
+              <td>${title}</td>
+              <td>${data.authors[index]}</td>
+              <td>${data.values[index]}</td>
+              <td>
+                <a href="/book/detail/id=${index + 1}" class="action-btn" target="_blank">
+                  <i class="fas fa-eye"></i> Xem
+                </a>
+              </td>
+            `;
+            tableBody.appendChild(row);
+          });
+        }
         
-        // Tạo chart mới
-        ratingDistributionChart = new Chart(ctx, {
-          type: 'pie',
+        console.log('✅ Most read books loaded');
+        return true;
+      } catch (error) {
+        console.error('❌ Error loading most read books:', error);
+        return false;
+      }
+    }
+    
+    // FIX: Updated loadBookViewsChart - change 'area' to 'line'
+    async function loadBookViewsChart(days, signal) {
+      try {
+        const response = await fetch(`/admin/api/stats/book-views/?days=${days}`, { signal });
+        if (!response.ok) throw new Error('Error loading book views data');
+        
+        const data = await response.json();
+        
+        if (signal && signal.aborted) return;
+        
+        const ctx = document.getElementById('book-views-chart').getContext('2d');
+        
+        if (bookViewsChart) bookViewsChart.destroy();
+        
+        bookViewsChart = new Chart(ctx, {
+          type: 'line', // ✅ Changed from 'area' to 'line'
+          data: {
+            labels: data.labels,
+            datasets: [{
+              label: 'Lượt đọc',
+              data: data.values,
+              borderColor: 'rgba(245, 158, 11, 1)',
+              backgroundColor: 'rgba(245, 158, 11, 0.1)',
+              borderWidth: 2,
+              tension: 0.3,
+              fill: true
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: { beginAtZero: true }
+            }
+          }
+        });
+        
+        return true;
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          console.error('Error loading book views chart:', error);
+        }
+        throw error;
+      }
+    }
+    
+    // Updated main stats loading function
+    async function loadStats(days) {
+      console.log(`📊 Loading stats for ${days} days`);
+      
+      // Cancel previous request if still running
+      if (currentRequest) {
+        console.log('🚫 Cancelling previous request');
+        currentRequest.abort();
+      }
+      
+      // Create new AbortController for this request
+      const controller = new AbortController();
+      currentRequest = controller;
+      
+      // Update loading state
+      isLoading = true;
+      lastLoadTime = Date.now();
+      setLoadingState(true);
+      
+      try {
+        // Load all the chart functions
+        const signal = controller.signal;
+        
+        await Promise.all([
+          loadNewBooksChart(days, signal),
+          loadActivityTimelineChart(days, signal),
+          loadNewUsersChart(days, signal),
+          loadBookViewsChart(days, signal),
+          loadPopularGenresChart(days, signal),
+          loadRatingDistributionChart(days, signal),
+          loadTopRatedBooksTable(signal),
+          loadRatingOverview(signal)
+        ]);
+        
+        console.log('✅ All data loaded successfully');
+        return true;
+      } catch (error) {
+        if (error.name === 'AbortError') {
+          console.log('🔄 Request was cancelled');
+        } else {
+          console.error('❌ Error loading data:', error);
+        }
+        return false;
+      } finally {
+        // Always cleanup
+        isLoading = false;
+        setLoadingState(false);
+        if (currentRequest === controller) {
+          currentRequest = null;
+        }
+      }
+    }
+    
+    // Your existing chart functions remain the same...
+    async function loadNewBooksChart(days, signal) {
+      try {
+        const response = await fetch(`/admin/api/stats/new-books/?days=${days}`, { signal });
+        if (!response.ok) throw new Error('Error loading new books data');
+        
+        const data = await response.json();
+        
+        if (signal && signal.aborted) return;
+        
+        const ctx = document.getElementById('new-books-chart').getContext('2d');
+        
+        if (newBooksChart) newBooksChart.destroy();
+        
+        newBooksChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: data.labels,
+            datasets: [{
+              label: 'Sách mới',
+              data: data.values,
+              backgroundColor: 'rgba(59, 130, 246, 0.7)',
+              borderColor: 'rgba(59, 130, 246, 1)',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { precision: 0 }
+              }
+            }
+          }
+        });
+        
+        return true;
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          console.error('Error loading new books chart:', error);
+        }
+        throw error;
+      }
+    }
+    
+    async function loadNewUsersChart(days, signal) {
+      try {
+        const response = await fetch(`/admin/api/stats/new-users/?days=${days}`, { signal });
+        if (!response.ok) throw new Error('Error loading new users data');
+        
+        const data = await response.json();
+        
+        if (signal && signal.aborted) return;
+        
+        const ctx = document.getElementById('new-users-chart').getContext('2d');
+        
+        if (newUsersChart) newUsersChart.destroy();
+        
+        newUsersChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: data.labels,
+            datasets: [{
+              label: 'Người dùng mới',
+              data: data.values,
+              borderColor: 'rgba(16, 185, 129, 1)',
+              backgroundColor: 'rgba(16, 185, 129, 0.1)',
+              borderWidth: 2,
+              tension: 0.3,
+              fill: true
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: { beginAtZero: true, ticks: { precision: 0 } }
+            }
+          }
+        });
+        
+        return true;
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          console.error('Error loading new users chart:', error);
+        }
+        throw error;
+      }
+    }
+
+    async function loadPopularGenresChart(days, signal) {
+      try {
+        const response = await fetch(`/admin/api/stats/popular-genres/?days=${days}`, { signal });
+        if (!response.ok) throw new Error('Error loading popular genres data');
+        
+        const data = await response.json();
+        
+        if (signal && signal.aborted) return;
+        
+        const ctx = document.getElementById('popular-genres-chart').getContext('2d');
+        
+        if (popularGenresChart) popularGenresChart.destroy();
+        
+        popularGenresChart = new Chart(ctx, {
+          type: 'doughnut',
           data: {
             labels: data.labels,
             datasets: [{
               data: data.values,
               backgroundColor: [
-                'rgba(239, 68, 68, 0.7)',   // 1 sao - đỏ
-                'rgba(245, 158, 11, 0.7)',  // 2 sao - cam
-                'rgba(250, 204, 21, 0.7)',  // 3 sao - vàng
-                'rgba(34, 197, 94, 0.7)',   // 4 sao - xanh lá
-                'rgba(16, 185, 129, 0.7)'   // 5 sao - xanh ngọc
+                'rgba(59, 130, 246, 0.7)',
+                'rgba(16, 185, 129, 0.7)',
+                'rgba(245, 158, 11, 0.7)',
+                'rgba(239, 68, 68, 0.7)',
+                'rgba(139, 92, 246, 0.7)'
               ],
               borderWidth: 2
             }]
@@ -1219,27 +1267,76 @@
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-              legend: {
-                position: 'bottom'
-              }
+              legend: { position: 'bottom' }
             }
           }
         });
         
         return true;
       } catch (error) {
-        console.error('Lỗi khi tải dữ liệu phân bố đánh giá:', error);
-        return false;
+        if (error.name !== 'AbortError') {
+          console.error('Error loading popular genres chart:', error);
+        }
+        throw error;
       }
     }
-    
-    // Hàm tải dữ liệu top sách đánh giá cao
-    async function loadTopRatedBooksTable() {
+
+    async function loadRatingDistributionChart(days, signal) {
       try {
-        const response = await fetch('/admin/api/stats/top-rated-books/');
-        if (!response.ok) throw new Error('Lỗi khi tải top sách đánh giá cao');
+        const response = await fetch(`/admin/api/stats/rating-distribution/?days=${days}`, { signal });
+        if (!response.ok) throw new Error('Error loading rating distribution data');
         
         const data = await response.json();
+        
+        if (signal && signal.aborted) return;
+        
+        const ctx = document.getElementById('rating-distribution-chart').getContext('2d');
+        
+        if (ratingDistributionChart) ratingDistributionChart.destroy();
+        
+        ratingDistributionChart = new Chart(ctx, {
+          type: 'pie',
+          data: {
+            labels: data.labels,
+            datasets: [{
+              data: data.values,
+              backgroundColor: [
+                'rgba(239, 68, 68, 0.7)',
+                'rgba(245, 158, 11, 0.7)',
+                'rgba(250, 204, 21, 0.7)',
+                'rgba(34, 197, 94, 0.7)',
+                'rgba(16, 185, 129, 0.7)'
+              ],
+              borderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'bottom' }
+            }
+          }
+        });
+        
+        return true;
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          console.error('Error loading rating distribution chart:', error);
+        }
+        throw error;
+      }
+    }
+
+    async function loadTopRatedBooksTable(signal) {
+      try {
+        const response = await fetch('/admin/api/stats/top-rated-books/', { signal });
+        if (!response.ok) throw new Error('Error loading top rated books data');
+        
+        const data = await response.json();
+        
+        if (signal && signal.aborted) return;
+        
         const tableBody = document.getElementById('top-rated-books-table');
         
         tableBody.innerHTML = '';
@@ -1263,20 +1360,22 @@
         
         return true;
       } catch (error) {
-        console.error('Lỗi khi tải top sách đánh giá cao:', error);
-        return false;
+        if (error.name !== 'AbortError') {
+          console.error('Error loading top rated books table:', error);
+        }
+        throw error;
       }
     }
-    
-    // Hàm tải tổng quan đánh giá
-    async function loadRatingOverview() {
+
+    async function loadRatingOverview(signal) {
       try {
-        const response = await fetch('/admin/api/stats/rating-overview/');
-        if (!response.ok) throw new Error('Lỗi khi tải tổng quan đánh giá');
+        const response = await fetch('/admin/api/stats/rating-overview/', { signal });
+        if (!response.ok) throw new Error('Error loading rating overview data');
         
         const data = await response.json();
         
-        // Display with more decimal places for double precision
+        if (signal && signal.aborted) return;
+        
         document.getElementById('avg-rating').textContent = `${data.average_rating.toFixed(2)}⭐`;
         document.getElementById('total-ratings-overview').textContent = formatNumber(data.total_ratings);
         document.getElementById('books-with-ratings').textContent = formatNumber(data.books_with_ratings);
@@ -1284,147 +1383,73 @@
         
         return true;
       } catch (error) {
-        console.error('Lỗi khi tải tổng quan đánh giá:', error);
-        return false;
+        if (error.name !== 'AbortError') {
+          console.error('Error loading rating overview:', error);
+        }
+        throw error;
       }
     }
     
-    // Xử lý sự kiện khi người dùng thay đổi khoảng thời gian
+    // Time filter button handling
     document.querySelectorAll('.time-filter-btn').forEach(button => {
-      button.addEventListener('click', function() {
-        // Kiểm tra nếu button này đã active
-        if (this.classList.contains('active')) {
-          console.log('Button này đã được chọn');
+      button.addEventListener('click', async function(e) {
+        e.preventDefault();
+        
+        const days = parseInt(this.dataset.days);
+        console.log(`🔘 Time filter clicked: ${days} days`);
+        
+        if (this.classList.contains('active') && activeDays === days) {
+          console.log('📌 Button already active');
           return;
         }
         
-        // Kiểm tra nếu đang loading
-        if (isLoading) {
-          console.log('Đang tải dữ liệu, vui lòng đợi...');
-          return;
-        }
-        
-        // Cập nhật UI - remove active từ tất cả buttons
         document.querySelectorAll('.time-filter-btn').forEach(btn => {
           btn.classList.remove('active');
+          btn.disabled = false;
         });
         
-        // Thêm active cho button được click
         this.classList.add('active');
         
-        // Thêm hiệu ứng loading cho button
-        const originalText = this.textContent;
-        this.textContent = 'Đang tải...';
-        this.style.pointerEvents = 'none';
+        document.querySelectorAll('.time-filter-btn').forEach(btn => {
+          btn.disabled = true;
+        });
         
-        // Lấy số ngày và tải dữ liệu
-        const days = parseInt(this.dataset.days);
+        const originalText = this.textContent;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tải...';
+        
         activeDays = days;
         
-        // Tải dữ liệu và khôi phục button
-        loadStats(days).finally(() => {
+        try {
+          const success = await loadStats(days);
+          
+          if (success) {
+            console.log(`✅ Successfully loaded ${days} days data`);
+          } else {
+            console.log(`⚠️ Failed to load ${days} days data`);
+          }
+        } catch (error) {
+          console.error('❌ Error in time filter:', error);
+        } finally {
           this.textContent = originalText;
-          this.style.pointerEvents = 'auto';
-        });
+          document.querySelectorAll('.time-filter-btn').forEach(btn => {
+            btn.disabled = false;
+          });
+        }
       });
     });
     
-    // Tải dữ liệu ban đầu
-    loadStats(activeDays);
-    
-    // Tải dữ liệu tổng quan
-    async function loadSummaryStats() {
-      try {
-        const response = await fetch('/admin/api/stats/summary/');
-        if (!response.ok) throw new Error('Lỗi khi tải dữ liệu tổng quan');
-        
-        const data = await response.json();
-        
-        // Cập nhật các thẻ summary
-        updateSummaryCard('total-books', data.books.total, 'books-change', data.books.change);
-        updateSummaryCard('total-users', data.users.total, 'users-change', data.users.change);
-        updateSummaryCard('total-views', data.views.total, 'views-change', data.views.change);
-        updateSummaryCard('total-ratings', data.ratings.total, 'ratings-change', data.ratings.change);
-        
-        return true;
-      } catch (error) {
-        console.error('Lỗi khi tải dữ liệu tổng quan:', error);
-        return false;
-      }
-    }
-    
-    // Hàm cập nhật thẻ tổng quan
-    function updateSummaryCard(valueId, value, changeId, change) {
-      const valueElement = document.getElementById(valueId);
-      const changeElement = document.getElementById(changeId);
-      
-      // Định dạng số
-      valueElement.textContent = formatNumber(value);
-      
-      // Định dạng phần trăm thay đổi
-      if (change >= 0) {
-        changeElement.parentElement.classList.remove('negative');
-        changeElement.parentElement.classList.add('positive');
-        changeElement.parentElement.querySelector('i').className = 'fas fa-arrow-up';
-        changeElement.textContent = `+${change}%`;
+    // Initial load
+    console.log('🚀 Initial load starting...');
+    loadStats(activeDays).then(success => {
+      if (success) {
+        console.log('✅ Initial load completed');
       } else {
-        changeElement.parentElement.classList.remove('positive');
-        changeElement.parentElement.classList.add('negative');
-        changeElement.parentElement.querySelector('i').className = 'fas fa-arrow-down';
-        changeElement.textContent = `${change}%`;
+        console.log('⚠️ Initial load had issues');
       }
-    }
+    });
     
-    // Hàm định dạng số
-    function formatNumber(num) {
-      if (num >= 1000000) {
-        return (num / 1000000).toFixed(1) + 'M';
-      } else if (num >= 1000) {
-        return (num / 1000).toFixed(1) + 'K';
-      }
-      return num.toString();
-    }
-    
-    // Tải dữ liệu top 10 sách được đọc nhiều nhất
-    async function loadMostReadBooks() {
-      try {
-        const response = await fetch('/admin/api/stats/most-read-books/');
-        if (!response.ok) throw new Error('Lỗi khi tải dữ liệu sách đọc nhiều');
-        
-        const data = await response.json();
-        const tableBody = document.getElementById('most-read-books-table');
-        
-        // Xóa thông báo loading
-        tableBody.innerHTML = '';
-        
-        // Thêm dữ liệu vào bảng
-        data.labels.forEach((title, index) => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${index + 1}</td>
-            <td>${title}</td>
-            <td>${data.authors[index]}</td>
-            <td>${data.values[index].toLocaleString()}</td>
-            <td>
-              <a href="/book/detail/id=${data.book_ids[index]}" class="action-btn" target="_blank">
-                <i class="fas fa-eye"></i> Xem
-              </a>
-            </td>
-          `;
-          tableBody.appendChild(row);
-        });
-        
-        return true;
-      } catch (error) {
-        console.error('Lỗi khi tải dữ liệu sách đọc nhiều:', error);
-        return false;
-      }
-    }
-    
-    // Tải dữ liệu tổng quan
+    // Load summary stats and other data
     loadSummaryStats();
-    
-    // Tải dữ liệu top 10 sách được đọc nhiều nhất
     loadMostReadBooks();
   });
 </script>
