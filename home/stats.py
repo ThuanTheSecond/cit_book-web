@@ -444,7 +444,7 @@ def get_book_views(request):
 @staff_member_required
 def get_activity_timeline(request):
     """
-    API trả về dữ liệu hoạt động theo thời gian (đăng nhập, xem sách, tải xuống)
+    API trả về dữ liệu hoạt động theo thời gian (đăng nhập, xem sách, đánh giá)
     """
     days = request.GET.get('days', 7)
     try:
@@ -463,11 +463,18 @@ def get_activity_timeline(request):
             count=Count('id')
         ).order_by('viewed_at__date')
         
+        # Lấy số lượng đánh giá trong từng ngày
+        rating_stats = Rating.objects.filter(
+            created_at__date__gte=start_date
+        ).values('created_at__date').annotate(
+            count=Count('id')
+        ).order_by('created_at__date')
+        
         # Tạo danh sách các ngày
         dates = []
         views = []
         logins = []
-        downloads = []
+        ratings = []
         
         current_date = start_date
         today = timezone.now().date()
@@ -484,11 +491,17 @@ def get_activity_timeline(request):
                     view_count = stat['count']
                     break
             
-            # Dữ liệu mẫu cho đăng nhập và tải xuống (vì chưa có bảng thật)
-            # Trong thực tế, bạn sẽ truy vấn từ bảng LoginHistory và DownloadHistory
+            # Tìm số lượng đánh giá cho ngày hiện tại
+            rating_count = 0
+            for stat in rating_stats:
+                if stat['created_at__date'] == current_date:
+                    rating_count = stat['count']
+                    break
+            
+            # Dữ liệu thực cho views và ratings, dữ liệu mẫu cho logins
             views.append(view_count)
             logins.append(int(view_count * 0.7))  # Giả lập: 70% của lượt xem
-            downloads.append(int(view_count * 0.4))  # Giả lập: 40% của lượt xem
+            ratings.append(rating_count)  # Dữ liệu thực từ bảng Rating
             
             current_date += timedelta(days=1)
     except Exception as e:
@@ -498,23 +511,23 @@ def get_activity_timeline(request):
         dates = []
         views = []
         logins = []
-        downloads = []
+        ratings = []
         for i in range(days):
             date = timezone.now().date() - timedelta(days=i)
             dates.append(date.strftime('%d/%m'))
             views.append(0)
             logins.append(0)
-            downloads.append(0)
+            ratings.append(0)
         dates.reverse()
         views.reverse()
         logins.reverse()
-        downloads.reverse()
+        ratings.reverse()
     
     return JsonResponse({
         'labels': dates,
         'views': views,
         'logins': logins,
-        'downloads': downloads
+        'ratings': ratings  # Thay đổi từ 'downloads' thành 'ratings'
     })
 
 @staff_member_required
@@ -549,9 +562,11 @@ def get_summary_stats(request):
         old_views = BookViewHistory.objects.filter(viewed_at__date__gte=two_weeks_ago, viewed_at__date__lt=week_ago).count()
         view_change = calculate_percentage_change(old_views, new_views)
         
-        # Tải xuống (giả lập)
-        download_count = int(view_count * 0.3)  # Giả sử số lượt tải là 30% số lượt xem
-        download_change = view_change  # Giả sử tỷ lệ thay đổi giống với lượt xem
+        # Đánh giá (dữ liệu thực từ bảng Rating)
+        rating_count = Rating.objects.count()
+        new_ratings = Rating.objects.filter(created_at__date__gte=week_ago).count()
+        old_ratings = Rating.objects.filter(created_at__date__gte=two_weeks_ago, created_at__date__lt=week_ago).count()
+        rating_change = calculate_percentage_change(old_ratings, new_ratings)
         
     except Exception as e:
         # Log the error
@@ -560,11 +575,11 @@ def get_summary_stats(request):
         book_count = 1250
         user_count = 845
         view_count = 32560
-        download_count = 9768
+        rating_count = 4500
         book_change = 5.2
         user_change = 3.8
         view_change = 12.5
-        download_change = 8.7
+        rating_change = 8.7
     
     return JsonResponse({
         'books': {
@@ -579,9 +594,9 @@ def get_summary_stats(request):
             'total': view_count,
             'change': view_change,
         },
-        'downloads': {
-            'total': download_count,
-            'change': download_change,
+        'ratings': {  # Thay đổi từ 'downloads' thành 'ratings'
+            'total': rating_count,
+            'change': rating_change,
         }
     })
 
