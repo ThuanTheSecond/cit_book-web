@@ -130,6 +130,60 @@
     color: white;
   }
   
+  .time-filters {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .time-filter-btn {
+    padding: 8px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    font-weight: 500;
+    outline: none;
+  }
+  
+  .time-filter-btn:hover {
+    border-color: #3b82f6;
+    background: #f3f4f6;
+    transform: translateY(-1px);
+  }
+  
+  .time-filter-btn.active {
+    background: #3b82f6 !important;
+    color: white !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+  }
+  
+  .time-filter-btn.active:hover {
+    background: #2563eb !important;
+    border-color: #2563eb !important;
+  }
+  
+  /* Dark mode styles */
+  body.dark-mode .time-filter-btn {
+    background: #374151;
+    border-color: #4b5563;
+    color: #e5e7eb;
+  }
+  
+  body.dark-mode .time-filter-btn:hover {
+    background: #4b5563;
+    border-color: #6b7280;
+  }
+  
+  body.dark-mode .time-filter-btn.active {
+    background: #3b82f6 !important;
+    color: white !important;
+    border-color: #3b82f6 !important;
+  }
+  
   table.data-table {
     width: 100%;
     border-collapse: collapse;
@@ -238,21 +292,33 @@
   
   .time-filter-btn {
     padding: 8px 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #374151;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    font-weight: 500;
+    outline: none;
   }
   
   .time-filter-btn:hover {
     border-color: #3b82f6;
+    background: #f3f4f6;
+    transform: translateY(-1px);
   }
   
   .time-filter-btn.active {
-    background: #3b82f6;
-    color: white;
-    border-color: #3b82f6;
+    background: #3b82f6 !important;
+    color: white !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+  }
+  
+  .time-filter-btn.active:hover {
+    background: #2563eb !important;
+    border-color: #2563eb !important;
   }
   
   .charts-container {
@@ -1226,19 +1292,40 @@
     // Xử lý sự kiện khi người dùng thay đổi khoảng thời gian
     document.querySelectorAll('.time-filter-btn').forEach(button => {
       button.addEventListener('click', function() {
-        // Kiểm tra nếu button này đã active hoặc đang loading
-        if (this.classList.contains('active') || isLoading) {
+        // Kiểm tra nếu button này đã active
+        if (this.classList.contains('active')) {
+          console.log('Button này đã được chọn');
           return;
         }
         
-        // Cập nhật UI
-        document.querySelector('.time-filter-btn.active').classList.remove('active');
+        // Kiểm tra nếu đang loading
+        if (isLoading) {
+          console.log('Đang tải dữ liệu, vui lòng đợi...');
+          return;
+        }
+        
+        // Cập nhật UI - remove active từ tất cả buttons
+        document.querySelectorAll('.time-filter-btn').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        
+        // Thêm active cho button được click
         this.classList.add('active');
+        
+        // Thêm hiệu ứng loading cho button
+        const originalText = this.textContent;
+        this.textContent = 'Đang tải...';
+        this.style.pointerEvents = 'none';
         
         // Lấy số ngày và tải dữ liệu
         const days = parseInt(this.dataset.days);
         activeDays = days;
-        loadStats(days);
+        
+        // Tải dữ liệu và khôi phục button
+        loadStats(days).finally(() => {
+          this.textContent = originalText;
+          this.style.pointerEvents = 'auto';
+        });
       });
     });
     
