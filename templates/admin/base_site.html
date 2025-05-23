@@ -796,6 +796,11 @@
       height: calc(100vh - 100px);
     }
   }
+
+  #changelist table tbody tr:hover {
+    background-color: #043463d9;
+    cursor: pointer;
+  }
 </style>
 {% endblock %}
 
@@ -837,7 +842,7 @@
         {% endblock %}
     {% endif %}
     <button id="theme-toggle" class="theme-toggle" title="Toggle Dark Mode">
-        <i class="fas fa-moon"></i>
+        <i class="fas fa-sun"></i>
     </button>
 </div>
 {% endblock %}
@@ -874,7 +879,7 @@
 {% block content_container %}
 <div id="toast-container" class="toast-container"></div>
 <button id="fixed-theme-toggle" class="fixed-theme-toggle" title="Toggle Dark Mode">
-  <i class="fas fa-moon"></i>
+  <i class="fas fa-sun"></i>
 </button>
 <div id="sidebar">
   <div class="sidebar-search">

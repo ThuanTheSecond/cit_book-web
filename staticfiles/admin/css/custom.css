@@ -23,7 +23,7 @@ body, button, input, select, textarea {
 }
 
 #changelist table tbody tr:hover {
-  background-color: #f8fafc;
+  background-color: #043463d9;
 }
 
 /* Style form rows */
