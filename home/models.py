@@ -46,7 +46,17 @@ class Book(models.Model):
     updated_at = models.DateTimeField(auto_now=True)  # Đã ok
     
     def __str__(self):
-        return f'{self.book_id-3000}-{self.book_title},{self.book_author},{self.book_publish},{self.book_position},{self.book_MFN},{self.is_active}' 
+        # Handle case when book_id is None (new book not saved yet)
+        display_id = (self.book_id - 3000) if self.book_id is not None else "NEW"
+        
+        # Handle potential None values in other fields
+        title = self.book_title or "Untitled"
+        author = self.book_author or "Unknown"
+        publish = self.book_publish or "No info"
+        position = self.book_position or "Unknown"
+        mfn = self.book_MFN or "Unknown"
+        
+        return f'{display_id}-{title},{author},{publish},{position},{mfn},{self.is_active}' 
     
 class Book_Topic(models.Model):
     book_id = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='book_topics')
@@ -195,6 +205,6 @@ def update_content_on_topic_change(sender, instance, **kwargs):
         
     except Exception as e:
         logger.error(f'Error in Book_Topic signal handler: {str(e)}')
-    
-        
-        
+
+
+

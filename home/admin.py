@@ -192,10 +192,16 @@ class BookAdmin(admin.ModelAdmin):
         print("=== SAVE_MODEL COMPLETED ===")
             
     def get_inline_instances(self, request, obj=None):
-        """Đảm bảo inlines được load đúng cách"""
-        if not obj:  # Nếu đang tạo mới object
-            return []
-        return super().get_inline_instances(request, obj)
+        """Ensure inlines are loaded for both new and existing books"""
+        print(f"=== GET_INLINE_INSTANCES CALLED ===")
+        print(f"Object: {obj}")
+        print(f"Is new book: {obj is None}")
+        
+        # ALWAYS return inline instances, even for new books
+        inline_instances = super().get_inline_instances(request, obj)
+        print(f"Inline instances count: {len(inline_instances)}")
+        
+        return inline_instances
 
     def get_form(self, request, obj=None, **kwargs):
         """Tùy chỉnh form"""
@@ -255,9 +261,10 @@ class BookAdmin(admin.ModelAdmin):
             raise e
 
     def save_related(self, request, form, formsets, change):
-        """Handle saving many-to-many and inline formsets"""
+        """Handle saving many-to-many and inline formsets for both new and existing books"""
         print(f"=== SAVE_RELATED DEBUG ===")
         print(f"Change: {change}, Book: {form.instance}")
+        print(f"Book ID: {form.instance.pk}")
         
         for formset in formsets:
             print(f"Processing formset: {formset.model}")
@@ -265,11 +272,14 @@ class BookAdmin(admin.ModelAdmin):
             if formset.model == Book_Topic:
                 print("Found Book_Topic formset")
                 
-                # Always clear existing relationships first to avoid duplicates
-                existing_count = Book_Topic.objects.filter(book_id=form.instance).count()
-                if existing_count > 0:
-                    print(f"Clearing {existing_count} existing relationships")
-                    Book_Topic.objects.filter(book_id=form.instance).delete()
+                # For existing books (change=True), clear existing relationships first
+                if change and form.instance.pk:
+                    existing_count = Book_Topic.objects.filter(book_id=form.instance).count()
+                    if existing_count > 0:
+                        print(f"Clearing {existing_count} existing relationships")
+                        Book_Topic.objects.filter(book_id=form.instance).delete()
+                else:
+                    print("This is a new book - no existing relationships to clear")
                 
                 # Extract desired topics from formset data
                 desired_topics = []
