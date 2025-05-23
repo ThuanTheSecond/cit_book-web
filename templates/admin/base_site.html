@@ -929,14 +929,29 @@
         const fixedThemeToggle = document.getElementById('fixed-theme-toggle');
         const body = document.body;
         
-        // Check for saved theme preference
-        const savedTheme = localStorage.getItem('theme');
+        // Set dark theme as default
+        const savedTheme = localStorage.getItem('theme') || 'dark'; // Default to dark
+        
+        // Apply the theme
         if (savedTheme === 'dark') {
             body.classList.add('dark-mode');
-            document.querySelectorAll('.fa-moon').forEach(icon => {
+            // Set icons to sun (indicating light mode can be toggled to)
+            document.querySelectorAll('.theme-toggle i, .fixed-theme-toggle i').forEach(icon => {
                 icon.classList.remove('fa-moon');
                 icon.classList.add('fa-sun');
             });
+        } else {
+            body.classList.remove('dark-mode');
+            // Set icons to moon (indicating dark mode can be toggled to)
+            document.querySelectorAll('.theme-toggle i, .fixed-theme-toggle i').forEach(icon => {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            });
+        }
+        
+        // Save the theme if it wasn't set before
+        if (!localStorage.getItem('theme')) {
+            localStorage.setItem('theme', 'dark');
         }
         
         // Function to toggle theme
@@ -946,6 +961,7 @@
             const isDarkMode = body.classList.contains('dark-mode');
             localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
             
+            // Update all theme toggle icons
             document.querySelectorAll('.theme-toggle i, .fixed-theme-toggle i').forEach(icon => {
                 if (isDarkMode) {
                     icon.classList.remove('fa-moon');
@@ -955,6 +971,10 @@
                     icon.classList.add('fa-moon');
                 }
             });
+            
+            // Show toast notification
+            showToast('info', 'Theme Changed', 
+                isDarkMode ? 'Switched to Dark Mode' : 'Switched to Light Mode', 2000);
         };
         
         // Toggle theme on button click
@@ -971,15 +991,18 @@
         const sidebarToggle = document.getElementById('sidebar-toggle');
         const sidebar = document.getElementById('sidebar');
         
-        sidebarToggle.addEventListener('click', function() {
-            sidebar.classList.toggle('open');
-            body.classList.toggle('sidebar-open');
-        });
+        if (sidebarToggle && sidebar) {
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('open');
+                body.classList.toggle('sidebar-open');
+            });
+        }
     });
 
     // Toast functionality
     function showToast(type, title, message, duration = 5000) {
         const container = document.getElementById('toast-container');
+        if (!container) return;
         
         // Create toast element
         const toast = document.createElement('div');
@@ -1037,16 +1060,11 @@
         toast.classList.remove('show');
         setTimeout(() => {
             toast.remove();
-        }, 300); // Wait for animation to complete
+        }, 300);
     }
 
     // Check URL parameters for login/logout messages
     document.addEventListener('DOMContentLoaded', function() {
-        // Handle theme toggle 
-        const themeToggle = document.getElementById('theme-toggle');
-        const fixedThemeToggle = document.getElementById('fixed-theme-toggle');
-        // ... rest of your existing theme toggle code ...
-        
         // Check for login success
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('login') && urlParams.get('login') === 'success') {
@@ -1060,7 +1078,6 @@
         const logoutForm = document.getElementById('logout-form');
         if (logoutForm) {
             logoutForm.addEventListener('submit', function(event) {
-                // Store in session that we're logging out
                 sessionStorage.setItem('logout-success', 'true');
             });
         }
@@ -1072,4 +1089,4 @@
         }
     });
 </script>
-{% endblock %} 
+{% endblock %}

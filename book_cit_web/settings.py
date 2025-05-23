@@ -262,3 +262,17 @@ LOGGING = {
         },
     },
 }
+
+# Add or modify these settings
+DEBUG = True  # Make sure this is True during development
+
+# Add cache busting for static files
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+
+# For development - disable caching
+if DEBUG:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        }
+    }
