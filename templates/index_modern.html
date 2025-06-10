@@ -545,76 +545,102 @@
     }
     
     @media (max-width: 768px) {
+      .hero-section {
+        padding: 8% 0; /* Reduce padding */
+        margin-top: 1%;
+        border-radius: 10px; /* Smaller border radius */
+      }
+      
+      .hero-content {
+        max-width: 90%; /* Much wider on mobile */
+        margin-left: 2%; /* Less margin */
+        padding-left: 4%; /* Adjust padding */
+      }
+      
       .hero-title {
-        font-size: 2.2rem;
+        font-size: 1.8rem; /* Smaller for mobile */
+        line-height: 1.1;
+        margin-bottom: 4%;
       }
       
       .hero-subtitle {
-        font-size: 1rem;
+        font-size: 0.9rem; /* Smaller subtitle */
+        max-width: 95%; /* Wider text */
       }
       
-      .collections {
-        grid-template-columns: 1fr;
+      /* Improved book card responsive design */
+      .book-card {
+        min-width: 40%; /* Better size for tablets */
       }
       
-      .stats-section {
-        grid-template-columns: repeat(2, 1fr);
+      .book-title {
+        font-size: 0.85rem; /* Slightly smaller text */
+        line-height: 1.3;
+      }
+      
+      .book-info {
+        padding: 8px 12px; /* Adjust padding */
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero-title {
+        font-size: 1.5rem; /* Even smaller for very small screens */
+      }
+      
+      .hero-content {
+        max-width: 95%;
+        margin-left: 1%;
+        padding-left: 3%;
       }
       
       .book-card {
-        min-width: 30%;
+        min-width: 65%; /* Much larger for phones */
+        margin-bottom: 10px; /* Add vertical spacing */
       }
       
-      .search-container {
-        max-width: 90%;
-        margin-left: auto;
-        margin-right: auto;
+      .book-cover {
+        padding-bottom: 130%; /* Adjust aspect ratio */
       }
       
-      .search-input {
-        padding: 2% 3%;
-        font-size: 1rem;
-      }
-      
-      .search-button {
-        padding: 2% 4%;
-      }
-      
-      .theme-btn {
-        width: 8vw;
-        height: 8vw;
+      .book-title {
+        font-size: 0.8rem;
+        -webkit-line-clamp: 3; /* Allow more lines on mobile */
       }
     }
     
-    @media (max-width: 480px) {
-      .stats-section {
-        grid-template-columns: 1fr;
+    @media (max-width: 360px) {
+      body {
+        font-size: 14px; /* Smaller base font */
       }
       
-      .search-bar {
-        flex-direction: column;
-        border-radius: 15px;
+      .main-content {
+        padding: 0 1%; /* Less padding */
       }
       
-      .search-input {
-        width: 100%;
-        border-radius: 15px;
-        margin-bottom: 3%;
-        padding: 3% 4%;
+      .section-title {
+        font-size: 1.3rem; /* Smaller section titles */
       }
       
-      .search-button {
-        width: 100%;
-        padding: 3%;
+      .section-header {
+        margin-left: 1%;
+        margin-bottom: 2%;
       }
       
-      .book-card {
-        min-width: 45%;
+      .collections {
+        gap: 15px; /* Tighter gaps */
       }
       
-      .theme-btn {
-        width: 12vw;
-        height: 12vw;
+      .collection-box {
+        padding: 5%; /* Less padding */
+      }
+      
+      .collection-title {
+        font-size: 1rem; /* Smaller titles */
+      }
+      
+      .collection-desc {
+        font-size: 0.8rem; /* Smaller descriptions */
       }
     }
     
@@ -707,28 +733,67 @@
     @media (max-width: 768px) {
       .book-slider .slick-prev,
       .book-slider .slick-next {
-        width: 35px;
-        height: 35px;
+        width: 44px; /* Minimum touch target size */
+        height: 44px;
+        background: rgba(37, 117, 252, 0.9); /* More visible */
       }
       
       .book-slider .slick-prev:before,
       .book-slider .slick-next:before {
-        font-size: 16px;
+        font-size: 18px;
+      }
+      
+      .book-slider .slick-prev {
+        left: 5px; /* Move away from edge */
+      }
+      
+      .book-slider .slick-next {
+        right: 5px;
       }
     }
     
     @media (max-width: 480px) {
       .book-slider .slick-prev,
       .book-slider .slick-next {
-        width: 30px;
-        height: 30px;
+        width: 40px;
+        height: 40px;
       }
       
-      .book-slider .slick-prev:before,
-      .book-slider .slick-next:before {
-        font-size: 14px;
+      /* Consider hiding arrows on very small screens */
+      .book-slider .slick-prev,
+      .book-slider .slick-next {
+        display: none !important;
+      }
+      
+      .book-slider .slick-dots {
+        bottom: -15px; /* Closer to slider */
       }
     }
+
+    /* Better touch interactions */
+@media (max-width: 768px) {
+  .view-all,
+  .collection-link {
+    padding: 12px 20px; /* Larger touch targets */
+    font-size: 0.9rem;
+  }
+  
+  .book-overlay {
+    /* Make overlay easier to trigger on touch */
+    opacity: 0.1; /* Slightly visible hint */
+    transition: opacity 0.2s ease;
+  }
+  
+  .book-card:active .book-overlay {
+    opacity: 1; /* Show on touch */
+  }
+  
+  /* Improve scroll behavior */
+  .books-row {
+    scroll-padding: 20px;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  }
+}
   </style>
 {% endblock pack %}
 
@@ -1042,14 +1107,31 @@
           breakpoint: 768,
           settings: {
             slidesToShow: 2,
-            slidesToScroll: 1
+            slidesToScroll: 1,
+            arrows: true, // Keep arrows on tablets
+            dots: true
           }
         },
         {
           breakpoint: 480,
           settings: {
             slidesToShow: 1,
-            slidesToScroll: 1
+            slidesToScroll: 1,
+            arrows: false, // Remove arrows on phones
+            dots: true,
+            centerMode: true, // Center the slides
+            centerPadding: '20px'
+          }
+        },
+        {
+          breakpoint: 360,
+          settings: {
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            arrows: false,
+            dots: false, // Remove dots on very small screens
+            centerMode: true,
+            centerPadding: '15px'
           }
         }
       ]
@@ -1084,4 +1166,4 @@
     );
   });
 </script>
-{% endblock scripts %} 
+{% endblock scripts %}

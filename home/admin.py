@@ -7,6 +7,9 @@ from .models import Book, Topic, Book_Topic, Rating, ToReads, BookViewHistory, A
 from django.db.models import Count
 from django.utils import timezone
 from . import stats
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # Register your models here.
@@ -322,6 +325,37 @@ class BookAdmin(admin.ModelAdmin):
         print(f"BookAdmin instance: {self}")
         print(f"Has save_related method: {hasattr(self, 'save_related')}")
         return super().change_view(request, object_id, form_url, extra_context)
+
+    def delete_model(self, request, obj):
+        """Custom delete method to safely handle book deletion"""
+        try:
+            # Log the deletion attempt
+            logger.info(f'Attempting to delete book: {obj.book_title} (ID: {obj.book_id})')
+            
+            # Perform the deletion
+            super().delete_model(request, obj)
+            
+            # Log successful deletion
+            logger.info(f'Successfully deleted book: {obj.book_title} (ID: {obj.book_id})')
+            
+        except Exception as e:
+            logger.error(f'Error deleting book {obj.book_title}: {str(e)}')
+            raise e
+
+    def delete_queryset(self, request, queryset):
+        """Custom bulk delete method"""
+        try:
+            book_titles = list(queryset.values_list('book_title', flat=True))
+            logger.info(f'Attempting to bulk delete {len(book_titles)} books')
+            
+            # Perform the bulk deletion
+            super().delete_queryset(request, queryset)
+            
+            logger.info(f'Successfully bulk deleted {len(book_titles)} books')
+            
+        except Exception as e:
+            logger.error(f'Error in bulk delete: {str(e)}')
+            raise e
 
 class Book_TopicAdmin(admin.ModelAdmin):
     list_display = ('book_id', 'topic_id')

@@ -3,7 +3,7 @@ from django.db import models
 from django.db.models import Transform, CharField
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, post_delete, pre_delete
 from django.dispatch import receiver
 from .utils import createBookContent, updateContentRecommend, updateBookContent
 from django.utils import timezone
@@ -128,28 +128,6 @@ class AmazonRating(models.Model):
     def __str__(self):
         return f'{self.amazon_user} rated {self.book} with {self.rating}'
 
-# Dùng để thêm extension Unaccent của postgresql
-class Unaccent(Transform):
-    lookup_name = 'unaccent'
-    function = 'unaccent'
-    output_field = CharField()
-CharField.register_lookup(Unaccent)
-
-@receiver(post_save, sender=Book)
-def createBookContent_signal(sender, instance, created, **kwargs):
-    try:
-        if created:
-            content = createBookContent(instance)
-        else:
-            content = updateBookContent(instance)
-            
-        # Retrain model sau khi thêm/cập nhật sách
-        from .content_based_recommender import ContentBasedRecommender
-        recommender = ContentBasedRecommender()
-        recommender.train_model()
-        
-    except Exception as e:
-        logger.error(f'Error in Book signal handler for {instance.book_title}: {str(e)}')
 # tạo lịch sử xem sách :>>
 class BookViewHistory(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -191,18 +169,121 @@ class AuthorViewHistory(models.Model):
     def __str__(self):
         return f"{self.user.username} viewed author {self.author}"
 
+# Dùng để thêm extension Unaccent của postgresql
+class Unaccent(Transform):
+    lookup_name = 'unaccent'
+    function = 'unaccent'
+    output_field = CharField()
+CharField.register_lookup(Unaccent)
+
+# Signal handlers
+from django.db import transaction
+
+# Global set to track books being deleted
+_books_being_deleted = set()
+
+@receiver(pre_delete, sender=Book)
+def cleanup_book_related_data_before_delete(sender, instance, **kwargs):
+    """Set flag to prevent content updates during deletion"""
+    try:
+        book_id = instance.book_id
+        logger.info(f'Starting cleanup for book: {instance.book_title} (ID: {book_id})')
+        
+        # Add to global deletion set
+        _books_being_deleted.add(book_id)
+        
+        # Don't manually delete CASCADE relationships - let Django handle them
+        # Just log what will be deleted
+        content_books_count = ContentBook.objects.filter(book=instance).count()
+        ratings_count = Rating.objects.filter(book=instance).count()
+        comments_count = Comment.objects.filter(book=instance).count()
+        favlist_count = FavList.objects.filter(book=instance).count()
+        toreads_count = ToReads.objects.filter(book=instance).count()
+        amazon_ratings_count = AmazonRating.objects.filter(book=instance).count()
+        view_history_count = BookViewHistory.objects.filter(book=instance).count()
+        reviews_count = BookReview.objects.filter(book=instance).count()
+        book_topics_count = Book_Topic.objects.filter(book_id=instance).count()
+        
+        logger.info(f'Book deletion will cascade to: {content_books_count} ContentBook, {ratings_count} Rating, {comments_count} Comment, {favlist_count} FavList, {toreads_count} ToReads, {amazon_ratings_count} AmazonRating, {view_history_count} BookViewHistory, {reviews_count} BookReview, {book_topics_count} Book_Topic records')
+        
+    except Exception as e:
+        logger.error(f'Error in pre_delete handler for book {instance.book_title}: {str(e)}')
+        # Don't re-raise - allow deletion to continue
+
+@receiver(post_delete, sender=Book)
+def cleanup_deletion_flag(sender, instance, **kwargs):
+    """Clean up the deletion flag after book is deleted"""
+    try:
+        book_id = instance.book_id
+        if book_id in _books_being_deleted:
+            _books_being_deleted.remove(book_id)
+            logger.info(f'Removed deletion flag for book ID: {book_id}')
+    except Exception as e:
+        logger.error(f'Error cleaning up deletion flag: {str(e)}')
+
+@receiver(post_save, sender=Book)
+def createBookContent_signal(sender, instance, created, **kwargs):
+    try:
+        # Skip if the book is being deleted or doesn't have a valid pk
+        if not instance.pk or not instance.is_active:
+            return
+            
+        # Skip if this book is being deleted
+        if instance.book_id in _books_being_deleted:
+            logger.info(f'Book {instance.book_title} is being deleted, skipping content creation')
+            return
+            
+        if created:
+            content = createBookContent(instance)
+        else:
+            content = updateBookContent(instance)
+            
+        # Retrain model sau khi thêm/cập nhật sách
+        from .content_based_recommender import ContentBasedRecommender
+        recommender = ContentBasedRecommender()
+        recommender.train_model()
+        
+    except Exception as e:
+        logger.error(f'Error in Book signal handler for {instance.book_title}: {str(e)}')
+
 @receiver([post_save, post_delete], sender=Book_Topic)
 def update_content_on_topic_change(sender, instance, **kwargs):
     try:
         book = instance.book_id
-        book.refresh_from_db()
+        
+        # Skip if the book is being deleted or doesn't exist
+        if not book or not book.pk:
+            logger.info('Book reference is None or has no pk, skipping content update')
+            return
+        
+        # Skip if this book is being deleted
+        if book.book_id in _books_being_deleted:
+            logger.info(f'Book {book.book_title} is being deleted, skipping content update')
+            return
+        
+        # Check if the book still exists in the database before proceeding
+        try:
+            book.refresh_from_db()
+        except Book.DoesNotExist:
+            logger.info(f'Book {book.pk} no longer exists, skipping content update')
+            return
+        
+        # Additional check: verify the book is still active
+        if not book.is_active:
+            logger.info(f'Book {book.pk} is not active, skipping content update')
+            return
+            
+        # Only proceed if book definitely exists and is active
         content = updateBookContent(book)
+        logger.info(f'Successfully updated content for book: {book.book_title}')
         
         # Retrain model sau khi cập nhật topic
         from .content_based_recommender import ContentBasedRecommender
         recommender = ContentBasedRecommender()
         recommender.train_model()
         
+    except Book.DoesNotExist:
+        logger.info(f'Book was deleted during signal processing, skipping content update')
     except Exception as e:
         logger.error(f'Error in Book_Topic signal handler: {str(e)}')
 
