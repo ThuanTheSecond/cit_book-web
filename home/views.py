@@ -364,7 +364,11 @@ def index(request):
     if request.user.is_authenticated:
         rating_count = Rating.objects.filter(user=request.user).count()
         if rating_count >= 5:
-            recommended_books = get_recommendations(request.user.id, num_recommendations=10)
+            from home.utils import get_user_knn_recommendations
+            # recommended_books = get_recommendations(request.user.id, num_recommendations=10)
+            from home.tasks import update_knn_models_chain
+            update_knn_models_chain.delay()
+            recommended_books = get_user_knn_recommendations(request.user.id, top_n = 20)
             if recommended_books:
                 show_recommendations = True
                 logger.info(f"Đã tạo gợi ý cho user {request.user.id}: {len(recommended_books)} sách")

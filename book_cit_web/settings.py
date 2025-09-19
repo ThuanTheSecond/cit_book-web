@@ -217,6 +217,10 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'home.tasks.update_content_recommendations_task',
         'schedule': 86400.0 * 7,  # Every 7 days
     },
+    'knn-retrain-model-daily':{
+        'task': 'home.tasks.update_knn_models_chain',
+        'schedule': 86400.0,
+    }
 }  # Add new task to CELERY_BEAT_SCHEDULE
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'

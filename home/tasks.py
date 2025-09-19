@@ -10,6 +10,7 @@ from surprise import SVD, Dataset, Reader
 from surprise.model_selection import train_test_split
 from surprise.accuracy import rmse, mae
 from surprise import dump
+from surprise import KNNWithMeans  # thêm import
 from home.models import Rating, Book
 from django.contrib.auth.models import User
 from .utils import update_recommendation_model
@@ -198,3 +199,204 @@ def update_content_recommendations_task():
     except Exception as e:
         logger.error(f"Error in update_content_recommendations_task: {str(e)}")
         return False
+
+
+@shared_task(name='home.tasks.prepare_user_knn_datasets_task')
+def prepare_user_knn_datasets_task(_=None):
+    """
+    Build KNN datasets:
+      - knn_finetune_data.csv: ratings from DB (1-5), no normalization
+      - knn_pretrain_data.csv: ratings from AmazonRating_clean.csv (1-5), rename user column to 'user_id'
+      - userknn_train_data.csv: combined data for debug/training
+    """
+    try:
+        logger.info("Preparing KNN datasets...")
+
+        data_dir = os.path.join(settings.BASE_DIR, 'data')
+        os.makedirs(data_dir, exist_ok=True)
+
+        # Paths
+        pretrain_raw_path = os.path.join(data_dir, 'AmazonRating_clean.csv')
+        pretrain_knn_path = os.path.join(data_dir, 'knn_pretrain_data.csv')
+        finetune_knn_path = os.path.join(data_dir, 'knn_finetune_data.csv')
+        combined_path = os.path.join(data_dir, 'userknn_train_data.csv')
+
+        # 1) Build knn_pretrain_data.csv from AmazonRating_clean.csv
+        if not os.path.exists(pretrain_raw_path):
+            raise FileNotFoundError(f"Missing raw pretrain data: {pretrain_raw_path}")
+
+        df_pre = pd.read_csv(pretrain_raw_path)
+
+        # Normalize column names: amazon_user_id -> user_id
+        if 'amazon_user_id' in df_pre.columns and 'user_id' not in df_pre.columns:
+            df_pre = df_pre.rename(columns={'amazon_user_id': 'user_id'})
+
+        expected_cols = {'user_id', 'book_id', 'rating'}
+        missing = expected_cols - set(df_pre.columns)
+        if missing:
+            raise ValueError(f"AmazonRating_clean.csv missing columns: {missing}")
+
+        # Ensure correct dtypes and valid rating range
+        df_pre = df_pre[['user_id', 'book_id', 'rating']].astype({'user_id': str, 'book_id': str})
+        df_pre = df_pre[(df_pre['rating'] >= 1) & (df_pre['rating'] <= 5)]
+        df_pre.to_csv(pretrain_knn_path, index=False)
+        logger.info(f"Saved knn_pretrain_data.csv: {len(df_pre)} rows -> {pretrain_knn_path}")
+
+        # 2) Build knn_finetune_data.csv from DB ratings
+        ratings = Rating.objects.all().select_related('user', 'book')
+        ft_rows = []
+        for r in ratings:
+            try:
+                ft_rows.append({
+                    'user_id': str(r.user.id),
+                    'book_id': str(r.book.book_id),
+                    'rating': float(r.rating),
+                    'timestamp': r.created_at.timestamp() if getattr(r, 'created_at', None) else None
+                })
+            except Exception as e:
+                logger.warning(f"Skip rating {getattr(r, 'id', None)}: {e}")
+
+        df_ft = pd.DataFrame(ft_rows, columns=['user_id', 'book_id', 'rating', 'timestamp'])
+        if not df_ft.empty:
+            df_ft = df_ft[(df_ft['rating'] >= 1) & (df_ft['rating'] <= 5)]
+            # Drop timestamp for training if not needed, but keep in file for reference
+            df_ft.to_csv(finetune_knn_path, index=False)
+            logger.info(f"Saved knn_finetune_data.csv: {len(df_ft)} rows -> {finetune_knn_path}")
+        else:
+            # still create an empty file with headers for consistency
+            pd.DataFrame(columns=['user_id', 'book_id', 'rating', 'timestamp']).to_csv(finetune_knn_path, index=False)
+            logger.info("No DB ratings found; created empty knn_finetune_data.csv")
+
+        # 3) Combined debug/training dataset
+        df_ft_trim = df_ft[['user_id', 'book_id', 'rating']] if not df_ft.empty else pd.DataFrame(columns=['user_id', 'book_id', 'rating'])
+        df_all = pd.concat([df_pre[['user_id', 'book_id', 'rating']], df_ft_trim], ignore_index=True)
+        # Keep latest duplicate (prefer DB rows that appear later)
+        df_all.drop_duplicates(subset=['user_id', 'book_id'], keep='last', inplace=True)
+        df_all.to_csv(combined_path, index=False)
+        logger.info(f"Saved combined KNN train data: {len(df_all)} rows -> {combined_path}")
+
+        return {
+            'status': 'success',
+            'pretrain_rows': int(len(df_pre)),
+            'finetune_rows': int(len(df_ft)),
+            'combined_rows': int(len(df_all)),
+            'files': {
+                'pretrain': pretrain_knn_path,
+                'finetune': finetune_knn_path,
+                'combined': combined_path,
+            }
+        }
+    except Exception as exc:
+        logger.error(f"Error preparing KNN datasets: {exc}", exc_info=True)
+        raise
+
+
+@shared_task(name='home.tasks.train_user_knn_cf_task')
+def train_user_knn_cf_task(_=None):
+    """
+    Train user-based CF (KNNWithMeans) using 1-5 ratings.
+    Rebuilds dataset from prebuilt KNN CSVs (if available) + current DB ratings.
+    """
+    try:
+        logger.info("Starting user-kNN CF training...")
+
+        data_dir = os.path.join(settings.BASE_DIR, 'data')
+        models_dir = os.path.join(settings.BASE_DIR, 'models')
+        os.makedirs(data_dir, exist_ok=True)
+        os.makedirs(models_dir, exist_ok=True)
+
+        pretrain_knn_path = os.path.join(data_dir, 'knn_pretrain_data.csv')
+        combined_dump_path = os.path.join(data_dir, 'userknn_train_data.csv')
+        pretrain_raw_path = os.path.join(data_dir, 'AmazonRating_clean.csv')
+
+        # 1) Load pretrain (prefer prebuilt KNN CSV)
+        if os.path.exists(pretrain_knn_path):
+            df_pre = pd.read_csv(pretrain_knn_path)
+            logger.info(f"Loaded knn_pretrain_data.csv: {len(df_pre)} rows")
+        else:
+            if not os.path.exists(pretrain_raw_path):
+                logger.error(f"Raw pretrain data not found at {pretrain_raw_path}")
+                raise FileNotFoundError(f"Missing raw pretrain data: {pretrain_raw_path}")
+            df_pre = pd.read_csv(pretrain_raw_path)
+            if 'amazon_user_id' in df_pre.columns and 'user_id' not in df_pre.columns:
+                df_pre = df_pre.rename(columns={'amazon_user_id': 'user_id'})
+            expected_cols = {'user_id', 'book_id', 'rating'}
+            missing = expected_cols - set(df_pre.columns)
+            if missing:
+                raise ValueError(f"AmazonRating_clean.csv missing columns: {missing}")
+            df_pre = df_pre[['user_id', 'book_id', 'rating']].astype({'user_id': str, 'book_id': str})
+            df_pre = df_pre[(df_pre['rating'] >= 1) & (df_pre['rating'] <= 5)]
+            logger.info(f"Pretrain rows (from raw): {len(df_pre)}")
+
+        # 2) Load current DB ratings (1-5)
+        ratings = Rating.objects.all().select_related('user', 'book')
+        data = []
+        for r in ratings:
+            try:
+                data.append({
+                    'user_id': str(r.user.id),
+                    'book_id': str(r.book.book_id),
+                    'rating': float(r.rating),
+                })
+            except Exception as e:
+                logger.warning(f"Skip rating {getattr(r,'id',None)}: {e}")
+        df_ft = pd.DataFrame(data, columns=['user_id', 'book_id', 'rating'])
+        if not df_ft.empty:
+            df_ft = df_ft[(df_ft['rating'] >= 1) & (df_ft['rating'] <= 5)]
+        logger.info(f"Finetune(DB) rows: {len(df_ft)}")
+
+        # 3) Combine
+        df_all = pd.concat([df_pre[['user_id', 'book_id', 'rating']], df_ft], ignore_index=True)
+        df_all.drop_duplicates(subset=['user_id', 'book_id'], keep='last', inplace=True)
+        logger.info(f"Combined rows: {len(df_all)}")
+
+        # Dump combined (debug)
+        df_all.to_csv(combined_dump_path, index=False)
+        logger.info(f"Dumped combined train data to {combined_dump_path}")
+
+        # 4) Build Surprise dataset with 1-5 scale
+        reader = Reader(rating_scale=(1, 5))
+        dataset = Dataset.load_from_df(df_all[['user_id', 'book_id', 'rating']], reader)
+
+        # 5) Train user-based KNNWithMeans
+        sim_options = {
+            'name': 'pearson_baseline',
+            'user_based': True,
+            'min_support': 2,
+        }
+        algo = KNNWithMeans(k=50, min_k=3, sim_options=sim_options)
+
+        trainset, testset = train_test_split(dataset, test_size=0.2, random_state=42)
+        algo.fit(trainset)
+
+        # 6) Evaluate
+        preds = algo.test(testset)
+        rmse_score = rmse(preds, verbose=False)
+        mae_score = mae(preds, verbose=False)
+        logger.info(f"User-KNN CF - RMSE: {rmse_score:.4f}, MAE: {mae_score:.4f}")
+
+        # 7) Save model
+        model_path = os.path.join(models_dir, 'userknn_cf_model.pkl')
+        with open(model_path, 'wb') as f:
+            pickle.dump(algo, f)
+        logger.info(f"Saved user-kNN CF model to {model_path}")
+
+        return {
+            'status': 'success',
+            'metrics': {'rmse': float(rmse_score), 'mae': float(mae_score)},
+            'rows': int(len(df_all)),
+            'model_path': model_path,
+            'data_dump': combined_dump_path
+        }
+
+    except Exception as exc:
+        logger.error(f"Error training user-kNN CF: {exc}", exc_info=True)
+        raise
+    
+@shared_task(name='home.tasks.update_knn_models_chain')
+def update_knn_models_chain():
+    from celery import chain
+    chain(
+        prepare_user_knn_datasets_task.s(),
+        train_user_knn_cf_task.s()
+    ).delay()

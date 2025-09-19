@@ -4,7 +4,7 @@ pandas==2.2.3
 scikit_learn==1.5.0
 asgiref==3.8.1
 Django==5.0.6
-psycopg2==2.9.9
+# psycopg2==2.9.9
 sqlparse==0.5.0
 tzdata==2024.1
 whitenoise==6.7.0
@@ -12,3 +12,4 @@ dj-database-url==2.1.0
 gunicorn==21.2.0
 celery==5.3.6
 redis==5.0.1
+C:\Users\thait\LABS\NC\cit_book-web

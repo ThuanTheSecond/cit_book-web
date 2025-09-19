@@ -246,12 +246,14 @@ def filterBasedType(books, type):
     
     return books
     
-import pickle
-import os
-from django.conf import settings
+
 
 # Gợi ý lọc cộng tác dựa trên ngươif dùng
 def get_recommendations(user_id, num_recommendations=10):
+    import pickle
+    import os
+    from django.conf import settings
+    from home.models import Rating, Book
     try:
         # Xác định đường dẫn file mô hình
         models_dir = os.path.join(settings.BASE_DIR, 'models')
@@ -274,7 +276,6 @@ def get_recommendations(user_id, num_recommendations=10):
             print("Đã tải trực tiếp đối tượng SVD (định dạng cũ)")
 
         # Lấy tất cả sách trong hệ thống
-        from .models import Book, Rating
         all_books = Book.objects.all()
         user_rated_books = set(Rating.objects.filter(user_id=user_id).values_list('book_id', flat=True))
 
@@ -378,3 +379,48 @@ def get_trending_books(days=7, limit=10, books_queryset=None):
     ).order_by('-trending_score')[:limit]
     
     return trending_books
+
+def get_user_knn_recommendations(user_id: int, top_n: int = 20):
+    import pickle
+    import os
+    from django.conf import settings
+    from home.models import Rating, Book
+   
+    model_path = os.path.join(settings.BASE_DIR, 'models', 'userknn_cf_model.pkl')
+    if not os.path.exists(model_path):
+        return []
+
+    with open(model_path, 'rb') as f:
+        algo = pickle.load(f)
+
+    uid = str(user_id)
+
+    # Các sách user đã đánh giá
+    rated_ids = set(
+        Rating.objects.filter(user_id=user_id)
+        .values_list('book__book_id', flat=True)
+    )
+
+    # Ứng viên là tất cả sách chưa đánh giá
+    candidates = (
+        Book.objects.exclude(book_id__in=rated_ids)
+        .values_list('book_id', flat=True)
+    )
+
+    scored = []
+    for iid in candidates:
+        try:
+            est = algo.predict(uid, str(iid), clip=True).est  # est trên thang 1–5
+            scored.append((iid, est))
+        except Exception:
+            continue
+
+    scored.sort(key=lambda x: x[1], reverse=True)
+    top_ids = [iid for iid, _ in scored[:top_n]]
+
+    # Trả về queryset đã giữ nguyên thứ tự
+    books = list(Book.objects.filter(book_id__in=top_ids))
+    # sắp xếp theo top_ids
+    order = {bid: i for i, bid in enumerate(top_ids)}
+    books.sort(key=lambda b: order.get(b.book_id, 1e9))
+    return books
