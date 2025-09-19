@@ -27,7 +27,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-20p@sd!v6gq#yx3n*&0^j
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['book-cit-web.fly.dev', 'localhost', '127.0.0.1']
+# ALLOWED_HOSTS = ['book-cit-web.fly.dev', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -89,18 +89,31 @@ AUTHENTICATION_BACKENDS = (
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
+DB_LIVE = os.getenv("DB_LIVE")
 
 # Cấu hình Database - kết nối với PostgreSQL local
-DATABASES = {
-     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'CIT_Book2',
-        'USER': 'Mangaka',
-        'PASSWORD': 'kazuma',
-        'HOST': 'localhost',
-        'PORT': '5432',
+if DB_LIVE in ['False', False ]:
+    DATABASES = {
+         'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'CIT_Book2',
+            'USER': 'Mangaka',
+            'PASSWORD': 'kazuma',
+            'HOST': 'localhost',
+            'PORT': '5432',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': os.getenv("DB_NAME"),
+            'USER': os.getenv("DB_USER"),
+            'PASSWORD': os.getenv("DB_PASSWORD"),
+            'HOST': os.getenv("DB_HOST"),
+            'PORT': os.getenv("DB_PORT"),
+        }   
+    }
 
 
 # Password validation

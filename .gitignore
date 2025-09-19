@@ -52,3 +52,5 @@ EOL
 
 # venv
 bookWorld/
+
+.env
