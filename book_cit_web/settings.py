@@ -51,6 +51,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -94,28 +95,32 @@ AUTHENTICATION_BACKENDS = (
 DB_LIVE = os.getenv("DB_LIVE")
 
 # Cấu hình Database - kết nối với PostgreSQL local
-if DB_LIVE in ['False', False ]:
-    DATABASES = {
-         'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'CIT_Book2',
-            'USER': 'Mangaka',
-            'PASSWORD': 'kazuma',
-            'HOST': 'localhost',
-            'PORT': '5432',
-        }
-    }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': os.getenv("DB_NAME"),
-            'USER': os.getenv("DB_USER"),
-            'PASSWORD': os.getenv("DB_PASSWORD"),
-            'HOST': os.getenv("DB_HOST"),
-            'PORT': os.getenv("DB_PORT"),
-        }   
-    }
+# if DB_LIVE in ['False', False ]:
+#     DATABASES = {
+#          'default': {
+#             'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#             'NAME': 'CIT_Book2',
+#             'USER': 'Mangaka',
+#             'PASSWORD': 'kazuma',
+#             'HOST': 'localhost',
+#             'PORT': '5432',
+#         }
+#     }
+# else:
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#             'NAME': os.getenv("DB_NAME"),
+#             'USER': os.getenv("DB_USER"),
+#             'PASSWORD': os.getenv("DB_PASSWORD"),
+#             'HOST': os.getenv("DB_HOST"),
+#             'PORT': os.getenv("DB_PORT"),
+#         }   
+#         "default": dj_database_url.config(default=os.getenv("DATABASE_URL"))
+#     }
+DATABASES = {
+    "default": dj_database_url.config(default=os.getenv("DATABASE_URL"))
+}
 
 
 # Password validation
@@ -158,7 +163,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+# STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
@@ -203,8 +209,8 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_AUTH_EXTRA_ARGUMENTS = {
 
 
 # Celery + Redis settings
-CELERY_BROKER_URL = 'redis://localhost:6379/0'  # DB 0 for Celery broker
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'  # DB 0 for Celery results
+CELERY_BROKER_URL =  os.getenv("REDIS_URL", "redis://localhost:6379/0")  # DB 0 for Celery broker
+CELERY_RESULT_BACKEND = os.getenv("REDIS_URL", "redis://localhost:6379/0") # DB 0 for Celery results
 
 # Cache + Redis settings
 CACHES = {
