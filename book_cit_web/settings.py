@@ -194,8 +194,8 @@ SOCIAL_AUTH_PIPELINE = (
 )
 
 # Google OAuth2 settings - update with your new credentials
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '544791322126-c07jr34343ug8ko92qpr6p30nlgg2src.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['email', 'profile']
 # Don't specify a custom redirect URI - let the library use the default one
 
