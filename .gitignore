@@ -54,3 +54,7 @@ EOL
 bookWorld/
 
 .env
+entrypoint.sh
+Dockerfile
+Dockerfile
+entrypoint.sh
