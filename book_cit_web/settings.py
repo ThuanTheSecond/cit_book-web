@@ -14,11 +14,17 @@ from pathlib import Path
 from environ import Env
 import os
 import dj_database_url
-env = Env()
-Env.read_env()
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+env = Env(
+    DEBUG=(bool, False)
+)
+Env.read_env(os.path.join(BASE_DIR, '.env'))
+
 ENVIRONMENT = env('ENVIRONMENT', default='production')
 
 # Quick-start development settings - unsuitable for production
@@ -52,8 +58,6 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'social_django',
     'django_select2',
-    "django_celery_beat",
-    "django_celery_results",
     # 'django_extensions',
 ]
 
