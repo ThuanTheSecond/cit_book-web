@@ -11,26 +11,32 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+from environ import Env
 import os
 import dj_database_url
-from dotenv import load_dotenv
-load_dotenv()
+env = Env()
+Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+ENVIRONMENT = env('ENVIRONMENT', default='production')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-20p@sd!v6gq#yx3n*&0^j3y4z1_!n$*ej33cr69eeuwiw=m2_m')
+# SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-20p@sd!v6gq#yx3n*&0^j3y4z1_!n$*ej33cr69eeuwiw=m2_m')
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+if ENVIRONMENT == 'development':
+    DEBUG = True
+else:
+    DEBUG = False
 
 # ALLOWED_HOSTS = ['book-cit-web.fly.dev', 'localhost', '127.0.0.1']
-
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', env('RENDER_EXTERNAL_HOSTNAME')]
+CSRF_TRUSTED_ORIGINS = [ 'https://cit-library-4493c.up.railway.app' ]
 
 # Application definition
 
@@ -46,6 +52,8 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'social_django',
     'django_select2',
+    "django_celery_beat",
+    "django_celery_results",
     # 'django_extensions',
 ]
 
@@ -92,35 +100,21 @@ AUTHENTICATION_BACKENDS = (
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-DB_LIVE = os.getenv("DB_LIVE")
 
 # Cấu hình Database - kết nối với PostgreSQL local
-# if DB_LIVE in ['False', False ]:
-#     DATABASES = {
-#          'default': {
-#             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#             'NAME': 'CIT_Book2',
-#             'USER': 'Mangaka',
-#             'PASSWORD': 'kazuma',
-#             'HOST': 'localhost',
-#             'PORT': '5432',
-#         }
-#     }
-# else:
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#             'NAME': os.getenv("DB_NAME"),
-#             'USER': os.getenv("DB_USER"),
-#             'PASSWORD': os.getenv("DB_PASSWORD"),
-#             'HOST': os.getenv("DB_HOST"),
-#             'PORT': os.getenv("DB_PORT"),
-#         }   
-#         "default": dj_database_url.config(default=os.getenv("DATABASE_URL"))
-#     }
 DATABASES = {
-    "default": dj_database_url.config(default=os.getenv("DATABASE_URL"))
-}
+        'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'CIT_Book2',
+        'USER': 'Mangaka',
+        'PASSWORD': 'kazuma',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
+}   
+POSTGRES_LOCALLY = False
+if ENVIRONMENT == 'production' or POSTGRES_LOCALLY == True:
+    DATABASES['default'] = dj_database_url.parse(env('DATABASE_URL'))
 
 
 # Password validation
@@ -288,11 +282,9 @@ LOGGING = {
     },
 }
 
-# Add or modify these settings
-DEBUG = True  # Make sure this is True during development
 
 # Add cache busting for static files
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+# STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 # For development - disable caching
 if DEBUG:
