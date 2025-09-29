@@ -35,7 +35,7 @@ else:
     DEBUG = False
 
 # ALLOWED_HOSTS = ['book-cit-web.fly.dev', 'localhost', '127.0.0.1']
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', env('RENDER_EXTERNAL_HOSTNAME')]
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', env('RAILWAY_PUBLIC_DOMAIN', default='')]
 CSRF_TRUSTED_ORIGINS = [ 'https://cit-library-4493c.up.railway.app' ]
 
 # Application definition

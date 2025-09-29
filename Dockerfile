@@ -1,60 +1,51 @@
-# ARG PYTHON_VERSION=3.13-slim
+ARG PYTHON_BUILD_VERSION=3.11
 
-# FROM python:${PYTHON_VERSION}
-
-# ENV PYTHONDONTWRITEBYTECODE 1
-# ENV PYTHONUNBUFFERED 1
-
-# # install psycopg2 dependencies.
-# RUN apt-get update && apt-get install -y \
-#     libpq-dev \
-#     gcc \
-#     && rm -rf /var/lib/apt/lists/*
-
-# RUN mkdir -p /code
-
-# WORKDIR /code
-
-# COPY requirements.txt /tmp/requirements.txt
-# RUN set -ex && \
-#     pip install --upgrade pip && \
-#     pip install -r /tmp/requirements.txt && \
-#     rm -rf /root/.cache/
-# COPY . /code
-
-# ENV SECRET_KEY "6RwgocRwBXoo0K7WNoZlgTR6nMB8Ozu9iJDzGLE7neTgyvNuVu"
-# RUN python manage.py collectstatic --noinput
-
-# EXPOSE 8000
-
-# CMD ["gunicorn","--bind",":8000","--workers","2","book_cit_web.wsgi"]
-# Dockerfile
-# Dockerfile
-FROM python:3.11-slim
-
-# Ngăn Python tạo .pyc và buffer stdout/stderr
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
-# Thư mục làm việc
+FROM python:$PYTHON_BUILD_VERSION-slim AS BASE
 WORKDIR /app
 
-# Cài đặt OS deps cần cho psycopg2
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpq-dev \
-    gcc \
-    --no-install-recommends && rm -rf /var/lib/apt/lists/*
+ENV PIP_DEFAULT_TIMEOUT=100 \
+    # Allow statements and log messages to immediately appear
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    # disable a pip version check to reduce run-time & log-spam
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    # cache is useless in docker image, so disable it to reduce image size
+    PIP_NO_CACHE_DIR=1
 
-# Cài dependencies
-COPY requirements.txt .
-RUN pip install --upgrade pip && pip install -r requirements.txt
+# Update and install dependencies
+RUN apt-get update && \
+    apt-get -y upgrade && \
+    apt-get -y install --no-install-recommends python3-dev gcc libc-dev vim curl postgresql-client && \
+    # Clean up
+    apt-get autoremove -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    # Add a non-root user
+    groupadd -g 999 python && \
+    useradd -r -u 999 -g python python
 
-# Copy toàn bộ code
-COPY . .
+WORKDIR /app
 
-# Đảm bảo entrypoint có quyền chạy
-RUN chmod +x ./entrypoint.sh
+# Python Dependencies
+COPY --chown=python:python ./requirements.txt /app/
+RUN pip install --upgrade pip \
+    && pip install -r requirements.txt --no-cache-dir --compile
 
-# Command mặc định chạy Gunicorn
-CMD ["gunicorn", "book_cit_web.wsgi:application", "--bind", "0.0.0.0:$PORT", "--workers", "3", "--log-file", "-"]
+# Clean up
+RUN apt-get -y purge gcc libc-dev python3-dev
+
+# Add all application code from this folder, including deployment entrypoints
+COPY --chown=python:python ./ /app
+
+# Create staticfiles folder
+RUN mkdir -p staticfiles && \
+    chown -R python:python staticfiles
+
+# Make entrypoints executable
+RUN chmod +x /app/deployment/server-entrypoint.sh && \
+    chmod +x /app/deployment/worker-entrypoint.sh
+
+USER 999
+
+EXPOSE 8000
+CMD [ "/app/deployment/server-entrypoint.sh" ]
