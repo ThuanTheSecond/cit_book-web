@@ -4,7 +4,7 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "sh ./entrypoint.sh python manage.py migrate && python manage.py collectstatic --noinput && gunicorn book_cit_web.wsgi --forwarded-allow-ips '*'",
+    "startCommand": "sh ./entrypoint.sh && python manage.py migrate && python manage.py collectstatic --noinput && gunicorn book_cit_web.wsgi --forwarded-allow-ips '*'",
     "restartPolicyType": "ON_FAILURE", 
     "restartPolicyMaxRetries": 10
   }
