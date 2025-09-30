@@ -163,7 +163,11 @@ STATICFILES_DIRS = [
 ]
 # STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
-MEDIA_URL = '/media/'
+
+if ENVIRONMENT == 'development':
+    MEDIA_URL = '/media/'
+else:
+    MEDIA_URL = 'app/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 MODELS_DIR = os.path.join(BASE_DIR, 'models')
