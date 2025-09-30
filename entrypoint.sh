@@ -1,6 +1,6 @@
 #!/bin/sh
-#copy media content from local to volume
 if [ -z "$(ls -A /app/media)" ]; then
+  echo "copy media"
   cp -r ./media/* /app/media/
 fi
 
