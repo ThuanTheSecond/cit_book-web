@@ -195,3 +195,4 @@ xlrd==2.0.1
 xxhash==3.5.0
 yarg==0.1.9
 yarl==1.18.3
+django-cloudinary-storage==0.3.0
