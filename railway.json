@@ -4,6 +4,6 @@
     "builder": "RAILPACK"
   },
   "deploy": {
-    "startCommand": "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn book_cit_web.wsgi"
+    "startCommand": "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn book_cit_web.wsgi --forwarded-allow-ips \"*\""
   }
 }
