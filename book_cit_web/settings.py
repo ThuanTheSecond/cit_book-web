@@ -25,7 +25,7 @@ env = Env(
 )
 Env.read_env(os.path.join(BASE_DIR, '.env'))
 
-ENVIRONMENT = env('ENVIRONMENT', default='production')
+ENVIRONMENT = env('ENVIRONMENT', default='development')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -201,9 +201,10 @@ SOCIAL_AUTH_PIPELINE = (
 )
 
 # Google OAuth2 settings - update with your new credentials
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY_NEW')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET_NEW')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['email', 'profile']
+print(SOCIAL_AUTH_GOOGLE_OAUTH2_KEY)
 # Don't specify a custom redirect URI - let the library use the default one
 
 # Bắt buộc người dùng chọn tài khoản mỗi lần đăng nhập
