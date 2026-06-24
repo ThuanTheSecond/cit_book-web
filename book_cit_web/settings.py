@@ -204,7 +204,7 @@ SOCIAL_AUTH_PIPELINE = (
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY_NEW')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET_NEW')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['email', 'profile']
-print(SOCIAL_AUTH_GOOGLE_OAUTH2_KEY)
+
 # Don't specify a custom redirect URI - let the library use the default one
 
 # Bắt buộc người dùng chọn tài khoản mỗi lần đăng nhập
@@ -254,6 +254,16 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
 
+#setting up Gmail smtp 
+# settings.py
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = f"CIT Library <{EMAIL_HOST_USER}>"
 
 # Debug settings - turn on for development only
 SOCIAL_AUTH_SANITIZE_REDIRECTS = False
